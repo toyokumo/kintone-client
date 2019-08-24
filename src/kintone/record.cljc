@@ -94,3 +94,33 @@
   (let [url (pt/-url conn path/cursor)
         params {:id id}]
     (pt/-delete conn url {:params params})))
+
+(defn add-record
+  "Add one record to an app.
+
+  record - The record data that you want to add to kintone app.
+           See API reference regarding record format."
+  ([conn app]
+   (add-record conn app nil))
+  ([conn app record]
+   (let [url (pt/-url conn path/record)
+         params (cond-> {:app app}
+                  (seq record) (assoc :record record))]
+     (pt/-post conn url {:params params}))))
+
+(defn add-records
+  "Add multiple records to an app.
+
+  records - The sequence of record data that you want to add to kintone app.
+            See API reference regarding record format."
+  [conn app records]
+  (let [url (pt/-url conn path/records)]
+    (go-loop [[records :as rests] (partition-all 100 records) ; The number of records must be 100 or less.
+              ret {:ids [] :revisions []}]
+      (if (empty? records)
+        ret
+        (let [params {:app app :records records}
+              {:keys [ids revisions]} (<! (pt/-post conn url {:params params}))]
+          (recur (rest rests)
+                 {:ids (apply conj (:ids ret) ids)
+                  :revisions (apply conj (:revisions ret) revisions)}))))))
