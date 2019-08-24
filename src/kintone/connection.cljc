@@ -84,7 +84,7 @@
   :guest-space-id - kintone guest space id
                     integer, optional
 
-  See: https://github.com/JulianBirch/cljs-ajax
+  See: https://github.com/dakrone/clj-http or https://github.com/JulianBirch/cljs-ajax
 
   :connection-timeout - The time to wait for establishing
                         the connection with the remote host.
