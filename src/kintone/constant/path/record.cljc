@@ -3,7 +3,7 @@
 
 (def record "/v1/record.json")
 
-(def records "v1/records.json")
+(def records "/v1/records.json")
 
 (def cursor "/v1/records/cursor.json")
 
