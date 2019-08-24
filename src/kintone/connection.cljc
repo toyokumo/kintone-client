@@ -13,7 +13,7 @@
            :as :json
            :connection-timeout (* 1000 10)
            :socket-timeout (* 1000 30)
-           :coerce :unexceptional}
+           :coerce :always}
      :cljs {:format :json
             :response-format :json
             :keywords? true
