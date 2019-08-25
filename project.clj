@@ -5,9 +5,7 @@
             :url "https://www.eclipse.org/legal/epl-2.0/"}
   :dependencies [[org.clojure/clojure "1.10.0"]
                  [org.clojure/core.async "0.4.500"]
-                 [cheshire "5.9.0"]
-                 [cljs-ajax "0.8.0"]
-                 [clj-http "3.10.0"]]
+                 [cljs-ajax "0.8.0"]]
   :profiles {:provided {:dependencies [[org.clojure/clojurescript "1.10.520"]
                                        [com.bhauman/figwheel-main "0.2.3"]]}
              :dev {:source-paths ["dev"]

@@ -1,44 +1,34 @@
 (ns kintone.connection
   "Connection object has connection information to call kintone API"
-  (:require #?(:clj [clojure.core.async :refer [chan put!]]
+  (:require [ajax.core :as ajax]
+            #?(:clj [clojure.core.async :refer [chan put!]]
                :cljs [cljs.core.async :refer [chan put!]])
             [kintone.protocols :as pt]
-            #?(:clj [clj-http.client :as client]
-               :cljs [ajax.core :as ajax])))
+            [kintone.types :as t]))
 
 (def ^:dynamic *default-req*
-  #?(:clj {:accept :json
-           :content-type :json
-           :async? true
-           :as :json
-           :connection-timeout (* 1000 10)
-           :socket-timeout (* 1000 30)
-           :coerce :always}
-     :cljs {:format :json
-            :response-format :json
-            :keywords? true
-            :timeout 30}))
+  {:format :json
+   :response-format :json
+   :keywords? true
+   :timeout (* 1000 30)})
 
-#?(:clj
-   (defn- build-req [auth req]
-     (let [headers (merge (pt/-header auth) (:headers req))]
-       (merge *default-req*
-              {:headers headers
-               :form-params (:params req)}))))
+(defn- ^:dynamic handler [channel res]
+  (put! channel (t/->KintoneResponse res nil)))
 
-#?(:cljs
-   (defn- build-req [auth req channel]
-     (let [headers (merge (pt/-header auth) (:headers req))]
-       (merge *default-req*
-              {:headers headers
-               :params (:params req)
-               :handler #(put! channel %)
-               :error-handler #(put! channel %)}))))
+(defn- ^:dynamic err-handler [channel err]
+  (put! channel (t/->KintoneResponse nil err)))
+
+(defn- ^:dynamic build-req [auth req channel]
+  (let [headers (merge (pt/-header auth) (:headers req))]
+    (merge *default-req*
+           {:headers headers
+            :params (:params req)
+            :handler (partial handler channel)
+            :error-handler (partial err-handler channel)})))
 
 (deftype Connection
   [auth domain guest-space-id
-   connection-timeout socket-timeout timeout
-   headers]
+   timeout headers]
   pt/IRequest
   (-path [_ path]
     (if (seq guest-space-id)
@@ -50,26 +40,20 @@
    ;; Use POST method to pass the URL bytes limitation.
     (pt/-post this url (assoc-in req [:headers "X-HTTP-Method-Override"] "GET")))
   (-post [_ url req]
-    (let [c (chan)
-          req #?(:clj (build-req auth req)
-                 :cljs (build-req auth req c))]
-      #?(:clj (client/post url req #(put! c (:body %)) #(put! c %))
-         :cljs (ajax/POST url req))
-      c))
+   (let [c (chan)
+         req (build-req auth req c)]
+     (ajax/POST url req)
+     c))
   (-put [_ url req]
     (let [c (chan)
-          req #?(:clj (build-req auth req)
-                 :cljs (build-req auth req c))]
-      #?(:clj (client/put url req #(put! c (:body %)) #(put! c %))
-         :cljs (ajax/PUT url req))
+          req (build-req auth req c)]
+      (ajax/PUT url req)
       c))
   (-delete [_ url req]
     (let [c (chan)
-          req #?(:clj (build-req auth req)
-                 :cljs (build-req auth req c))]
-      #?(:clj (client/delete url req #(put! c (:body %)) #(put! c %))
-         :cljs (ajax/DELETE url req))
-      c)))
+          req (build-req auth req c)]
+       (ajax/DELETE url req)
+       c)))
 
 (defn new-connection
   "Make a new connection object.
@@ -84,26 +68,14 @@
   :guest-space-id - kintone guest space id
                     integer, optional
 
-  See: https://github.com/dakrone/clj-http or https://github.com/JulianBirch/cljs-ajax
-
-  :connection-timeout - The time to wait for establishing
-                        the connection with the remote host.
-                        integer, milliseconds, Only for Clojure
-                        optional, default 10s
-
-  :socket-timeout - The time to wait for getting data
-                    after the connection established.
-                    integer, milliseconds, Only for Clojure
-                    optional, default 30s
+  See: https://github.com/JulianBirch/cljs-ajax
 
   :timeout - The ajax call's timeout.
-             integer, milliseconds, Only for ClojureScript
+             integer, milliseconds
              optional, default 30s
 
   :headers - map, optional"
   [{:keys [auth domain guest-space-id
-           connection-timeout socket-timeout timeout
-           headers]}]
+           timeout headers]}]
   (->Connection auth domain guest-space-id
-                connection-timeout socket-timeout timeout
-                headers))
+                timeout headers))
