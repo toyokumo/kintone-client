@@ -126,15 +126,16 @@
     (pt/-post conn url {:params params})))
 
 (defn add-all-records
-  "Add Multiple Records to an app over 100.
+  "Add Multiple Records to an app.
+  This API can add more than 100 records unlike `add-records`.
+  If the request fail, this will stop executing and
+  return the response that includes both of completed and failed values.
 
   app - The kintone app ID.
         integer
 
   records - The sequence of record data that you want to add to kintone app.
-            See API reference regarding record format.
-            If the request fail, this will stop executing and
-            return the response that includes both of completed and failed values."
+            See API reference regarding record format."
   [conn app records]
   (go-loop [[records :as rests] (partition-all 100 records)
             ret (t/->KintoneResponse nil nil)]
@@ -149,3 +150,100 @@
                                        (:revisions (.res res))))]
             (recur (rest rests)
                    (t/->KintoneResponse {:ids ids :revisions revisions} nil))))))))
+
+(defn- ->update-params
+  [{:keys [id update-key record revision]}]
+  (cond-> {:record record}
+    (not update-key) (assoc :id id)
+    (not id) (assoc :updateKey update-key)
+    revision (assoc :revision revision)))
+
+(defn update-record
+  "Updates a record.
+  There must be :id or :update-key in the params.
+
+  app - The kintone app ID.
+        integer
+
+  params - A map of update request params.
+
+    :id - The record ID of the kintone app.
+          If :id is none or nil, :update-key is necessary.
+          integer
+
+    :update-key - The unique key of the record to be updated.
+                  If :update-key is none or nil, :id is necessary.
+                  string
+
+    :record - The record data that you want to update.
+              See API reference regarding record format.
+
+    :revision - The revision number of the record.
+                integer, optional"
+  [conn app {:as params :keys [id update-key record revision]}]
+  (let [url (pt/-url conn path/record)
+        params (assoc (->update-params params)
+                      :app app)]
+     (pt/-put conn url {:params params})))
+
+(defn update-records
+  "Updates details of multiple records in an app,
+  by specifying their record id, or a different unique key.
+
+  app - The kintone app ID.
+        integer
+
+  records - The record data that you want to update.
+            See API reference regarding record format.
+            The size of records must be 100 or less.
+            If the request fail, all updating will be canceled.
+            Each record must be following map.
+
+    params - A map of update request params.
+
+      :id - The record ID of the kintone app.
+            If :id is none or nil, :update-key is necessary.
+            integer
+
+      :update-key - The unique key of the record to be updated.
+                    If :update-key is none or nil, :id is necessary.
+                    string
+
+      :record - The record data that you want to update.
+                See API reference regarding record format.
+
+      :revision - The revision number of the record.
+                  integer, optional"
+  [conn app records]
+  (let [url (pt/-url conn path/records)
+        records (mapv ->update-params records)
+        params {:app app
+                :records records}]
+    (pt/-put conn url {:params params})))
+
+(defn update-all-records
+  "Updates details of multiple records in an app,
+  by specifying their record id, or a different unique keys.
+  This API can update more than 100 records unlike `update-records`.
+  If the request fail, this will stop executing and
+  return the response that includes both of completed and failed values.
+
+  app - The kintone app ID.
+        integer
+
+  records - The record data that you want to update.
+            See API reference regarding record format.
+            The size of records must be 100 or less.
+            If the request fail, all updating will be canceled.  "
+  [conn app records]
+  (go-loop [[records :as rests] (partition-all 100 records)
+            ret (t/->KintoneResponse nil nil)]
+    (if (empty? records)
+      ret
+      (let [res (<! (update-records conn app records))]
+        (if (.err res)
+          (t/->KintoneResponse (.res ret) (.err res))
+          (let [records (vec (concat (:records (.res ret))
+                                     (:records (.res res))))]
+            (recur (rest rests)
+                   (t/->KintoneResponse {:records records} nil))))))))
