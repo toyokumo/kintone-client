@@ -80,11 +80,14 @@
            A map has cursor id"
   [conn cursor]
   (go-loop [ret []]
-    (let [{:keys [records next]} (<! (get-records-by-cursor conn cursor))
-          ret (apply conj ret records)]
-      (if next
-        (recur ret)
-        {:records ret}))))
+    (let [res (<! (get-records-by-cursor conn cursor))]
+      (if (.err res)
+        res
+        (let [{:keys [records next]} (.res res)
+              ret (apply conj ret records)]
+          (if next
+            (recur ret)
+            (t/->KintoneResponse {:records ret} nil)))))))
 
 (defn delete-cursor
   "Delete a cursor.
