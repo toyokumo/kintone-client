@@ -249,3 +249,74 @@
                                      (:records (.res res))))]
             (recur (rest rests)
                    (t/->KintoneResponse {:records records} nil))))))))
+
+(defn delete-records
+  "Deletes multiple records in an app.
+
+  app - The kintone app ID.
+        integer
+
+  ids - List of record id that you want to delete.
+        The size of records must be 100 or less.
+        sequence of integer"
+  [conn app ids]
+  (let [url (pt/-url conn path/records)
+        params {:app app
+                :ids ids}]
+    (pt/-delete conn url {:params params})))
+
+(defn delete-records-with-revision
+  "Deletes multiple records in an app.
+
+  app - The kintone app ID.
+        integer
+
+  params - params includes following keys.
+           The size of params must be 100 or less.
+
+    :id - record id that you want to delete.
+          integer
+
+    :revision - The revision number of the record.
+                  integer"
+  [conn app params]
+  (let [url (pt/-url conn path/records)
+        params {:app app
+                :ids (mapv :id params)
+                :revisions (mapv :revisions params)}]
+    (pt/-delete conn url {:params params})))
+
+(defn- get-id-from-record [record]
+  (when-let [sid (get-in record [:$id :value])]
+    #?(:clj (Long/parseLong sid)
+       :cljs (js/parseInt sid 10))))
+
+(defn delete-all-records-by-query
+  "Deletes all records in an app by query string.
+  Can delete over 2000 records, but can't do rollback.
+
+  app - The kintone app ID.
+        integer
+
+  query - The kintone query.
+          string"
+  [conn app query]
+  (go
+    (let [res (<! (create-cursor conn app {:fields [:$id]
+                                           :query query
+                                           :size 100}))]
+      (if (.err res)
+        res
+        (loop []
+          (let [cursor (.res res)
+                res (<! (get-records-by-cursor conn cursor))]
+            (if (.err res)
+              res
+              (let [{:keys [records next]} (.res res)
+                    ids (map get-id-from-record records)]
+                (if (empty? ids)
+                  (t/->KintoneResponse {} nil)
+                  (let [res (<! (delete-records conn app ids))]
+                    (if (or (.err res) (not next))
+                      res
+                      (recur))))))))))))
