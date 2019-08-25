@@ -16,7 +16,7 @@
   (let [url (pt/-url conn path/record)]
     (pt/-get conn url {:params {:app app :id id}})))
 
-(defn get-records
+(defn get-records-by-query
   "Retrieves details of multiple records from an app using a query string.
 
   app - The kintone app ID.
