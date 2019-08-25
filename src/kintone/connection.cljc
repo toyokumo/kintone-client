@@ -40,10 +40,10 @@
    ;; Use POST method to pass the URL bytes limitation.
     (pt/-post this url (assoc-in req [:headers "X-HTTP-Method-Override"] "GET")))
   (-post [_ url req]
-   (let [c (chan)
-         req (build-req auth req c)]
-     (ajax/POST url req)
-     c))
+    (let [c (chan)
+          req (build-req auth req c)]
+      (ajax/POST url req)
+      c))
   (-put [_ url req]
     (let [c (chan)
           req (build-req auth req c)]
@@ -52,8 +52,8 @@
   (-delete [_ url req]
     (let [c (chan)
           req (build-req auth req c)]
-       (ajax/DELETE url req)
-       c)))
+      (ajax/DELETE url req)
+      c)))
 
 (defn new-connection
   "Make a new connection object.
