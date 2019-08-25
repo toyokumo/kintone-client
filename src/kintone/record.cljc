@@ -187,7 +187,7 @@
   (let [url (pt/-url conn path/record)
         params (assoc (->update-params params)
                       :app app)]
-     (pt/-put conn url {:params params})))
+    (pt/-put conn url {:params params})))
 
 (defn update-records
   "Updates details of multiple records in an app,
@@ -236,7 +236,6 @@
 
   records - The record data that you want to update.
             See API reference regarding record format.
-            The size of records must be 100 or less.
             If the request fail, all updating will be canceled.  "
   [conn app records]
   (go-loop [[records :as rests] (partition-all 100 records)
