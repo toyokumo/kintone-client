@@ -2,7 +2,8 @@
   (:require #?(:clj [clojure.core.async :refer [go go-loop <!]]
                :cljs [cljs.core.async :refer [<!] :refer-macros [go go-loop]])
             [kintone.constant.path.record :as path]
-            [kintone.protocols :as pt]))
+            [kintone.protocols :as pt]
+            [kintone.types :as t]))
 
 (defn get-record
   "Retrieves details of 1 record from an app.
@@ -98,29 +99,53 @@
 (defn add-record
   "Add one record to an app.
 
+  app - The kintone app ID.
+        integer
+
   record - The record data that you want to add to kintone app.
            See API reference regarding record format."
-  ([conn app]
-   (add-record conn app nil))
-  ([conn app record]
-   (let [url (pt/-url conn path/record)
-         params (cond-> {:app app}
-                  (seq record) (assoc :record record))]
-     (pt/-post conn url {:params params}))))
+  [conn app record]
+  (let [url (pt/-url conn path/record)
+        params (cond-> {:app app}
+                 (seq record) (assoc :record record))]
+    (pt/-post conn url {:params params})))
 
 (defn add-records
   "Add multiple records to an app.
 
+  app - The kintone app ID.
+        integer
+
   records - The sequence of record data that you want to add to kintone app.
-            See API reference regarding record format."
+            The size of records must be 100 or less.
+            See API reference regarding record format.
+            If the request fail, all registration will be canceled."
   [conn app records]
-  (let [url (pt/-url conn path/records)]
-    (go-loop [[records :as rests] (partition-all 100 records) ; The number of records must be 100 or less.
-              ret {:ids [] :revisions []}]
-      (if (empty? records)
-        ret
-        (let [params {:app app :records records}
-              {:keys [ids revisions]} (<! (pt/-post conn url {:params params}))]
-          (recur (rest rests)
-                 {:ids (apply conj (:ids ret) ids)
-                  :revisions (apply conj (:revisions ret) revisions)}))))))
+  (let [url (pt/-url conn path/records)
+        params {:app app :records records}]
+    (pt/-post conn url {:params params})))
+
+(defn add-all-records
+  "Add Multiple Records to an app over 100.
+
+  app - The kintone app ID.
+        integer
+
+  records - The sequence of record data that you want to add to kintone app.
+            See API reference regarding record format.
+            If the request fail, this will stop executing and
+            return the response that includes both of completed and failed values."
+  [conn app records]
+  (go-loop [[records :as rests] (partition-all 100 records)
+            ret (t/->KintoneResponse nil nil)]
+    (if (empty? records)
+      ret
+      (let [res (<! (add-records conn app records))]
+        (if (.err res)
+          (t/->KintoneResponse (.res ret) (.err res))
+          (let [ids (vec (concat (:ids (.res ret))
+                                 (:ids (.res res))))
+                revisions (vec (concat (:revisions (.res ret))
+                                       (:revisions (.res res))))]
+            (recur (rest rests)
+                   (t/->KintoneResponse {:ids ids :revisions revisions} nil))))))))
