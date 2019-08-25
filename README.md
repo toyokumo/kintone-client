@@ -6,6 +6,7 @@ A [kintone](https://www.kintone.com) SDK for Clojure and ClojureScript.
 
 - `kintone.authentication` : Make Auth object.
 - `kintone.connection` : Make connection object.
+- `kintone.types` : Type definitions such as response object.
 - `kintone.record` : kintone REST Record API.
 
 ## Usage
@@ -13,8 +14,7 @@ A [kintone](https://www.kintone.com) SDK for Clojure and ClojureScript.
 The SDK provides an easy way to use kintone API from Clojure or ClojureScript.
 
 Every API run asynchronously to use [core.async](https://github.com/clojure/core.async) and
-[clj-http](https://github.com/dakrone/clj-http) on Clojure or
-[cljs-ajax](https://github.com/JulianBirch/cljs-ajax) on ClojureScript.
+[cljs-ajax](https://github.com/JulianBirch/cljs-ajax).
 They return a channel of core.async.
 
 Follow bellow the steps.
@@ -83,19 +83,31 @@ You should use `Connection` object as the first argument on every API call.
 (require '[clojure.core.async :refer [<!!]])
 
 (let [app 1111
-      id 1]
-  (<!! (record/get-record conn app id))) ;; Block the thread and get response
-;; => {:record {:$id {:type "__ID__", :value "1"} ...}
+      id 1
+      ;; Block the thread and get response
+      res (<!! (record/get-record conn app id))]
+  ;; Every API response is kintone.types/KintoneResonse
+  (if (.err res)
+    (log/error "Something bad happen")
+    (.res res)))
+;; success => {:record {:$id {:type "__ID__", :value "1"} ...}
+;; fail => {:status 404
+;;          :status-text "Not Found"
+;;          :failure :erro
+;;          :response {:code "GAIA_RE01" ...}}
 
 
 ;; ClojureScript
 (require '[cljs.core.async :refer [<!] :refer-macros [go]])
 
+;; Call in go block to handle response
 (go
   (let [app 1111
-        res (<! (record/get-record conn app 1))] ;; You can get response only in the go block
-    ;; => {:record {:$id {:type "__ID__", :value "1"} ...}
-    ))
+        id 1
+        res (<! (record/get-record conn app id))]
+    (if (.err res)
+      (.err res)
+      (.res res))))
 ```
 
 For more information, See API documents.
