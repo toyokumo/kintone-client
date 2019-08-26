@@ -87,9 +87,9 @@ You should use `Connection` object as the first argument on every API call.
       ;; Block the thread and get response
       res (<!! (record/get-record conn app id))]
   ;; Every API response is kintone.types/KintoneResonse
-  (if (.err res)
+  (if (:err res)
     (log/error "Something bad happen")
-    (.res res)))
+    (:res res)))
 ;; success => {:record {:$id {:type "__ID__", :value "1"} ...}
 ;; fail => {:status 404
 ;;          :status-text "Not Found"
@@ -105,9 +105,9 @@ You should use `Connection` object as the first argument on every API call.
   (let [app 1111
         id 1
         res (<! (record/get-record conn app id))]
-    (if (.err res)
-      (.err res)
-      (.res res))))
+    (if (:err res)
+      (:err res)
+      (:res res))))
 ```
 
 For more information, See API documents.
