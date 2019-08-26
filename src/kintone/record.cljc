@@ -321,6 +321,38 @@
                       res
                       (recur))))))))))))
 
+(defn get-comments
+  "Retrieves multiple comments from a record in an app.
+
+  app - The kintone app ID.
+        integer
+
+  record-id - record id that you want to add comment.
+              integer
+
+  opts
+
+    :order - The sort order of the Comment ID.
+             Specifying \"asc\" will sort the comments in ascending order,
+             and \"desc\" will sort the comments in descending order.
+
+    :offset - This skips the retrieval of the first number of comments.
+              If it is 30, response skips the first 30 comments,
+              and retrieves from the 31st comment.
+              There is no maximum for this value.
+
+    :limit - The number of records to retrieve.
+             If it is 5, response retrieve the first 5 comments.
+             The default and maximum is 10 comments."
+  [conn app record-id & [{:as opts :keys [order offset limit]}]]
+  (let [url (pt/-url conn path/comments)
+        params {:app app
+                :record record-id
+                :order (or order "desc")
+                :offset (or offset 0)
+                :limit (or limit 10)}]
+    (pt/-get conn url {:params params})))
+
 (defn add-comment
   "Add a comment to a record in an app.
 
