@@ -81,9 +81,9 @@
   [conn cursor]
   (go-loop [ret []]
     (let [res (<! (get-records-by-cursor conn cursor))]
-      (if (.err res)
+      (if (:err res)
         res
-        (let [{:keys [records next]} (.res res)
+        (let [{:keys [records next]} (:res res)
               ret (apply conj ret records)]
           (if next
             (recur ret)
@@ -145,12 +145,12 @@
     (if (empty? records)
       ret
       (let [res (<! (add-records conn app records))]
-        (if (.err res)
-          (t/->KintoneResponse (.res ret) (.err res))
-          (let [ids (vec (concat (:ids (.res ret))
-                                 (:ids (.res res))))
-                revisions (vec (concat (:revisions (.res ret))
-                                       (:revisions (.res res))))]
+        (if (:err res)
+          (t/->KintoneResponse (:res ret) (:err res))
+          (let [ids (vec (concat (:ids (:res ret))
+                                 (:ids (:res res))))
+                revisions (vec (concat (:revisions (:res ret))
+                                       (:revisions (:res res))))]
             (recur (rest rests)
                    (t/->KintoneResponse {:ids ids :revisions revisions} nil))))))))
 
@@ -243,10 +243,10 @@
     (if (empty? records)
       ret
       (let [res (<! (update-records conn app records))]
-        (if (.err res)
-          (t/->KintoneResponse (.res ret) (.err res))
-          (let [records (vec (concat (:records (.res ret))
-                                     (:records (.res res))))]
+        (if (:err res)
+          (t/->KintoneResponse (:res ret) (:err res))
+          (let [records (vec (concat (:records (:res ret))
+                                     (:records (:res res))))]
             (recur (rest rests)
                    (t/->KintoneResponse {:records records} nil))))))))
 
@@ -305,19 +305,19 @@
     (let [res (<! (create-cursor conn app {:fields [:$id]
                                            :query query
                                            :size 100}))]
-      (if (.err res)
+      (if (:err res)
         res
         (loop []
-          (let [cursor (.res res)
+          (let [cursor (:res res)
                 res (<! (get-records-by-cursor conn cursor))]
-            (if (.err res)
+            (if (:err res)
               res
-              (let [{:keys [records next]} (.res res)
+              (let [{:keys [records next]} (:res res)
                     ids (map get-id-from-record records)]
                 (if (empty? ids)
                   (t/->KintoneResponse {} nil)
                   (let [res (<! (delete-records conn app ids))]
-                    (if (or (.err res) (not next))
+                    (if (or (:err res) (not next))
                       res
                       (recur))))))))))))
 

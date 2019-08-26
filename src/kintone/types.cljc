@@ -1,3 +1,3 @@
 (ns kintone.types)
 
-(deftype KintoneResponse [res err])
+(defrecord KintoneResponse [res err])

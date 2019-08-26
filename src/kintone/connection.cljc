@@ -26,7 +26,7 @@
             :handler (partial handler channel)
             :error-handler (partial err-handler channel)})))
 
-(deftype Connection
+(defrecord Connection
   [auth domain guest-space-id
    timeout headers]
   pt/IRequest

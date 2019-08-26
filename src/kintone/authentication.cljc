@@ -11,7 +11,7 @@
   #?(:clj (.encodeToString (Base64/getEncoder) (.getBytes s))
      :cljs (goog.base64/encodeString s)))
 
-(deftype Auth [basic password api-token]
+(defrecord Auth [basic password api-token]
   pt/IAuth
   (-header [_]
    (cond-> {}
