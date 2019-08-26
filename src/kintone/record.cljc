@@ -320,3 +320,50 @@
                     (if (or (.err res) (not next))
                       res
                       (recur))))))))))))
+
+(defn add-comment
+  "Add a comment to a record in an app.
+
+  app - The kintone app ID.
+        integer
+
+  record-id - record id that you want to add comment.
+              integer
+
+  comment - A map including comment details.
+
+    :text - The comment text.
+            The maximum characters of the comment is 65535.
+
+    :mentions - A sequence including information to mention other users.
+
+      :code - The code the user, group or organization that will be mentioned.
+              The maximum number of mentions is 10.
+              The mentioned users will be placed in front of the comment text when the API succeeds.
+
+      :type - The type of the mentioned target.
+              USER or GROUP or ORGANIZATION"
+  [conn app record-id {:as comment :keys [text mentions]}]
+  (let [url (pt/-url conn path/comment)
+        params {:app app
+                :record record-id
+                :comment {:text text :mentions mentions}}]
+    (pt/-post conn url {:params params})))
+
+(defn delete-comment
+  "Delete a comment in a record in an app
+
+  app - The kintone app ID.
+        integer
+
+  record-id - The record id.
+              integer
+
+  comment-id - The comment id.
+               integer"
+  [conn app record-id comment-id]
+  (let [url (pt/-url conn path/comment)
+        params {:app app
+                :record record-id
+                :comment comment-id}]
+    (pt/-delete conn url {:params params})))
