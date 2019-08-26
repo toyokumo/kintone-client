@@ -256,7 +256,7 @@
   app - The kintone app ID.
         integer
 
-  ids - List of record id that you want to delete.
+  ids - Sequence of record id that you want to delete.
         The size of records must be 100 or less.
         sequence of integer"
   [conn app ids]
