@@ -325,8 +325,8 @@
   app - The kintone app ID.
         integer
 
-  record-id - record id that you want to add comment.
-              integer
+  id - The record id.
+       integer
 
   opts
 
@@ -342,10 +342,10 @@
     :limit - The number of records to retrieve.
              If it is 5, response retrieve the first 5 comments.
              The default and maximum is 10 comments."
-  [conn app record-id & [{:as opts :keys [order offset limit]}]]
+  [conn app id & [{:as opts :keys [order offset limit]}]]
   (let [url (pt/-url conn path/comments)
         params {:app app
-                :record record-id
+                :record id
                 :order (or order "desc")
                 :offset (or offset 0)
                 :limit (or limit 10)}]
@@ -357,8 +357,8 @@
   app - The kintone app ID.
         integer
 
-  record-id - record id that you want to add comment.
-              integer
+  id - The record id.
+       integer
 
   comment - A map including comment details.
 
@@ -373,10 +373,10 @@
 
       :type - The type of the mentioned target.
               USER or GROUP or ORGANIZATION"
-  [conn app record-id {:as comment :keys [text mentions]}]
+  [conn app id {:as comment :keys [text mentions]}]
   (let [url (pt/-url conn path/comment)
         params {:app app
-                :record record-id
+                :record id
                 :comment {:text text :mentions mentions}}]
     (pt/-post conn url {:params params})))
 
