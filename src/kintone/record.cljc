@@ -386,14 +386,91 @@
   app - The kintone app ID.
         integer
 
-  record-id - The record id.
-              integer
+  id - The record id.
+       integer
 
   comment-id - The comment id.
                integer"
-  [conn app record-id comment-id]
+  [conn app id comment-id]
   (let [url (pt/-url conn path/comment)
         params {:app app
-                :record record-id
+                :record id
                 :comment comment-id}]
     (pt/-delete conn url {:params params})))
+
+(defn update-record-assignees
+  "Update assignees of a record.
+
+  app - The kintone app ID.
+        integer
+
+  id - The record id.
+       integer
+
+  assignees - The user codes of the assignees.
+              If empty, no users will be assigned.
+              The maximum number of assignees is 100.
+              sequence of string
+
+  revision - The revision number of the record.
+             integer, optional"
+  [conn app id assignees revision]
+  (let [url (pt/-url conn path/assignees)
+        params (cond-> {:app app
+                        :record id
+                        :assignees assignees}
+                 revision (assoc :revision revision))]
+    (pt/-put conn url {:params params})))
+
+(defn- ->status-params [app {:keys [id assignee revision]}]
+  (cond-> {:app app :id id}
+    assignee (assoc :assignee assignee)
+    revision (assoc :revision revision)))
+
+(defn update-record-status
+  "Updates the Status of a record of an app.
+
+  app - The kintone app ID.
+        integer
+
+  params
+
+    :id - The record id.
+          integer
+
+    :assignee - The user code of the assignee.
+                If empty, no users will be assigned.
+                The maximum number of assignees is 100.
+                sequence of string
+
+    :revision - The revision number of the record.
+                integer, optional"
+  [conn app {:as params :keys [id assignee revision]}]
+  (let [url (pt/-url conn path/status)
+        params (->status-params app params)]
+    (pt/-put conn url {:params params})))
+
+(defn update-records-status
+  "Updates the Status of multiple records of an app.
+
+  app - The kintone app ID.
+        integer
+
+  records - sequence of map.
+            each map has following keys.
+            The size must be 100 or less.
+
+    :id - The record id.
+          integer
+
+    :assignee - The user code of the assignee.
+                If empty, no users will be assigned.
+                The maximum number of assignees is 100.
+                sequence of string
+
+    :revision - The revision number of the record.
+                integer, optional"
+  [conn app [{:keys [id assignee revision]} :as records]]
+  (let [url (pt/-url conn path/statuses)
+        params (mapv (partial ->status-params app) records)]
+    (pt/-put conn url {:params params})))
