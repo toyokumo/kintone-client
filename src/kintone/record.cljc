@@ -22,15 +22,17 @@
   app - The kintone app ID.
         integer
 
-  :fields - List of field codes you want in the response.
-            sequence of string or nil
+  opts
 
-  :query - The kintone query.
-           string or nil
+    :fields - Sequence of field codes you want in the response.
+              sequence of string or nil
 
-  :total-count - If true, the request will retrieve
-                 total count of records match with query conditions.
-                 boolean or nil"
+    :query - The kintone query.
+             string or nil
+
+    :total-count - If true, the request will retrieve
+                   total count of records match with query conditions.
+                   boolean or nil"
   [conn app & [{:keys [fields query total-count]}]]
   (let [url (pt/-url conn path/records)
         params (cond-> {:app app}
@@ -45,16 +47,18 @@
   app - The kintone app ID.
         integer
 
-  :fields - List of field codes you want in the response.
-            sequence of string or nil
+  opts
 
-  :query - The kintone query.
-           string or nil
+    :fields - Sequence of field codes you want in the response.
+              sequence of string or nil
 
-  :size - Number of records to retrieve per request.
-          integer or nil
-          Default: 100.
-          Maximum: 500"
+    :query - The kintone query.
+             string or nil
+
+    :size - Number of records to retrieve per request.
+            integer or nil
+            Default: 100.
+            Maximum: 500"
   [conn app & [{:keys [fields query size]}]]
   (let [url (pt/-url conn path/cursor)
         size (or size 100)
@@ -107,11 +111,16 @@
 
   record - The record data that you want to add to kintone app.
            See API reference regarding record format."
-  [conn app record]
-  (let [url (pt/-url conn path/record)
-        params (cond-> {:app app}
-                 (seq record) (assoc :record record))]
-    (pt/-post conn url {:params params})))
+  ([app record]
+   (t/map->BulkRequest {:method :POST
+                        :path path/record
+                        :payload {:app app
+                                  :record record}}))
+  ([conn app record]
+   (let [url (pt/-url conn path/record)
+         params (cond-> {:app app}
+                  (seq record) (assoc :record record))]
+     (pt/-post conn url {:params params}))))
 
 (defn add-records
   "Add multiple records to an app.
@@ -123,10 +132,15 @@
             The size of records must be 100 or less.
             See API reference regarding record format.
             If the request fail, all registration will be canceled."
-  [conn app records]
-  (let [url (pt/-url conn path/records)
-        params {:app app :records records}]
-    (pt/-post conn url {:params params})))
+  ([app records]
+   (t/map->BulkRequest {:method :POST
+                        :path path/records
+                        :payload {:app app
+                                  :records records}}))
+  ([conn app records]
+   (let [url (pt/-url conn path/records)
+         params {:app app :records records}]
+     (pt/-post conn url {:params params}))))
 
 (defn add-all-records
   "Add Multiple Records to an app.
@@ -183,11 +197,17 @@
 
     :revision - The revision number of the record.
                 integer, optional"
-  [conn app {:as params :keys [id update-key record revision]}]
-  (let [url (pt/-url conn path/record)
-        params (assoc (->update-params params)
-                      :app app)]
-    (pt/-put conn url {:params params})))
+  ([app {:as params :keys [id update-key record revision]}]
+   (t/map->BulkRequest
+    {:method :PUT
+     :path path/record
+     :payload (assoc (->update-params params)
+                     :app app)}))
+  ([conn app {:as params :keys [id update-key record revision]}]
+   (let [url (pt/-url conn path/record)
+         params (assoc (->update-params params)
+                       :app app)]
+     (pt/-put conn url {:params params}))))
 
 (defn update-records
   "Updates details of multiple records in an app,
@@ -215,12 +235,18 @@
 
       :revision - The revision number of the record.
                   integer, optional"
-  [conn app records]
-  (let [url (pt/-url conn path/records)
-        records (mapv ->update-params records)
-        params {:app app
-                :records records}]
-    (pt/-put conn url {:params params})))
+  ([app records]
+   (t/map->BulkRequest
+    {:method :PUT
+     :path path/records
+     :payload {:app app
+               :records (mapv ->update-params records)}}))
+  ([conn app records]
+   (let [url (pt/-url conn path/records)
+         records (mapv ->update-params records)
+         params {:app app
+                 :records records}]
+     (pt/-put conn url {:params params}))))
 
 (defn update-all-records
   "Updates details of multiple records in an app,
@@ -257,11 +283,16 @@
   ids - Sequence of record id that you want to delete.
         The size of records must be 100 or less.
         sequence of integer"
-  [conn app ids]
-  (let [url (pt/-url conn path/records)
-        params {:app app
-                :ids ids}]
-    (pt/-delete conn url {:params params})))
+  ([app ids]
+   (t/map->BulkRequest {:method :DELETE
+                        :path path/records
+                        :payload {:app app
+                                  :ids ids}}))
+  ([conn app ids]
+   (let [url (pt/-url conn path/records)
+         params {:app app
+                 :ids ids}]
+     (pt/-delete conn url {:params params}))))
 
 (defn delete-records-with-revision
   "Deletes multiple records in an app.
@@ -276,13 +307,19 @@
           integer
 
     :revision - The revision number of the record.
-                  integer"
-  [conn app params]
-  (let [url (pt/-url conn path/records)
-        params {:app app
-                :ids (mapv :id params)
-                :revisions (mapv :revisions params)}]
-    (pt/-delete conn url {:params params})))
+                integer, optional"
+  ([app params]
+   (t/map->BulkRequest {:method :DELETE
+                        :path path/records
+                        :payload {:app app
+                                  :ids (mapv :id params)
+                                  :revisions (mapv :revisions params)}}))
+  ([conn app params]
+   (let [url (pt/-url conn path/records)
+         params {:app app
+                 :ids (mapv :id params)
+                 :revisions (mapv :revisions params)}]
+     (pt/-delete conn url {:params params}))))
 
 (defn- get-id-from-record [record]
   (when-let [sid (get-in record [:$id :value])]
@@ -422,8 +459,8 @@
                  revision (assoc :revision revision))]
     (pt/-put conn url {:params params})))
 
-(defn- ->status-params [app {:keys [id assignee revision]}]
-  (cond-> {:app app :id id}
+(defn- ->status-record [{:keys [id action assignee revision]}]
+  (cond-> {:id id :action action}
     assignee (assoc :assignee assignee)
     revision (assoc :revision revision)))
 
@@ -438,6 +475,14 @@
     :id - The record id.
           integer
 
+    :action - The Action name of the action you want to run.
+              If the localization feature has been used
+              to apply multiple translations of the action,
+              specify the name of the action in the language settings
+              of the user that will run the API.
+              Note \"Action name\" refers to the text on the button
+              that is pressed to move Process Management on to the next status.
+
     :assignee - The user code of the assignee.
                 If empty, no users will be assigned.
                 The maximum number of assignees is 100.
@@ -445,10 +490,16 @@
 
     :revision - The revision number of the record.
                 integer, optional"
-  [conn app {:as params :keys [id assignee revision]}]
-  (let [url (pt/-url conn path/status)
-        params (->status-params app params)]
-    (pt/-put conn url {:params params})))
+  ([app {:as params :keys [id action assignee revision]}]
+   (t/map->BulkRequest {:method :PUT
+                        :path path/status
+                        :payload (assoc (->status-record params)
+                                        :app app)}))
+  ([conn app {:as params :keys [id action assignee revision]}]
+   (let [url (pt/-url conn path/status)
+         params (assoc (->status-record params)
+                       :app app)]
+     (pt/-put conn url {:params params}))))
 
 (defn update-records-status
   "Updates the Status of multiple records of an app.
@@ -463,6 +514,14 @@
     :id - The record id.
           integer
 
+    :action - The Action name of the action you want to run.
+              If the localization feature has been used
+              to apply multiple translations of the action,
+              specify the name of the action in the language settings
+              of the user that will run the API.
+              Note \"Action name\" refers to the text on the button
+              that is pressed to move Process Management on to the next status.
+
     :assignee - The user code of the assignee.
                 If empty, no users will be assigned.
                 The maximum number of assignees is 100.
@@ -470,7 +529,38 @@
 
     :revision - The revision number of the record.
                 integer, optional"
-  [conn app [{:keys [id assignee revision]} :as records]]
-  (let [url (pt/-url conn path/statuses)
-        params (mapv (partial ->status-params app) records)]
-    (pt/-put conn url {:params params})))
+  ([app [{:keys [id action assignee revision]} :as records]]
+   (t/map->BulkRequest {:method :PUT
+                        :path path/statuses
+                        :payload {:app app
+                                  :records (mapv ->status-record records)}}))
+  ([conn app [{:keys [id action assignee revision]} :as records]]
+   (let [url (pt/-url conn path/statuses)
+         params {:app app
+                 :records (mapv ->status-record records)}]
+     (pt/-put conn url {:params params}))))
+
+(defn bulk-request
+  "Runs multiple API requests to multiple apps in one go.
+
+  requests - The multiple request maps.
+             Its size must be 20 or less.
+             The following functions return a request map
+             which is used here when you does not pass the connection map to these.
+               - add-record
+               - add-records
+               - update-record
+               - update-records
+               - delete-records
+               - delete-records-with-revision
+               - update-record-status
+               - update-records-status"
+  [conn requests]
+  (let [url (pt/-url conn path/bulk-request)
+        requests (mapv (fn [{:as m :keys [path]}]
+                         (-> m
+                             (assoc :api (pt/-path conn path))
+                             (dissoc :path)))
+                       requests)
+        params {:requests requests}]
+    (pt/-post conn url {:params params})))
