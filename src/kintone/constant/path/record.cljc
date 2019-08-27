@@ -15,6 +15,8 @@
 
 (def status "/v1/record/status.json")
 
+(def statuses "/v1/records/status.json")
+
 (def file "/v1/file.json")
 
 (def bulk-request "/v1/bulkRequest.json")

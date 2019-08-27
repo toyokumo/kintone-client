@@ -202,8 +202,6 @@
             If the request fail, all updating will be canceled.
             Each record must be following map.
 
-    params - A map of update request params.
-
       :id - The record ID of the kintone app.
             If :id is none or nil, :update-key is necessary.
             integer
@@ -236,7 +234,7 @@
 
   records - The record data that you want to update.
             See API reference regarding record format.
-            If the request fail, all updating will be canceled.  "
+            If the request fail, all updating will be canceled."
   [conn app records]
   (go-loop [[records :as rests] (partition-all 100 records)
             ret (t/->KintoneResponse nil nil)]
