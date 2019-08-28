@@ -540,6 +540,46 @@
                  :records (mapv ->status-record records)}]
      (pt/-put conn url {:params params}))))
 
+(defn file-upload
+  "Uploads a file to kintone.
+
+  When a file is uploaded, it produces a file key.
+  Note that although this API uploads a file to kintone,
+  it does not upload the file to an attachment field of an App.
+  To upload the file to an Attachment field,
+  the file key is used with the Add Record or Update Record API.
+
+  file - (Clojure) String, InputStream, File, a byte-array,
+                   or an instance of org.apache.http.entity.mime.content.ContentBody
+         (ClojureScript) File object
+
+  filename - The filename you want to set to
+             string, Only for ClojureScript"
+  #?(:clj
+     ([conn file]
+      (let [url (pt/-url conn path/file)
+            multipart [{:name "file" :content file}]]
+        (pt/-multipart-post conn url {:multipart multipart})))
+
+     :cljs
+     ([conn file filename]
+      (let [url (pt/-url conn path/file)
+           multipart (doto (js/FormData.)
+                       (.append "file" file filename))]
+       (pt/-multipart-post conn url {:multipart multipart})))))
+
+(defn file-download
+  "Download a file from an attachment field in an app.
+
+  file-key - The value is set on the attachment field in the response
+             that is gotten from GET record APIs.
+             So the file-key is different from that
+             obtained from the response when using the Upload File API."
+  [conn file-key]
+  (let [url (pt/-url conn path/file)
+        params {:fileKey file-key}]
+    (pt/-get-blob conn url {:params params})))
+
 (defn bulk-request
   "Runs multiple API requests to multiple apps in one go.
 

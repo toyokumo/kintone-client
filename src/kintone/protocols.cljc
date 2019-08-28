@@ -10,4 +10,6 @@
   (-get [_ url req])
   (-post [_ url req])
   (-put [_ url req])
-  (-delete [_ url req]))
+  (-delete [_ url req])
+  (-get-blob [_ url req])
+  (-multipart-post [_ url req]))
