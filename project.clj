@@ -7,6 +7,7 @@
                  [org.clojure/core.async "0.4.500"]
                  [clj-http "3.10.0"]
                  [cheshire "5.9.0"]]
+  :clean-targets ^{:protect false} ["target"]
   :profiles {:provided {:dependencies [[org.clojure/clojurescript "1.10.520"]
                                        [cljs-ajax "0.8.0"]
                                        [com.bhauman/figwheel-main "0.2.3"]]}

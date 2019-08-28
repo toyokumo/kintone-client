@@ -1,4 +1,5 @@
 (ns kintone.constant.path.record
+  {:no-doc true}
   (:refer-clojure :exclude [comment]))
 
 (def record "/v1/record.json")

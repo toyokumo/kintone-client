@@ -144,12 +144,14 @@
 
 (defn add-all-records
   "Add Multiple Records to an app.
+
   This API can add more than 100 records unlike `add-records`.
+
   If the request fail, this will stop executing and
   return the response that includes both of completed and failed values.
 
   app - The kintone app ID.
-        integer
+        integer.
 
   records - The sequence of record data that you want to add to kintone app.
             See API reference regarding record format."

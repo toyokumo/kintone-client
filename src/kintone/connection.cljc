@@ -9,7 +9,8 @@
   #?(:clj (:import (clojure.lang ExceptionInfo)
                    (java.lang Exception))))
 
-(def ^:dynamic *default-req*
+(def ^:dynamic ^:private *default-req*
+  "Default request parameters."
   #?(:clj {:accept :json
            :content-type :json
            :async? true
@@ -150,7 +151,7 @@
 
   See: https://github.com/dakrone/clj-http or https://github.com/JulianBirch/cljs-ajax
 
-  :Connection-timeout - The time to wait for establishing
+  :connection-timeout - The time to wait for establishing
                         the connection with the remote host.
                         integer, milliseconds, Only for Clojure
                         optional, default 10s

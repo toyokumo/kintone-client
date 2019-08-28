@@ -1,4 +1,5 @@
-(ns kintone.protocols)
+(ns kintone.protocols
+  {:no-doc true})
 
 (defprotocol IAuth
   (-header [_]))
