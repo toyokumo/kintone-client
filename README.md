@@ -4,18 +4,19 @@ A [kintone](https://www.kintone.com) SDK for Clojure and ClojureScript.
 
 ## Overview
 
+The SDK provides an easy way to use kintone API from Clojure or ClojureScript.
+
+Every API run asynchronously to use [clj-http](https://github.com/dakrone/clj-http) for Clojure
+, [cljs-ajax](https://github.com/JulianBirch/cljs-ajax) for ClojureScript and
+[core.async](https://github.com/clojure/core.async).
+They return a channel of core.async.
+
 - `kintone.authentication` : Make Auth object.
 - `kintone.connection` : Make connection object.
 - `kintone.types` : Type definitions such as response object.
 - `kintone.record` : kintone REST Record API.
 
 ## Usage
-
-The SDK provides an easy way to use kintone API from Clojure or ClojureScript.
-
-Every API run asynchronously to use [core.async](https://github.com/clojure/core.async) and
-[cljs-ajax](https://github.com/JulianBirch/cljs-ajax).
-They return a channel of core.async.
 
 Follow bellow the steps.
 
