@@ -80,7 +80,7 @@
    headers]
   pt/IRequest
   (-path [_ path]
-    (if (seq guest-space-id)
+    (if guest-space-id
       (str "/k/guest/" guest-space-id path)
       (str "/k" path)))
   (-url [this path]
