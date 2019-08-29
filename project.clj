@@ -8,11 +8,13 @@
                  [clj-http "3.10.0"]
                  [cheshire "5.9.0"]]
   :clean-targets ^{:protect false} ["target"]
+  :aliases {"test:cljs" ["run" "-m" "figwheel.main" "-co" "test.cljs.edn" "-m" "kintone.test-runner"]}
   :profiles {:provided {:dependencies [[org.clojure/clojurescript "1.10.520"]
                                        [cljs-ajax "0.8.0"]
                                        [com.bhauman/figwheel-main "0.2.3"]]}
              :dev {:source-paths ["dev"]
                    :resource-paths ["target"]
                    :dependencies [[nrepl/nrepl "0.6.0"]
-                                  [cider/piggieback "0.4.0"]]
+                                  [cider/piggieback "0.4.0"]
+                                  [com.bhauman/cljs-test-display "0.1.1"]]
                    :repl-options {:nrepl-middleware [cider.piggieback/wrap-cljs-repl]}}})

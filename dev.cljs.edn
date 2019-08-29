@@ -1,0 +1,8 @@
+^{:watch-dirs ["src" "test"]
+  :mode :repl}
+{:main kintone.test-runner
+ :optimizations :none
+ :warnings true
+ :output-wrapper true
+ :source-map true
+ :closure-defines {kintone.test-runner/DEBUG true}}
