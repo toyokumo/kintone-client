@@ -52,14 +52,14 @@
     :fields - Sequence of field codes you want in the response.
               sequence of string or nil
 
-    :query - The kintone query.
+    :query - The kintone query. It can't have limit or offset.
              string or nil
 
     :size - Number of records to retrieve per request.
             integer or nil
             Default: 100.
             Maximum: 500"
-  [conn app & [{:keys [fields query size]}]]
+  [conn app & [{:as opts :keys [fields query size]}]]
   (let [url (pt/-url conn path/cursor)
         size (or size 100)
         params (cond-> {:app app :size size}
@@ -80,18 +80,36 @@
 (defn get-all-records
   "Get all records to use cursor.
 
-  cursor - The kintone record cursor
-           A map has cursor id"
-  [conn cursor]
-  (go-loop [ret []]
-    (let [res (<! (get-records-by-cursor conn cursor))]
+  app - The kintone app ID.
+        integer
+
+  opts
+
+    :fields - Sequence of field codes you want in the response.
+              sequence of string or nil
+
+    :query - The kintone query. It can't have limit or offset.
+             string or nil
+
+    :size - Number of records to retrieve per request.
+            integer or nil
+            Default: 100.
+            Maximum: 500"
+  [conn app & [{:as opts :keys [fields query total-count]}]]
+  (go
+    (let [res (<! (create-cursor conn app opts))
+          cursor (:res res)]
       (if (:err res)
         res
-        (let [{:keys [records next]} (:res res)
-              ret (apply conj ret records)]
-          (if next
-            (recur ret)
-            (t/->KintoneResponse {:records ret} nil)))))))
+        (loop [ret []]
+          (let [res (<! (get-records-by-cursor conn cursor))]
+            (if (:err res)
+              res
+              (let [{:keys [records next]} (:res res)
+                    ret (apply conj ret records)]
+                (if next
+                  (recur ret)
+                  (t/->KintoneResponse {:records ret} nil))))))))))
 
 (defn delete-cursor
   "Delete a cursor.
