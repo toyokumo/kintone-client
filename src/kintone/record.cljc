@@ -322,23 +322,24 @@
 
   params - params includes following keys.
            The size of params must be 100 or less.
+           sequence of map
 
     :id - record id that you want to delete.
           integer
 
     :revision - The revision number of the record.
-                integer, optional"
+                integer"
   ([app params]
    (t/map->BulkRequest {:method :DELETE
                         :path path/records
                         :payload {:app app
                                   :ids (mapv :id params)
-                                  :revisions (mapv :revisions params)}}))
+                                  :revisions (mapv :revision params)}}))
   ([conn app params]
    (let [url (pt/-url conn path/records)
          params {:app app
                  :ids (mapv :id params)
-                 :revisions (mapv :revisions params)}]
+                 :revisions (mapv :revision params)}]
      (pt/-delete conn url {:params params}))))
 
 (defn- get-id-from-record [record]
