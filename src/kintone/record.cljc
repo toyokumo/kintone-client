@@ -353,13 +353,13 @@
   app - The kintone app ID.
         integer
 
-  query - The kintone query.
+  query - The kintone query. It can't have limit or offset.
           string"
   [conn app query]
   (go
     (let [res (<! (create-cursor conn app {:fields [:$id]
                                            :query query
-                                           :size 100}))]
+                                           :size 500}))]
       (if (:err res)
         res
         (loop []
