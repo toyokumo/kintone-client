@@ -3,7 +3,8 @@
             [figwheel.main.testing :refer-macros [run-tests run-tests-async]]
             ;; require all the namespaces that have tests in them
             [kintone.authentication-test]
-            [kintone.connection-test]))
+            [kintone.connection-test]
+            [kintone.record-test]))
 
 (goog-define ^boolean DEBUG false)
 
