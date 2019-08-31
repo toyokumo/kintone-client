@@ -2,6 +2,8 @@
 
 A [kintone](https://www.kintone.com) SDK for Clojure and ClojureScript.
 
+[![CircleCI](https://circleci.com/gh/toyokumo/kintone-clj.svg?style=svg)](https://circleci.com/gh/toyokumo/kintone-clj)
+
 ## Overview
 
 The SDK provides an easy way to use kintone API from Clojure or ClojureScript.
