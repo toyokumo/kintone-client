@@ -179,8 +179,7 @@
   (is (= (t/->KintoneResponse {:url "https://test.kintone.com/k/v1/records/cursor.json"
                                :req {:params {:id "112-112"}}}
                               nil)
-         (<!! (r/delete-cursor fake-conn {:id "112-112"}))))
-  )
+         (<!! (r/delete-cursor fake-conn {:id "112-112"})))))
 
 (deftest add-record-test
   (is (= (t/->BulkRequest :POST "/v1/record.json"
