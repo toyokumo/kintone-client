@@ -4,6 +4,7 @@ jobs:
   test:
     docker:
       - image: circleci/clojure:openjdk-8-lein-2.9.1-node-browsers-legacy
+        user: root
         environment:
           LEIN_ROOT: nbd
           JVM_OPTS: -Xms1g -Xmx1g
