@@ -33,13 +33,15 @@
     :total-count - If true, the request will retrieve
                    total count of records match with query conditions.
                    boolean or nil"
-  [conn app & [{:keys [fields query total-count]}]]
-  (let [url (pt/-url conn path/records)
-        params (cond-> {:app app}
-                 (seq fields) (assoc :fields fields)
-                 (seq query) (assoc :query query)
-                 (not (nil? total-count)) (assoc :total-count total-count))]
-    (pt/-get conn url {:params params})))
+  ([conn app]
+   (get-records-by-query conn app nil))
+  ([conn app {:keys [fields query total-count]}]
+   (let [url (pt/-url conn path/records)
+         params (cond-> {:app app}
+                  (seq fields) (assoc :fields fields)
+                  (seq query) (assoc :query query)
+                  (not (nil? total-count)) (assoc :total-count total-count))]
+     (pt/-get conn url {:params params}))))
 
 (defn create-cursor
   "Create a cursor that is used to retrieve records.
@@ -59,13 +61,15 @@
             integer or nil
             Default: 100.
             Maximum: 500"
-  [conn app & [{:as opts :keys [fields query size]}]]
-  (let [url (pt/-url conn path/cursor)
-        size (or size 100)
-        params (cond-> {:app app :size size}
-                 (seq fields) (assoc :fields fields)
-                 (seq query) (assoc :query query))]
-    (pt/-post conn url {:params params})))
+  ([conn app]
+   (create-cursor conn app nil))
+  ([conn app {:keys [fields query size]}]
+   (let [url (pt/-url conn path/cursor)
+         size (or size 100)
+         params (cond-> {:app app :size size}
+                  (seq fields) (assoc :fields fields)
+                  (seq query) (assoc :query query))]
+     (pt/-post conn url {:params params}))))
 
 (defn get-records-by-cursor
   "Get one block of records to use cursor.
@@ -95,21 +99,23 @@
             integer or nil
             Default: 100.
             Maximum: 500"
-  [conn app & [{:as opts :keys [fields query total-count]}]]
-  (go
-    (let [res (<! (create-cursor conn app opts))
-          cursor (:res res)]
-      (if (:err res)
-        res
-        (loop [ret []]
-          (let [res (<! (get-records-by-cursor conn cursor))]
-            (if (:err res)
-              res
-              (let [{:keys [records next]} (:res res)
-                    ret (apply conj ret records)]
-                (if next
-                  (recur ret)
-                  (t/->KintoneResponse {:records ret} nil))))))))))
+  ([conn app]
+   (get-all-records conn app nil))
+  ([conn app {:as opts :keys [fields query total-count]}]
+   (go
+     (let [res (<! (create-cursor conn app opts))
+           cursor (:res res)]
+       (if (:err res)
+         res
+         (loop [ret []]
+           (let [res (<! (get-records-by-cursor conn cursor))]
+             (if (:err res)
+               res
+               (let [{:keys [records next]} (:res res)
+                     ret (apply conj ret records)]
+                 (if next
+                   (recur ret)
+                   (t/->KintoneResponse {:records ret} nil)))))))))))
 
 (defn delete-cursor
   "Delete a cursor.
@@ -400,14 +406,16 @@
     :limit - The number of records to retrieve.
              If it is 5, response retrieve the first 5 comments.
              The default and maximum is 10 comments."
-  [conn app id & [{:as opts :keys [order offset limit]}]]
-  (let [url (pt/-url conn path/comments)
-        params {:app app
-                :record id
-                :order (or order "desc")
-                :offset (or offset 0)
-                :limit (or limit 10)}]
-    (pt/-get conn url {:params params})))
+  ([conn app id]
+   (get-comments conn app id nil))
+  ([conn app id {:as opts :keys [order offset limit]}]
+   (let [url (pt/-url conn path/comments)
+         params {:app app
+                 :record id
+                 :order (or order "desc")
+                 :offset (or offset 0)
+                 :limit (or limit 10)}]
+     (pt/-get conn url {:params params}))))
 
 (defn add-comment
   "Add a comment to a record in an app.
@@ -585,9 +593,9 @@
      :cljs
      ([conn file filename]
       (let [url (pt/-url conn path/file)
-           multipart (doto (js/FormData.)
-                       (.append "file" file filename))]
-       (pt/-multipart-post conn url {:multipart multipart})))))
+            multipart (doto (js/FormData.)
+                        (.append "file" file filename))]
+        (pt/-multipart-post conn url {:multipart multipart})))))
 
 (defn file-download
   "Download a file from an attachment field in an app.
