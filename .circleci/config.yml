@@ -24,7 +24,7 @@ jobs:
           key: v1-dependencies-{{ checksum "project.clj" }}
           paths:
             - ~/.m2
-            - ~/.yarn/bin
+            - ~/.yarn
       - run:
           name: Test clj
           command: lein test
