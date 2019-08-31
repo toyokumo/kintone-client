@@ -1,2 +1,2 @@
-^{:launch-js ["google-chrome" "--headless" "--disable-gpu" "--repl" :open-url]}
+^{:launch-js ["/usr/bin/google-chrome-stable" "--headless" "--disable-gpu" "--repl" :open-url]}
 {:main kintone.test-runner}
