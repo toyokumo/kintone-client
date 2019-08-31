@@ -4,11 +4,16 @@ jobs:
   test:
     docker:
       - image: circleci/clojure:openjdk-8-lein-2.9.1-node-browsers-legacy
+    working_directory: ~/repo
+    environment:
+      LEIN_ROOT: "true"
+      JVM_OPTS: -Xms512m -Xmx512m
     steps:
       - checkout
       - restore_cache:
           keys:
-            - deps-modules-{{ checksum "project.clj" }}
+            - v1-dependencies-{{ checksum "project.clj" }}
+            - v1-dependencies-
       - run:
           name: Test clj
           command: lein test
@@ -16,7 +21,7 @@ jobs:
           name: Test cljs
           command: lein test:cljs
       - save_cache:
-          key: deps-modules-{{ checksum "project.clj" }}
+          key: v1-dependencies-{{ checksum "project.clj" }}
           paths:
             - ~/.m2
             - ~/.lein
