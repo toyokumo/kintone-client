@@ -14,7 +14,7 @@
   ;; https://github.com/bhauman/figwheel-main/issues/159
   :cljsbuild {:builds [{:id "test"
                         :source-paths ["src" "dev" "test"]
-                        :compiler {:output-to "target/public/js/testable.js"
+                        :compiler {:output-to "target/public/js/test.js"
                                    :main cljs.test-runner
                                    :optimizations :none}}]}
   :profiles {:provided {:dependencies [[org.clojure/clojurescript "1.10.520"]
