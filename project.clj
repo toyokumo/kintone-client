@@ -8,8 +8,15 @@
                  [clj-http "3.10.0"]
                  [cheshire "5.9.0"]]
   :clean-targets ^{:protect false} ["target"]
-  :aliases {"test:cljs" ["run" "-m" "figwheel.main" "-co" "test.cljs.edn" "-m" "kintone.test-runner"]
-            "test:mac:cljs" ["run" "-m" "figwheel.main" "-co" "test.mac.cljs.edn" "-m" "kintone.test-runner"]}
+  :aliases {"test:cljs" ["doo" "phantom" "test" "once"]}
+  :plugins [[lein-doo "0.1.10"]]
+  ;; Switch to Figwheel Main when this issue is solved
+  ;; https://github.com/bhauman/figwheel-main/issues/159
+  :cljsbuild {:builds [{:id "test"
+                        :source-paths ["src" "dev" "test"]
+                        :compiler {:output-to "target/public/js/testable.js"
+                                   :main cljs.test-runner
+                                   :optimizations :none}}]}
   :profiles {:provided {:dependencies [[org.clojure/clojurescript "1.10.520"]
                                        [cljs-ajax "0.8.0"]]}
              :dev {:source-paths ["dev"]

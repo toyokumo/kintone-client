@@ -1,8 +1,8 @@
-^{:watch-dirs ["src" "test"]
+^{:watch-dirs ["src" "dev" "test"]
   :mode :repl}
-{:main kintone.test-runner
+{:main cljs.user
  :optimizations :none
  :warnings true
  :output-wrapper true
  :source-map true
- :closure-defines {kintone.test-runner/DEBUG true}}
+ :closure-defines {cljs.user/DEBUG true}}

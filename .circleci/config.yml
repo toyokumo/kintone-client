@@ -4,9 +4,8 @@ jobs:
   test:
     docker:
       - image: circleci/clojure:openjdk-8-lein-2.9.1-node-browsers-legacy
-        user: root
+        user: circleci
         environment:
-          LEIN_ROOT: nbd
           JVM_OPTS: -Xms1g -Xmx1g
     working_directory: ~/repo
     steps:
@@ -18,10 +17,14 @@ jobs:
       - run:
           name: Fetch dependencies
           command: lein deps
+      - run:
+          name: Install phantom
+          command: yarn global add phantomjs
       - save_cache:
           key: v1-dependencies-{{ checksum "project.clj" }}
           paths:
             - ~/.m2
+            - ~/.yarn/bin
       - run:
           name: Test clj
           command: lein test
