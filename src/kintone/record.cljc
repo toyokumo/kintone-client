@@ -101,7 +101,7 @@
             Maximum: 500"
   ([conn app]
    (get-all-records conn app nil))
-  ([conn app {:as opts :keys [fields query total-count]}]
+  ([conn app {:as opts :keys [fields query size]}]
    (go
      (let [res (<! (create-cursor conn app opts))
            cursor (:res res)]
