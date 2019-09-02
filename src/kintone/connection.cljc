@@ -143,7 +143,7 @@
           required
 
   :domain - kintone domain name string
-            required
+            required(Clojure), optional(ClojureScript)
             e.g. sample.kintone.com or sample.cybozu.com, etc..
 
   :guest-space-id - kintone guest space id
@@ -169,6 +169,8 @@
   [{:keys [auth domain guest-space-id
            connection-timeout socket-timeout timeout
            headers]}]
-  (->Connection auth domain guest-space-id
-                connection-timeout socket-timeout timeout
-                headers))
+  (let [domain #?(:clj domain
+                  :cljs (or domain (.-hostname js/location)))]
+    (->Connection auth domain guest-space-id
+                  connection-timeout socket-timeout timeout
+                  headers)))
