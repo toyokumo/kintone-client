@@ -12,8 +12,8 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - v1-dependencies-{{ checksum "project.clj" }}
-            - v1-dependencies-
+            - v2-dependencies-{{ checksum "project.clj" }}
+            - v2-dependencies-
       - run:
           name: Fetch dependencies
           command: lein deps
@@ -21,7 +21,7 @@ jobs:
           name: Install phantom
           command: yarn global add phantomjs
       - save_cache:
-          key: v1-dependencies-{{ checksum "project.clj" }}
+          key: v2-dependencies-{{ checksum "project.clj" }}
           paths:
             - ~/.m2
       - run:
