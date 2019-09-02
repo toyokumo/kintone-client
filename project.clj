@@ -13,7 +13,7 @@
   ;; Switch to Figwheel Main when this issue is solved
   ;; https://github.com/bhauman/figwheel-main/issues/159
   :cljsbuild {:builds [{:id "test"
-                        :source-paths ["src" "dev" "test"]
+                        :source-paths ["src" "test" "script"]
                         :compiler {:output-to "target/public/js/test.js"
                                    :main cljs.test-runner
                                    :optimizations :none}}]}
