@@ -18,12 +18,16 @@ jobs:
           name: Fetch dependencies
           command: lein deps
       - run:
-          name: Install phantom
-          command: yarn global add phantomjs
+          name: Install karma dependencies
+          command: yarn add karma karma-cljs-test karma-chrome-launcher --dev
+      - run:
+          name: Install karma-cli
+          command: sudo yarn global add karma-cli
       - save_cache:
           key: v2-dependencies-{{ checksum "project.clj" }}
           paths:
             - ~/.m2
+            - ~/repo/node_modules
       - run:
           name: Test clj
           command: lein test
