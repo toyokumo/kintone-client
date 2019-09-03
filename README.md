@@ -118,7 +118,7 @@ You should use `Connection` object as the first argument on every API call.
       (:res res))))
 ```
 
-For more information, See API documents.
+For more information, See [API documents](https://cljdoc.org/d/toyokumo/kintone-clj/CURRENT).
 
 ## License
 
