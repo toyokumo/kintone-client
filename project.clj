@@ -1,8 +1,8 @@
 (defproject toyokumo/kintone-clj "0.1.0-SNAPSHOT"
   :description "A kintone SDK for Clojure and ClojureScript"
   :url "https://github.com/toyokumo/kintone-clj"
-  :license {:name "EPL-2.0 OR GPL-2.0-or-later WITH Classpath-exception-2.0"
-            :url "https://www.eclipse.org/legal/epl-2.0/"}
+  :license {:name "Apache, Version 2.0"
+            :url "http://www.apache.org/licenses/LICENSE-2.0"}
   :dependencies [[org.clojure/clojure "1.10.0"]
                  [org.clojure/core.async "0.4.500"]
                  [clj-http "3.10.0"]
