@@ -29,11 +29,8 @@ jobs:
             - ~/.m2
             - ~/repo/node_modules
       - run:
-          name: Test clj
-          command: lein test
-      - run:
-          name: Test cljs
-          command: lein test:cljs
+          name: Test
+          command: make test
 
 workflows:
   version: 2
