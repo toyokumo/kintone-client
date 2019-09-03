@@ -28,10 +28,10 @@ Follow bellow the steps.
 
 ### Make `Auth` object
 
-`Auth` object is used in order to make `Connection` object. 
+`Auth` object is used in order to make `Connection` object.
 
-This step is not necessary in case that you run JavaScript(ClojureScript) 
-on kintone as customise script for kintone app or portal.
+This step is not necessary in case that you run JavaScript(ClojureScript)
+on kintone as customize script for kintone app or portal.
 
 ```clojure
 (require '[kintone.authentication :as auth])
@@ -39,12 +39,12 @@ on kintone as customise script for kintone app or portal.
 ;; API token
 (auth/new-auth {:api-token "xyz..."})
 
-;; Basic authentication and passwrod authentication
+;; Basic authentication and password authentication
 (auth/new-auth {:basic {:username "basic-username" :password "basic-password"}
                 :password {:username "login-name" :password "login-password"}})
 
-;; Basic authentication, passwrod authentication and API token
-;; In this case, the API token is going to be ignored, 
+;; Basic authentication, password authentication and API token
+;; In this case, the API token is going to be ignored,
 ;; and the basic authentication and the password authentication is going to be used.
 (auth/new-auth {:basic {:username "basic-username" :password "basic-password"}
                 :password {:username "login-name" :password "login-password"}
@@ -66,7 +66,7 @@ on kintone as customise script for kintone app or portal.
                       :domain "sample.kintone.com"
                       :guest-space-id 1})
 
-;; It is noly accepted on ClojureScript that there is no auth.
+;; It is only accepted on ClojureScript that there is no auth.
 (conn/new-connection {:domain "sample.cybozu.com"})
 ```
 
@@ -96,7 +96,7 @@ You should use `Connection` object as the first argument on every API call.
 ;; success => {:record {:$id {:type "__ID__", :value "1"} ...}
 ;; fail => {:status 404
 ;;          :status-text "Not Found"
-;;          :failure :erro
+;;          :failure :error
 ;;          :response {:code "GAIA_RE01" ...}}
 
 
