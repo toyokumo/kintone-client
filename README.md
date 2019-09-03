@@ -79,11 +79,11 @@ You should use `Connection` object as the first argument on every API call.
 (require '[kintone.connection :as conn])
 (require '[kintone.record :as record])
 
-(def conn (conn/new-connection {:auth (auth/new-auth {:api-token "xyz.."})
-                                :domain "sample.kintone.com"}))
-
 ;; Clojure
 (require '[clojure.core.async :refer [<!!]])
+
+(def conn (conn/new-connection {:auth (auth/new-auth {:api-token "xyz.."})
+                                :domain "sample.kintone.com"}))
 
 (let [app 1111
       id 1
@@ -102,6 +102,9 @@ You should use `Connection` object as the first argument on every API call.
 
 ;; ClojureScript
 (require '[cljs.core.async :refer [<!] :refer-macros [go]])
+
+;; If you do not pass the domain string, (.-hostname js/location) will be used.
+(def conn (conn/new-connection {:auth (auth/new-auth {:api-token "xyz.."})}))
 
 ;; Call in go block to handle response
 (go
