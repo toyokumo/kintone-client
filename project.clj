@@ -10,7 +10,8 @@
                  [clj-http "3.10.0"]
                  [cheshire "5.9.0"]]
   :clean-targets ^{:protect false} ["target"]
-  :aliases {"test:cljs" ["doo" "chrome-headless" "test" "once"]}
+  :aliases {"test:cljs" ["doo" "chrome-headless" "test" "once"]
+            "bump-version" ["change" "version" "leiningen.release/bump-version"]}
   :plugins [[lein-doo "0.1.10"]]
   ;; Switch to Figwheel Main when this issue is solved
   ;; https://github.com/bhauman/figwheel-main/issues/159
