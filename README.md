@@ -3,9 +3,7 @@
 A [kintone](https://www.kintone.com) SDK for Clojure and ClojureScript.
 
 [![CircleCI](https://circleci.com/gh/toyokumo/kintone-clj.svg?style=svg)](https://circleci.com/gh/toyokumo/kintone-clj)
-
 [![cljdoc badge](https://cljdoc.org/badge/toyokumo/kintone-clj)](https://cljdoc.org/d/toyokumo/kintone-clj/CURRENT)
-
 [![Clojars Project](https://img.shields.io/clojars/v/toyokumo/kintone-clj.svg)](https://clojars.org/toyokumo/kintone-clj)
 
 ## Overview
