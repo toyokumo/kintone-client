@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+## 0.1.2
+### Added
+- Add as argument to `file-downlaod` API
+
+### Breaking
+- (Only Clojure) Change `file-download` default response body type from String to byte array
+
 ## 0.1.1 - 2019-09-04
 ### Fixed
 - Make dynamic function name surrounded by `*`
