@@ -402,9 +402,23 @@
                   :async? true
                   :connection-timeout 10000
                   :socket-timeout 30000
-                  :form-params {:id 1}}
+                  :form-params {:id 1}
+                  :as :byte-array}
                  nil)
-                (<!! (pt/-get-blob conn url {:params {:id 1}}))))))
+                (<!! (pt/-get-blob conn url {:params {:id 1}}))))
+
+         (is (= (t/->KintoneResponse
+                 {:headers {"X-Cybozu-API-Token" "TestApiToken"
+                            "X-HTTP-Method-Override" "GET"}
+                  :content-type :json
+                  :async? true
+                  :connection-timeout 10000
+                  :socket-timeout 30000
+                  :form-params {:id 1}
+                  :as :stream}
+                 nil)
+                (<!! (pt/-get-blob conn url {:params {:id 1}
+                                             :as :stream}))))))
 
      (testing "Negative"
        (testing "ExceptionInfo"
@@ -549,4 +563,3 @@
                    :response {:message "Something bad happen"}})
                  (<! (pt/-multipart-post conn url {:multipart [{:id 1}]})))))
         (done)))))
-
