@@ -40,7 +40,7 @@
          params (cond-> {:app app}
                   (seq fields) (assoc :fields fields)
                   (seq query) (assoc :query query)
-                  (not (nil? total-count)) (assoc :total-count total-count))]
+                  (not (nil? total-count)) (assoc :totalCount total-count))]
      (pt/-get conn url {:params params}))))
 
 (defn create-cursor
