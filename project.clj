@@ -1,4 +1,4 @@
-(defproject toyokumo/kintone-clj "0.1.2-SNAPSHOT"
+(defproject toyokumo/kintone-clj "0.1.2"
   :description "A kintone SDK for Clojure and ClojureScript"
   :url "https://github.com/toyokumo/kintone-clj"
   :license {:name "Apache, Version 2.0"
