@@ -6,6 +6,9 @@
 ### Added
 - Add as argument to `file-downlaod` API
 
+### Fixed
+- `totalCount` case on `get-records-by-query`
+
 ### Breaking
 - (Only Clojure) Change `file-download` default response body type from String to byte array
 
