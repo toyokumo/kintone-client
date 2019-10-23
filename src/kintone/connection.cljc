@@ -110,7 +110,8 @@
     (let [c (chan)
           req (post-as-get req)
           req #?(:clj (-> (*build-req* this req c)
-                          (dissoc :accept :as :coerce))
+                          (dissoc :accept :coerce)
+                          (assoc :as (or (:as req) :byte-array)))
                  :cljs (-> (*build-req* this req c)
                            (dissoc :format)
                            (assoc :response-format (ajax/raw-response-format))))]

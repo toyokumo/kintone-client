@@ -600,14 +600,24 @@
 (defn file-download
   "Download a file from an attachment field in an app.
 
-  file-key - The value is set on the attachment field in the response
+  file-key - The value(string) is set on the attachment field in the response
              that is gotten from GET record APIs.
              So the file-key is different from that
-             obtained from the response when using the Upload File API."
-  [conn file-key]
-  (let [url (pt/-url conn path/file)
-        params {:fileKey file-key}]
-    (pt/-get-blob conn url {:params params})))
+             obtained from the response when using the Upload File API.
+
+  as - (Only Clojure) A keyword that is used for output coercion.
+       default :byte-array
+       See clj-http document for detail."
+  ([conn file-key]
+   (let [url (pt/-url conn path/file)
+         params {:fileKey file-key}]
+     (pt/-get-blob conn url {:params params})))
+
+  #?(:clj
+     ([conn file-key as]
+      (let [url (pt/-url conn path/file)
+            params {:fileKey file-key}]
+        (pt/-get-blob conn url {:params params :as as})))))
 
 (defn bulk-request
   "Runs multiple API requests to multiple apps in one go.
