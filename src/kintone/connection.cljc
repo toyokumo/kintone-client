@@ -7,7 +7,8 @@
             [kintone.protocols :as pt]
             [kintone.types :as t])
   #?(:clj (:import (clojure.lang ExceptionInfo)
-                   (java.lang Exception))))
+                   (java.lang Exception)
+                   (org.apache.http.entity.mime HttpMultipartMode))))
 
 (def ^:dynamic ^:private *default-req*
   "Default request parameters."
@@ -122,6 +123,8 @@
           req (assoc req :json-req? false?)
           req #?(:clj (-> (*build-req* this req c)
                           (dissoc :content-type :async?)
+                          (assoc :multipart-mode HttpMultipartMode/BROWSER_COMPATIBLE)
+                          (assoc :multipart-charset "UTF-8")
                           (assoc :multipart (:multipart req)))
                  :cljs (-> (*build-req* this req c)
                            (dissoc :format)
