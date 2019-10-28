@@ -118,7 +118,20 @@ You should use `Connection` object as the first argument on every API call.
       (:res res))))
 ```
 
-For more information, See [API documents](https://cljdoc.org/d/toyokumo/kintone-clj/CURRENT).
+For more information, See [API documents](https://cljdoc.org/d/toyokumo/kintone-clj/CURRENT) and dev/test.clj.
+
+## dev/test.clj
+These tests actually interact with a kintone app. These are good examples of kintone-clj.
+### how to run
+- import dev-resources/kintone-clj-test.zip
+- fill dev-resources/config.edn
+```edn
+{:auth {:basic {:username "username" :password "password"}
+        :api-token "api-token"}
+ :domain "domain"
+ :app 9999}
+```
+- try tests
 
 ## License
 
