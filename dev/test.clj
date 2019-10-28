@@ -29,6 +29,9 @@
   (println x)
   x)
 
+;; TODO: throws weird error on Cursive
+;; Error handling response - class java.lang.IndexOutOfBoundsException: Wrong line: 140. Available lines count: 140
+
 (deftest get-record-test
   (with-cleanup
     (let [id (-> (<!! (record/add-record conn app {:文字列__1行_ {:value "ほげ"}}))
@@ -120,7 +123,6 @@
 (deftest add-record-invalid-argument-test
   (with-cleanup
     (let [res (<!! (record/add-record conn app [{:文字列__1行_ {:value "ほげ"}}]))] ;; adds empty records
-      (pp res)
       (is (not= nil (:err res))))))
 
 (deftest add-records-test
@@ -143,7 +145,6 @@
                    :records
                    count))))))
 
-;; TODO: throws weird err (caused by Cursive?)
 (deftest update-record-test
   (with-cleanup
     (let [id (-> (<!! (record/add-record conn app {:文字列__1行_ {:value "あああ"}}))
@@ -159,7 +160,6 @@
                  :文字列__1行_
                  :value))))))
 
-;; TODO: throws weird err (caused by Cursive?)
 (deftest update-records-test
   (with-cleanup
     (let [id1 (-> (<!! (record/add-record conn app {:文字列__1行_ {:value "あああ"}}))
@@ -186,7 +186,6 @@
                  :文字列__1行_
                  :value))))))
 
-;; TODO: throws weird err (caused by Cursive?)
 (deftest update-all-records-test
   (with-cleanup
     (let [id1 (-> (<!! (record/add-record conn app {:文字列__1行_ {:value "あああ"}}))
@@ -213,17 +212,14 @@
                  :文字列__1行_
                  :value))))))
 
-;; TODO: throws weird err (caused by Cursive?)
 (deftest file-upload-test
   (with-cleanup
     (let [file-key (-> (<!! (record/file-upload conn (io/file "dev-resources/aa.txt")))
                        :res
                        :fileKey)
           res (<!! (record/add-record conn app {:添付ファイル {:value [{:fileKey file-key}]}}))]
-      (println res)
       (is (= nil (:err res))))))
 
-;; TODO: throws weird err (caused by Cursive?)
 (deftest file-download-test
   (with-cleanup
     (let [upload-file-key (-> (<!! (record/file-upload conn (io/file "dev-resources/aa.txt")))
@@ -241,3 +237,5 @@
                                 :fileKey)
           res (<!! (record/file-download conn download-file-key))]
       (is (= nil (:err res))))))
+
+#_(run-tests 'test)
