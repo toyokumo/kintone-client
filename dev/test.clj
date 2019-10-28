@@ -16,10 +16,6 @@
 
 (def app (:app conf))
 
-(def string-field-code :文字列__1行_)
-
-(def attachment-file-field-code :添付ファイル)
-
 (defn delete-all-record [conn app]
   (record/delete-all-records-by-query conn app ""))
 
