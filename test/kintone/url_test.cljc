@@ -23,14 +23,394 @@
   (:require [kintone.url :as sut]
             [clojure.test :as t]))
 
-(t/deftest parse-app-url-test
-  (t/testing "parse default space app"
-    (t/are [url parsed] (= (sut/parse-app-url url) parsed)
+(t/deftest extract-base-url-test
+  (t/are [url base-url] (= (sut/extract-base-url url) base-url)
+
+                        "https://foo.cybozu.com"
+                        "https://foo.cybozu.com"
+
+                        "https://foo.cybozu.com/"
+                        "https://foo.cybozu.com"
+
+                        "https://foo.cybozu.com/k"
+                        "https://foo.cybozu.com"
+
+                        "https://foo.cybozu.com/k/"
+                        "https://foo.cybozu.com"
+
                         "https://foo.cybozu.com/k/1"
+                        "https://foo.cybozu.com"
+
+                        "https://foo.cybozu.com/k/1/"
+                        "https://foo.cybozu.com"
+
+                        "https://foo.cybozu.com/k/99999999"
+                        "https://foo.cybozu.com"
+
+                        "https://foo.cybozu.com/k/abc"
+                        "https://foo.cybozu.com"
+
+                        "https://foo.s.cybozu.com/k/1"
+                        "https://foo.s.cybozu.com"
+
+                        "https://foo-bar.cybozu.com/k/1"
+                        "https://foo-bar.cybozu.com"
+
+                        "https://foo-bar-baz.cybozu.com/k/1"
+                        "https://foo-bar-baz.cybozu.com"
+
+                        "https://foo99.cybozu.com/k/1"
+                        "https://foo99.cybozu.com"
+
+                        "https://foo99.cybozu.com/k/1/show"
+                        "https://foo99.cybozu.com"
+
+                        "https://foo99.cybozu.com/k/1/?q=foo%20%3D%20\"1\""
+                        "https://foo99.cybozu.com"
+
+                        "https://foo.cybozu.com/k/guest/11/1"
+                        "https://foo.cybozu.com"
+
+                        "https://foo.cybozu-dev.com/k/1"
+                        "https://foo.cybozu-dev.com"
+
+                        "https://foo.kintone.com/k/1"
+                        "https://foo.kintone.com"
+
+                        "https://foo.kintone-dev.com/k/1"
+                        "https://foo.kintone-dev.com"
+
+                        "https://foo.cybozu.cn/k/1"
+                        "https://foo.cybozu.cn"
+
+                        "https://foo.cybozu-dev.cn/k/1"
+                        "https://foo.cybozu-dev.cn"
+
+                        "https://foo_bar.cybozu.com/k/1"
+                        nil
+
+                        "https://foo.bar.com/baz"
+                        nil))
+
+(t/deftest parse-base-url-test
+  (t/are [url parsed] (= (sut/parse-base-url url) parsed)
+
+                      "https://foo.cybozu.com"
+                      {:domain "cybozu.com"
+                       :subdomain "foo"}
+
+                      "https://foo.cybozu.com/"
+                      {:domain "cybozu.com"
+                       :subdomain "foo"}
+
+                      "https://foo.cybozu.com/k"
+                      {:domain "cybozu.com"
+                       :subdomain "foo"}
+
+                      "https://foo.cybozu.com/k/"
+                      {:domain "cybozu.com"
+                       :subdomain "foo"}
+
+                      "https://foo.cybozu.com/k/1"
+                      {:domain "cybozu.com"
+                       :subdomain "foo"}
+
+                      "https://foo.cybozu.com/k/1/"
+                      {:domain "cybozu.com"
+                       :subdomain "foo"}
+
+                      "https://foo.cybozu.com/k/99999999"
+                      {:domain "cybozu.com"
+                       :subdomain "foo"}
+
+                      "https://foo.cybozu.com/k/abc"
+                      {:domain "cybozu.com"
+                       :subdomain "foo"}
+
+                      "https://foo.s.cybozu.com/k/1"
+                      {:domain "cybozu.com"
+                       :subdomain "foo"}
+
+                      "https://foo-bar.cybozu.com/k/1"
+                      {:domain "cybozu.com"
+                       :subdomain "foo-bar"}
+
+                      "https://foo-bar-baz.cybozu.com/k/1"
+                      {:domain "cybozu.com"
+                       :subdomain "foo-bar-baz"}
+
+                      "https://foo99.cybozu.com/k/1"
+                      {:domain "cybozu.com"
+                       :subdomain "foo99"}
+
+                      "https://foo99.cybozu.com/k/1/show"
+                      {:domain "cybozu.com"
+                       :subdomain "foo99"}
+
+                      "https://foo99.cybozu.com/k/1/?q=foo%20%3D%20\"1\""
+                      {:domain "cybozu.com"
+                       :subdomain "foo99"}
+
+                      "https://foo.cybozu.com/k/guest/11/1"
+                      {:domain "cybozu.com"
+                       :subdomain "foo"}
+
+                      "https://foo.cybozu-dev.com/k/1"
+                      {:domain "cybozu-dev.com"
+                       :subdomain "foo"}
+
+                      "https://foo.kintone.com/k/1"
+                      {:domain "kintone.com"
+                       :subdomain "foo"}
+
+                      "https://foo.kintone-dev.com/k/1"
+                      {:domain "kintone-dev.com"
+                       :subdomain "foo"}
+
+                      "https://foo.cybozu.cn/k/1"
+                      {:domain "cybozu.cn"
+                       :subdomain "foo"}
+
+                      "https://foo.cybozu-dev.cn/k/1"
+                      {:domain "cybozu-dev.cn"
+                       :subdomain "foo"}
+
+                      "https://foo_bar.cybozu.com/k/1"
+                      nil
+
+                      "https://foo.bar.com/baz"
+                      nil))
+
+(t/deftest valid-base-url?-test
+  (t/are [url res] (= (sut/valid-base-url? url) res)
+
+                   "https://foo.cybozu.com"
+                   true
+
+                   "https://foo.cybozu.com/"
+                   true
+
+                   "https://foo.cybozu.com/k"
+                   true
+
+                   "https://foo.cybozu.com/k/"
+                   true
+
+                   "https://foo.cybozu.com/k/1"
+                   true
+
+                   "https://foo.cybozu.com/k/1/"
+                   true
+
+                   "https://foo.cybozu.com/k/99999999"
+                   true
+
+                   "https://foo.cybozu.com/k/abc"
+                   true
+
+                   "https://foo.s.cybozu.com/k/1"
+                   true
+
+                   "https://foo-bar.cybozu.com/k/1"
+                   true
+
+                   "https://foo-bar-baz.cybozu.com/k/1"
+                   true
+
+                   "https://foo99.cybozu.com/k/1"
+                   true
+
+                   "https://foo99.cybozu.com/k/1/show"
+                   true
+
+                   "https://foo99.cybozu.com/k/1/?q=foo%20%3D%20\"1\""
+                   true
+
+                   "https://foo.cybozu.com/k/guest/11/1"
+                   true
+
+                   "https://foo.cybozu-dev.com/k/1"
+                   true
+
+                   "https://foo.kintone.com/k/1"
+                   true
+
+                   "https://foo.kintone-dev.com/k/1"
+                   true
+
+                   "https://foo.cybozu.cn/k/1"
+                   true
+
+                   "https://foo.cybozu-dev.cn/k/1"
+                   true
+
+                   "https://foo_bar.cybozu.com/k/1"
+                   false
+
+                   "https://foo.bar.com/baz"
+                   false))
+
+(t/deftest extract-app-url-test
+
+  (t/testing "default space app"
+    (t/are [url app-url] (= (sut/extract-app-url url) app-url)
+
+                         "https://foo.cybozu.com"
+                         nil
+
+                         "https://foo.cybozu.com/"
+                         nil
+
+                         "https://foo.cybozu.com/k"
+                         nil
+
+                         "https://foo.cybozu.com/k/"
+                         nil
+
+                         "https://foo.cybozu.com/k/1"
+                         "https://foo.cybozu.com/k/1"
+
+                         "https://foo.cybozu.com/k/1/"
+                         "https://foo.cybozu.com/k/1"
+
+                         "https://foo.cybozu.com/k/99999999"
+                         "https://foo.cybozu.com/k/99999999"
+
+                         "https://foo.cybozu.com/k/abc"
+                         nil
+
+                         "https://foo.s.cybozu.com/k/1"
+                         "https://foo.s.cybozu.com/k/1"
+
+                         "https://foo-bar.cybozu.com/k/1"
+                         "https://foo-bar.cybozu.com/k/1"
+
+                         "https://foo-bar-baz.cybozu.com/k/1"
+                         "https://foo-bar-baz.cybozu.com/k/1"
+
+                         "https://foo99.cybozu.com/k/1"
+                         "https://foo99.cybozu.com/k/1"
+
+                         "https://foo99.cybozu.com/k/1/show"
+                         "https://foo99.cybozu.com/k/1"
+
+                         "https://foo99.cybozu.com/k/1/?q=foo%20%3D%20\"1\""
+                         "https://foo99.cybozu.com/k/1"
+
+                         "https://foo.cybozu-dev.com/k/1"
+                         "https://foo.cybozu-dev.com/k/1"
+
+                         "https://foo.kintone.com/k/1"
+                         "https://foo.kintone.com/k/1"
+
+                         "https://foo.kintone-dev.com/k/1"
+                         "https://foo.kintone-dev.com/k/1"
+
+                         "https://foo.cybozu.cn/k/1"
+                         "https://foo.cybozu.cn/k/1"
+
+                         "https://foo.cybozu-dev.cn/k/1"
+                         "https://foo.cybozu-dev.cn/k/1"
+
+                         "https://foo_bar.cybozu.com/k/1"
+                         nil
+
+                         "https://foo.bar.com/baz"
+                         nil))
+
+  (t/testing "guest space app"
+    (t/are [url app-url] (= (sut/extract-app-url url) app-url)
+
+                         "https://foo.cybozu.com/k/guest/11/1"
+                         "https://foo.cybozu.com/k/guest/11/1"
+
+                         "https://foo.cybozu.com/k/guest/11/1/"
+                         "https://foo.cybozu.com/k/guest/11/1"
+
+                         "https://foo.cybozu.com/k/guest/11/99999999"
+                         "https://foo.cybozu.com/k/guest/11/99999999"
+
+                         "https://foo.s.cybozu.com/k/guest/11/1"
+                         "https://foo.s.cybozu.com/k/guest/11/1"
+
+                         "https://foo-bar.cybozu.com/k/guest/11/1"
+                         "https://foo-bar.cybozu.com/k/guest/11/1"
+
+                         "https://foo-bar-baz.cybozu.com/k/guest/11/1"
+                         "https://foo-bar-baz.cybozu.com/k/guest/11/1"
+
+                         "https://foo99.cybozu.com/k/guest/11/1"
+                         "https://foo99.cybozu.com/k/guest/11/1"
+
+                         "https://foo99.cybozu.com/k/guest/11/1/show"
+                         "https://foo99.cybozu.com/k/guest/11/1"
+
+                         "https://foo99.cybozu.com/k/1/?q=foo%20%3D%20\"1\""
+                         "https://foo99.cybozu.com/k/1"
+
+                         "https://foo99.cybozu.com/k/guest/11/1/?q=foo%20%3D%20\"1\""
+                         "https://foo99.cybozu.com/k/guest/11/1"
+
+                         "https://foo.cybozu-dev.com/k/guest/11/1"
+                         "https://foo.cybozu-dev.com/k/guest/11/1"
+
+                         "https://foo.kintone.com/k/guest/11/1"
+                         "https://foo.kintone.com/k/guest/11/1"
+
+                         "https://foo.kintone-dev.com/k/guest/11/1"
+                         "https://foo.kintone-dev.com/k/guest/11/1"
+
+                         "https://foo.cybozu.cn/k/guest/11/1"
+                         "https://foo.cybozu.cn/k/guest/11/1"
+
+                         "https://foo.cybozu-dev.cn/k/guest/11/1"
+                         "https://foo.cybozu-dev.cn/k/guest/11/1"
+
+                         "https://foo_bar.cybozu.com/k/guest/11/1"
+                         nil
+
+                         "https://foo.bar.com/k/guest/11/1"
+                         nil
+
+                         "https://foo.cybozu.com/k/guest"
+                         nil
+
+                         "https://foo.cybozu.com/k/guest/"
+                         nil
+
+                         "https://foo.cybozu.com/k/guest/11"
+                         nil
+
+                         "https://foo.cybozu.com/k/guest/11/"
+                         nil)))
+
+(t/deftest parse-app-url-test
+
+  (t/testing "default space app"
+    (t/are [url parsed] (= (sut/parse-app-url url) parsed)
+                        "https://foo.cybozu.com"
+                        nil
+
+                        "https://foo.cybozu.com/"
+                        nil
+
+                        "https://foo.cybozu.com/k"
+                        nil
+
+                        "https://foo.cybozu.com/k/"
+                        nil
+
+                        "https://foo.cybozu.com/k/1"
+                        {:subdomain "foo" :domain "cybozu.com" :app-id "1"}
+
+                        "https://foo.cybozu.com/k/1/"
                         {:subdomain "foo" :domain "cybozu.com" :app-id "1"}
 
                         "https://foo.cybozu.com/k/99999999"
                         {:subdomain "foo" :domain "cybozu.com" :app-id "99999999"}
+
+                        "https://foo.cybozu.com/k/abc"
+                        nil
 
                         "https://foo.s.cybozu.com/k/1"
                         {:subdomain "foo" :domain "cybozu.com" :app-id "1"}
@@ -50,12 +430,33 @@
                         "https://foo99.cybozu.com/k/1/?q=foo%20%3D%20\"1\""
                         {:subdomain "foo99" :domain "cybozu.com" :app-id "1"}
 
+                        "https://foo.cybozu-dev.com/k/1"
+                        {:subdomain "foo" :domain "cybozu-dev.com" :app-id "1"}
+
+                        "https://foo.kintone.com/k/1"
+                        {:subdomain "foo" :domain "kintone.com" :app-id "1"}
+
+                        "https://foo.kintone-dev.com/k/1"
+                        {:subdomain "foo" :domain "kintone-dev.com" :app-id "1"}
+
+                        "https://foo.cybozu.cn/k/1"
+                        {:subdomain "foo" :domain "cybozu.cn" :app-id "1"}
+
+                        "https://foo.cybozu-dev.cn/k/1"
+                        {:subdomain "foo" :domain "cybozu-dev.cn" :app-id "1"}
+
                         "https://foo_bar.cybozu.com/k/1"
+                        nil
+
+                        "https://foo.bar.com/baz"
                         nil))
 
-  (t/testing "parse guest space app"
+  (t/testing "guest space app"
     (t/are [url parsed] (= (sut/parse-app-url url) parsed)
                         "https://foo.cybozu.com/k/guest/11/1"
+                        {:subdomain "foo" :domain "cybozu.com" :guest-space-id "11" :app-id "1"}
+
+                        "https://foo.cybozu.com/k/guest/11/1/"
                         {:subdomain "foo" :domain "cybozu.com" :guest-space-id "11" :app-id "1"}
 
                         "https://foo.cybozu.com/k/guest/11/99999999"
@@ -79,5 +480,154 @@
                         "https://foo99.cybozu.com/k/guest/11/1/?q=foo%20%3D%20\"1\""
                         {:subdomain "foo99" :domain "cybozu.com" :guest-space-id "11" :app-id "1"}
 
+                        "https://foo.cybozu-dev.com/k/guest/11/1"
+                        {:subdomain "foo" :domain "cybozu-dev.com" :guest-space-id "11" :app-id "1"}
+
+                        "https://foo.kintone.com/k/guest/11/1"
+                        {:subdomain "foo" :domain "kintone.com" :guest-space-id "11" :app-id "1"}
+
+                        "https://foo.kintone-dev.com/k/guest/11/1"
+                        {:subdomain "foo" :domain "kintone-dev.com" :guest-space-id "11" :app-id "1"}
+
+                        "https://foo.cybozu.cn/k/guest/11/1"
+                        {:subdomain "foo" :domain "cybozu.cn" :guest-space-id "11" :app-id "1"}
+
+                        "https://foo.cybozu-dev.cn/k/guest/11/1"
+                        {:subdomain "foo" :domain "cybozu-dev.cn" :guest-space-id "11" :app-id "1"}
+
                         "https://foo_bar.cybozu.com/k/guest/11/1"
+                        nil
+
+                        "https://foo.bar.com/k/guest/11/1"
                         nil)))
+
+(t/deftest valid-app-url?-test
+
+  (t/testing "default space app"
+    (t/are [url res] (= (sut/valid-app-url? url) res)
+
+                     "https://foo.cybozu.com"
+                     false
+
+                     "https://foo.cybozu.com/"
+                     false
+
+                     "https://foo.cybozu.com/k"
+                     false
+
+                     "https://foo.cybozu.com/k/"
+                     false
+
+                     "https://foo.cybozu.com/k/1"
+                     true
+
+                     "https://foo.cybozu.com/k/99999999"
+                     true
+
+                     "https://foo.cybozu.com/k/abc"
+                     false
+
+                     "https://foo.s.cybozu.com/k/1"
+                     true
+
+                     "https://foo-bar.cybozu.com/k/1"
+                     true
+
+                     "https://foo-bar-baz.cybozu.com/k/1"
+                     true
+
+                     "https://foo99.cybozu.com/k/1"
+                     true
+
+                     "https://foo99.cybozu.com/k/1/show"
+                     true
+
+                     "https://foo99.cybozu.com/k/1/?q=foo%20%3D%20\"1\""
+                     true
+
+                     "https://foo.cybozu-dev.com/k/1"
+                     true
+
+                     "https://foo.kintone.com/k/1"
+                     true
+
+                     "https://foo.kintone-dev.com/k/1"
+                     true
+
+                     "https://foo.cybozu.cn/k/1"
+                     true
+
+                     "https://foo.cybozu-dev.cn/k/1"
+                     true
+
+                     "https://foo_bar.cybozu.com/k/1"
+                     false
+
+                     "https://foo.bar.com/baz"
+                     false))
+
+  (t/testing "guest space app"
+    (t/are [url res] (= (sut/valid-app-url? url) res)
+
+                     "https://foo.cybozu.com/k/guest/11/1"
+                     true
+
+                     "https://foo.cybozu.com/k/guest/11/1"
+                     true
+
+                     "https://foo.cybozu.com/k/guest/11/99999999"
+                     true
+
+                     "https://foo.s.cybozu.com/k/guest/11/1"
+                     true
+
+                     "https://foo-bar.cybozu.com/k/guest/11/1"
+                     true
+
+                     "https://foo-bar-baz.cybozu.com/k/guest/11/1"
+                     true
+
+                     "https://foo99.cybozu.com/k/guest/11/1"
+                     true
+
+                     "https://foo99.cybozu.com/k/guest/11/1/show"
+                     true
+
+                     "https://foo99.cybozu.com/k/1/?q=foo%20%3D%20\"1\""
+                     true
+
+                     "https://foo99.cybozu.com/k/guest/11/1/?q=foo%20%3D%20\"1\""
+                     true
+
+                     "https://foo.cybozu-dev.com/k/guest/11/1"
+                     true
+
+                     "https://foo.kintone.com/k/guest/11/1"
+                     true
+
+                     "https://foo.kintone-dev.com/k/guest/11/1"
+                     true
+
+                     "https://foo.cybozu.cn/k/guest/11/1"
+                     true
+
+                     "https://foo.cybozu-dev.cn/k/guest/11/1"
+                     true
+
+                     "https://foo_bar.cybozu.com/k/guest/11/1"
+                     false
+
+                     "https://foo.bar.com/k/guest/11/1"
+                     false
+
+                     "https://foo.cybozu.com/k/guest"
+                     false
+
+                     "https://foo.cybozu.com/k/guest/"
+                     false
+
+                     "https://foo.cybozu.com/k/guest/11"
+                     false
+
+                     "https://foo.cybozu.com/k/guest/11/"
+                     false)))
