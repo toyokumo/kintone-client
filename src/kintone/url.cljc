@@ -30,14 +30,14 @@
    "cybozu.cn"
    "cybozu-dev.cn"])
 
-(def re-base-url*
+(def ^:private re-base-url*
   (str "^https://([a-zA-Z0-9][a-zA-Z0-9\\-]{1,30}[a-zA-Z0-9])(?:\\.s)?\\."
        "("
        (->> (map #(str/replace % "." "\\.") domain-list)
             (str/join "|"))
        ")"))
 
-(def re-base-url
+(def ^:private re-base-url
   (re-pattern re-base-url*))
 
 (defn extract-base-url [url]
@@ -51,10 +51,10 @@
 (defn valid-base-url? [url]
   (not (str/blank? (extract-base-url url))))
 
-(def re-app-url
+(def ^:private re-app-url
   (re-pattern (str re-base-url* "/k/(\\d++)")))
 
-(def re-guest-app-url
+(def ^:private re-guest-app-url
   (re-pattern (str re-base-url* "/k/guest/(\\d++)/(\\d++)")))
 
 (defn extract-app-url [url]
