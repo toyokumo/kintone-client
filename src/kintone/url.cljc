@@ -52,10 +52,10 @@
   (not (str/blank? (extract-base-url url))))
 
 (def ^:private re-app-url
-  (re-pattern (str re-base-url* "/k/(\\d++)")))
+  (re-pattern (str re-base-url* "/k/(\\d+)")))
 
 (def ^:private re-guest-app-url
-  (re-pattern (str re-base-url* "/k/guest/(\\d++)/(\\d++)")))
+  (re-pattern (str re-base-url* "/k/guest/(\\d+)/(\\d+)")))
 
 (defn extract-app-url [url]
   (or (some-> (re-find re-app-url url) first)

@@ -20,11 +20,12 @@
 ;OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 ;SOFTWARE.
 (ns kintone.url-test
-  (:require [kintone.url :as sut]
-            [clojure.test :as t]))
+  (:require #?(:clj [clojure.test :refer :all]
+               :cljs [cljs.test :refer-macros [deftest testing are run-tests]])
+            [kintone.url :as sut]))
 
-(t/deftest extract-base-url-test
-  (t/are [url base-url] (= (sut/extract-base-url url) base-url)
+(deftest extract-base-url-test
+  (are [url base-url] (= (sut/extract-base-url url) base-url)
 
                         "https://foo.cybozu.com"
                         "https://foo.cybozu.com"
@@ -92,8 +93,8 @@
                         "https://foo.bar.com/baz"
                         nil))
 
-(t/deftest parse-base-url-test
-  (t/are [url parsed] (= (sut/parse-base-url url) parsed)
+(deftest parse-base-url-test
+  (are [url parsed] (= (sut/parse-base-url url) parsed)
 
                       "https://foo.cybozu.com"
                       {:domain "cybozu.com"
@@ -181,8 +182,8 @@
                       "https://foo.bar.com/baz"
                       nil))
 
-(t/deftest valid-base-url?-test
-  (t/are [url res] (= (sut/valid-base-url? url) res)
+(deftest valid-base-url?-test
+  (are [url res] (= (sut/valid-base-url? url) res)
 
                    "https://foo.cybozu.com"
                    true
@@ -250,10 +251,10 @@
                    "https://foo.bar.com/baz"
                    false))
 
-(t/deftest extract-app-url-test
+(deftest extract-app-url-test
 
-  (t/testing "default space app"
-    (t/are [url app-url] (= (sut/extract-app-url url) app-url)
+  (testing "default space app"
+    (are [url app-url] (= (sut/extract-app-url url) app-url)
 
                          "https://foo.cybozu.com"
                          nil
@@ -318,8 +319,8 @@
                          "https://foo.bar.com/baz"
                          nil))
 
-  (t/testing "guest space app"
-    (t/are [url app-url] (= (sut/extract-app-url url) app-url)
+  (testing "guest space app"
+    (are [url app-url] (= (sut/extract-app-url url) app-url)
 
                          "https://foo.cybozu.com/k/guest/11/1"
                          "https://foo.cybozu.com/k/guest/11/1"
@@ -384,10 +385,10 @@
                          "https://foo.cybozu.com/k/guest/11/"
                          nil)))
 
-(t/deftest parse-app-url-test
+(deftest parse-app-url-test
 
-  (t/testing "default space app"
-    (t/are [url parsed] (= (sut/parse-app-url url) parsed)
+  (testing "default space app"
+    (are [url parsed] (= (sut/parse-app-url url) parsed)
                         "https://foo.cybozu.com"
                         nil
 
@@ -451,8 +452,8 @@
                         "https://foo.bar.com/baz"
                         nil))
 
-  (t/testing "guest space app"
-    (t/are [url parsed] (= (sut/parse-app-url url) parsed)
+  (testing "guest space app"
+    (are [url parsed] (= (sut/parse-app-url url) parsed)
                         "https://foo.cybozu.com/k/guest/11/1"
                         {:subdomain "foo" :domain "cybozu.com" :guest-space-id "11" :app-id "1"}
 
@@ -501,10 +502,10 @@
                         "https://foo.bar.com/k/guest/11/1"
                         nil)))
 
-(t/deftest valid-app-url?-test
+(deftest valid-app-url?-test
 
-  (t/testing "default space app"
-    (t/are [url res] (= (sut/valid-app-url? url) res)
+  (testing "default space app"
+    (are [url res] (= (sut/valid-app-url? url) res)
 
                      "https://foo.cybozu.com"
                      false
@@ -566,8 +567,8 @@
                      "https://foo.bar.com/baz"
                      false))
 
-  (t/testing "guest space app"
-    (t/are [url res] (= (sut/valid-app-url? url) res)
+  (testing "guest space app"
+    (are [url res] (= (sut/valid-app-url? url) res)
 
                      "https://foo.cybozu.com/k/guest/11/1"
                      true
