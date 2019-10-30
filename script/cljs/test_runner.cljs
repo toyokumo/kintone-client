@@ -3,8 +3,10 @@
             ;; require all the namespaces that have tests in them
             [kintone.authentication-test]
             [kintone.connection-test]
-            [kintone.record-test]))
+            [kintone.record-test]
+            [kintone.url-test]))
 
 (doo-tests 'kintone.authentication-test
            'kintone.connection-test
-           'kintone.record-test)
+           'kintone.record-test
+           'kintone.url-test)
