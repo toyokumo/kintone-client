@@ -19,6 +19,7 @@ They return a channel of core.async.
 - `kintone.connection` : Make connection object.
 - `kintone.types` : Type definitions such as response object.
 - `kintone.record` : kintone REST Record API.
+- `kintone.url`: kintone url utilities.
 
 ## Usage
 
@@ -118,10 +119,27 @@ You should use `Connection` object as the first argument on every API call.
       (:res res))))
 ```
 
-For more information, See [API documents](https://cljdoc.org/d/toyokumo/kintone-clj/CURRENT) and dev/test.clj.
+### url utilities
+```clojure
+(extract-base-url "https://hoge.cybozu.com/k/12")
+;; => "https://hoge.cybozu.com"
+(parse-base-url "https://hoge.kintone.com/k/12")
+;; => {:domain "kintone.com", :subdomain "hoge"}
+(valid-base-url? "https://hoge.cybozu.com/k/12")
+;; => true
+(extract-app-url "https://hoge.cybozu.com/k/12/show")
+;; => "https://hoge.cybozu.com/k/12"
+(parse-app-url "https://foo.s.cybozu.com/k/guest/11/1")
+;; => {:domain "cybozu.com", :subdomain "foo", :guest-space-id "11", :app-id "1"}
+(valid-app-url? "https://hoge.cybozu.com")
+;; => true
+```
+
+For more information, See [API documents](https://cljdoc.org/d/toyokumo/kintone-clj/CURRENT), `test/`, and `dev/test.clj`.
 
 ## dev/test.clj
-These tests actually interact with a kintone app. These are good examples of kintone-clj.
+These tests actually interact with a kintone app (not included in CI). These are good examples of the usage of kintone-clj.
+
 ### how to run
 - import dev-resources/kintone-clj-test.zip
 - fill dev-resources/config.edn
@@ -135,6 +153,7 @@ These tests actually interact with a kintone app. These are good examples of kin
 
 ## License
 
+```
 Copyright 2019 TOYOKUMO,Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -148,3 +167,30 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
+```
+
+For src/kintone/url.cljc and test/kintone/url_test.cljc:
+
+```
+MIT License
+
+Copyright (c) 2017 ayato-p
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
