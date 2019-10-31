@@ -726,14 +726,9 @@
              nil)
             (<! (r/bulk-request
                  fake-conn
-                 [(t/->BulkRequest :POST "/v1/record.json"
-                                   {:app app
+                 [(r/add-record app {:name {:value "foo"}})
+                  (r/update-record app
+                                   {:id id
                                     :record {:name {:value "foo"}}})
-                  (t/->BulkRequest :PUT "/v1/record.json"
-                                   {:app app
-                                    :id id
-                                    :record {:name {:value "foo"}}})
-                  (t/->BulkRequest :DELETE "/v1/records.json"
-                                   {:app app
-                                    :ids [1 2 3]})]))))
+                  (r/delete-records app [1 2 3])]))))
      (done))))

@@ -119,6 +119,28 @@ You should use `Connection` object as the first argument on every API call.
       (:res res))))
 ```
 
+### bulk request
+You can do insert, update, delete at once with `bulk-request`.
+`bulk-request` can be performed among different apps.
+```clojure
+(<!! (r/bulk-request conn
+                     [ ;; NOTE: conn is omitted here.
+                      (r/add-record app {:name {:value "foo"}})
+                      (r/update-record app
+                                       {:id id
+                                        :record {:name {:value "foo"}}})
+                      (r/delete-records app [1 2 3])]))
+```
+`bulk-request` can be used with:
+- add-record
+- add-records
+- update-record
+- update-records
+- delete-records
+- delete-records-with-revision
+- update-record-status
+- update-records-status
+
 ### url utilities
 ```clojure
 (extract-base-url "https://hoge.cybozu.com/k/12")
