@@ -42,7 +42,7 @@
      (pt/-get conn url {:params params}))))
 
 (defn create-cursor
-  "CAUTION: Consider using get-all-records first.
+  "CAUTION: Consider using get-all-records first (saves you from forgetting to delete cursor).
   Use this only if get-all-records returns too many records to eat up the whole RAM of your machine.
 
   Create a cursor that is used to retrieve records.
@@ -73,7 +73,7 @@
      (pt/-post conn url {:params params}))))
 
 (defn get-records-by-cursor
-  "CAUTION: Consider using get-all-records first.
+  "CAUTION: Consider using get-all-records first (saves you from forgetting to delete cursor).
   Use this only if get-all-records returns too many records to eat up the whole RAM of your machine.
 
   Get one block of records with cursor.
@@ -124,7 +124,7 @@
                    (t/->KintoneResponse {:records ret} nil)))))))))))
 
 (defn delete-cursor
-  "CAUTION: Consider using get-all-records first.
+  "CAUTION: Consider using get-all-records first (saves you from forgetting to delete cursor).
   Use this only if get-all-records returns too many records to eat up the whole RAM of your machine.
 
   Delete a cursor.
