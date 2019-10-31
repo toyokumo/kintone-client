@@ -5,7 +5,8 @@
             [clojure.test :refer :all]
             [kintone.authentication :as auth]
             [kintone.connection :as conn]
-            [kintone.record :as record]))
+            [kintone.record :as record]
+            [kintone.record :as r]))
 
 (def conf (edn/read-string (slurp "dev-resources/config.edn")))
 
@@ -119,12 +120,6 @@
                    :records
                    count))))))
 
-;; TODO: FIXME
-(deftest add-record-invalid-argument-test
-  (with-cleanup
-    (let [res (<!! (record/add-record conn app [{:文字列__1行_ {:value "ほげ"}}]))] ;; adds empty records
-      (is (not= nil (:err res))))))
-
 (deftest add-records-test
   (with-cleanup
     (let [res (<!! (record/add-records conn app [{:文字列__1行_ {:value "ほげ1"}}
@@ -195,9 +190,9 @@
                   :res
                   :id)
           res (<!! (record/update-all-records conn app [{:id id1
-                                                    :record {:文字列__1行_ {:value "いいい"}}}
-                                                   {:id id2
-                                                    :record {:文字列__1行_ {:value "ううう"}}}]))]
+                                                         :record {:文字列__1行_ {:value "いいい"}}}
+                                                        {:id id2
+                                                         :record {:文字列__1行_ {:value "ううう"}}}]))]
       (is (= nil (:err res)))
       (is (= "いいい"
              (-> (<!! (record/get-record conn app id1))
@@ -238,4 +233,19 @@
           res (<!! (record/file-download conn download-file-key))]
       (is (= nil (:err res))))))
 
-#_(run-tests 'test)
+(deftest bulk-request-test
+  (with-cleanup
+    (let [id (-> (<!! (record/add-record conn app {:文字列__1行_ {:value "あああ"}}))
+                 :res
+                 :id)
+          res (<!! (record/bulk-request conn
+                                        [(r/add-record app {:文字列__1行_ {:value "いいい"}})
+                                         (r/update-record app {:id id
+                                                               :record {:文字列__1行_ {:value "ううう"}}})]))
+          records (<!! (record/get-all-records conn app))]
+      (is (= nil (:err res)))
+      (is (= (set ["いいい" "ううう"])
+             (->> records :res :records (map #(-> % :文字列__1行_ :value)) set))))))
+
+(comment
+ (run-tests 'test))
