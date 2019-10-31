@@ -58,17 +58,20 @@
 
 (deftest get-records-by-query-test
   (is (= (t/->KintoneResponse {:url "https://test.kintone.com/k/v1/records.json"
-                               :req {:params {:app app}}}
+                               :req {:params {:app app
+                                              :totalCount true}}}
                               nil)
          (<!! (r/get-records-by-query fake-conn app))))
 
   (is (= (t/->KintoneResponse {:url "https://test.kintone.com/k/v1/records.json"
-                               :req {:params {:app app}}}
+                               :req {:params {:app app
+                                              :totalCount true}}}
                               nil)
          (<!! (r/get-records-by-query fake-conn app {}))))
 
   (is (= (t/->KintoneResponse {:url "https://test.kintone.com/k/v1/records.json"
                                :req {:params {:app app
+                                              :totalCount true
                                               :fields [:$id :name]
                                               :query "order by $id limit 10"}}}
                               nil)
