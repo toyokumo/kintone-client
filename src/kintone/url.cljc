@@ -40,16 +40,55 @@
 (def ^:private re-base-url
   (re-pattern re-base-url*))
 
-(defn extract-base-url [url]
+(defn extract-base-url
+  "
+  (extract-base-url \"https://hoge.cybozu.com\")\n=> \"https://hoge.cybozu.com\"
+  (extract-base-url \"https://hoge.cybozu.com/k/12\")\n=> \"https://hoge.cybozu.com\"\n
+  (extract-base-url \"https://foo.s.cybozu.com/k/guest/11/1\")\n=> \"https://foo.s.cybozu.com\"\n
+  (extract-base-url \"https://hoge.hoge.com/k/11\")\n=> nil
+  "
+  [url]
   (some-> (re-find re-base-url url) first))
 
-(defn parse-base-url [url]
+(comment
+ (extract-base-url "https://hoge.cybozu.com")
+ (extract-base-url "https://hoge.cybozu.com/k/12")
+ (extract-base-url "https://foo.s.cybozu.com/k/guest/11/1")
+ (extract-base-url "https://hoge.hoge.com/k/11"))
+
+(defn parse-base-url
+  "
+  (parse-base-url \"https://hoge.cybozu.com\")\n=> {:domain \"cybozu.com\", :subdomain \"hoge\"}
+  (parse-base-url \"https://hoge.cybozu.com/k/12\")\n=> {:domain \"cybozu.com\", :subdomain \"hoge\"}\n
+  (parse-base-url \"https://foo.s.cybozu.com/k/guest/11/1\")\n=> {:domain \"cybozu.com\", :subdomain \"foo\"}\n
+  (parse-base-url \"https://hoge.hoge.com/k/11\")\n=> nil
+  "
+  [url]
   (when-let [[_ subdomain domain] (re-find re-base-url url)]
     {:domain domain
      :subdomain subdomain}))
 
-(defn valid-base-url? [url]
+(comment
+ (parse-base-url "https://hoge.cybozu.com")
+ (parse-base-url "https://hoge.cybozu.com/k/12")
+ (parse-base-url "https://foo.s.cybozu.com/k/guest/11/1")
+ (parse-base-url "https://hoge.hoge.com/k/11"))
+
+(defn valid-base-url?
+  "
+  (valid-base-url? \"https://hoge.cybozu.com\")\n=> true
+  (valid-base-url? \"https://hoge.cybozu.com/k/12\")\n=> true\n
+  (valid-base-url? \"https://foo.s.cybozu.com/k/guest/11/1\")\n=> true\n
+  (valid-base-url? \"https://hoge.hoge.com/k/11\")\n=> false
+  "
+  [url]
   (not (str/blank? (extract-base-url url))))
+
+(comment
+ (valid-base-url? "https://hoge.cybozu.com")
+ (valid-base-url? "https://hoge.cybozu.com/k/12")
+ (valid-base-url? "https://foo.s.cybozu.com/k/guest/11/1")
+ (valid-base-url? "https://hoge.hoge.com/k/11"))
 
 (def ^:private re-app-url
   (re-pattern (str re-base-url* "/k/(\\d+)")))
@@ -57,11 +96,31 @@
 (def ^:private re-guest-app-url
   (re-pattern (str re-base-url* "/k/guest/(\\d+)/(\\d+)")))
 
-(defn extract-app-url [url]
+(defn extract-app-url
+  "
+  (extract-app-url \"https://hoge.cybozu.com\")\n=> nil\n
+  (extract-app-url \"https://hoge.cybozu.com/k/12\")\n=> \"https://hoge.cybozu.com/k/12\"\n
+  (extract-app-url \"https://foo.s.cybozu.com/k/guest/11/1\")\n=> \"https://foo.s.cybozu.com/k/guest/11/1\"\n
+  (extract-app-url \"https://hoge.hoge.com/k/11\")\n=> nil
+  "
+  [url]
   (or (some-> (re-find re-app-url url) first)
       (some-> (re-find re-guest-app-url url) first)))
 
-(defn parse-app-url [url]
+(comment
+ (extract-app-url "https://hoge.cybozu.com")
+ (extract-app-url "https://hoge.cybozu.com/k/12")
+ (extract-app-url "https://foo.s.cybozu.com/k/guest/11/1")
+ (extract-app-url "https://hoge.hoge.com/k/11"))
+
+(defn parse-app-url
+  "
+  (parse-app-url \"https://hoge.cybozu.com\")\n=> nil\n
+  (parse-app-url \"https://hoge.cybozu.com/k/12\")\n=> {:domain \"cybozu.com\", :subdomain \"hoge\", :app-id \"12\"}\n
+  (parse-app-url \"https://foo.s.cybozu.com/k/guest/11/1\")\n=> {:domain \"cybozu.com\", :subdomain \"foo\", :guest-space-id \"11\", :app-id \"1\"}\n
+  (parse-app-url \"https://hoge.hoge.com/k/11\")\n=> nil
+  "
+  [url]
   (or
    (when-let [[_ subdomain domain app-id] (re-find re-app-url url)]
      {:domain domain
@@ -73,6 +132,25 @@
       :guest-space-id guest-space-id
       :app-id app-id})))
 
-(defn valid-app-url? [url]
+(comment
+ (parse-app-url "https://hoge.cybozu.com")
+ (parse-app-url "https://hoge.cybozu.com/k/12")
+ (parse-app-url "https://foo.s.cybozu.com/k/guest/11/1")
+ (parse-app-url "https://hoge.hoge.com/k/11"))
+
+(defn valid-app-url?
+  "
+  (valid-app-url? \"https://hoge.cybozu.com\")\n=> false\n
+  (valid-app-url? \"https://hoge.cybozu.com/k/12\")\n=> true\n
+  (valid-app-url? \"https://foo.s.cybozu.com/k/guest/11/1\")\n=> true\n
+  (valid-app-url? \"https://hoge.hoge.com/k/11\")\n=> false
+  "
+  [url]
   (some? (or (re-find re-app-url url)
              (re-find re-guest-app-url url))))
+
+(comment
+ (valid-app-url? "https://hoge.cybozu.com")
+ (valid-app-url? "https://hoge.cybozu.com/k/12")
+ (valid-app-url? "https://foo.s.cybozu.com/k/guest/11/1")
+ (valid-app-url? "https://hoge.hoge.com/k/11"))

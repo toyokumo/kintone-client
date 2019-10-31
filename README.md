@@ -19,6 +19,7 @@ They return a channel of core.async.
 - `kintone.connection` : Make connection object.
 - `kintone.types` : Type definitions such as response object.
 - `kintone.record` : kintone REST Record API.
+- `kintone.url`: kintone url utilities.
 
 ## Usage
 
@@ -118,10 +119,27 @@ You should use `Connection` object as the first argument on every API call.
       (:res res))))
 ```
 
-For more information, See [API documents](https://cljdoc.org/d/toyokumo/kintone-clj/CURRENT) and dev/test.clj.
+### url utilities
+```clojure
+(extract-base-url "https://hoge.cybozu.com/k/12")
+;; => "https://hoge.cybozu.com"
+(parse-base-url "https://hoge.kintone.com/k/12")
+;; => {:domain "kintone.com", :subdomain "hoge"}
+(valid-base-url? "https://hoge.cybozu.com/k/12")
+;; => true
+(extract-app-url "https://hoge.cybozu.com/k/12/show")
+;; => "https://hoge.cybozu.com/k/12"
+(parse-app-url "https://foo.s.cybozu.com/k/guest/11/1")
+;; => {:domain "cybozu.com", :subdomain "foo", :guest-space-id "11", :app-id "1"}
+(valid-app-url? "https://hoge.cybozu.com")
+;; => true
+```
+
+For more information, See [API documents](https://cljdoc.org/d/toyokumo/kintone-clj/CURRENT), `test/`, and `dev/test.clj`.
 
 ## dev/test.clj
-These tests actually interact with a kintone app. These are good examples of kintone-clj.
+These tests actually interact with a kintone app (not included in CI). These are good examples of the usage of kintone-clj.
+
 ### how to run
 - import dev-resources/kintone-clj-test.zip
 - fill dev-resources/config.edn
