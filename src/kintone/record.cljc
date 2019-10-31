@@ -30,7 +30,7 @@
     :query - The kintone query.
              string or nil
 
-   A response map contains the totalCount of query-matched records.
+   A response map always contains the totalCount of query-matched records.
   "
   ([conn app]
    (get-records-by-query conn app nil))
