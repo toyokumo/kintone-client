@@ -30,17 +30,15 @@
     :query - The kintone query.
              string or nil
 
-    :total-count - If true, the request will retrieve
-                   total count of records match with query conditions.
-                   boolean or nil"
+   A response map always contains the totalCount of query-matched records.
+  "
   ([conn app]
    (get-records-by-query conn app nil))
-  ([conn app {:keys [fields query total-count]}]
+  ([conn app {:keys [fields query]}]
    (let [url (pt/-url conn path/records)
-         params (cond-> {:app app}
+         params (cond-> {:app app :totalCount true}
                   (seq fields) (assoc :fields fields)
-                  (seq query) (assoc :query query)
-                  (not (nil? total-count)) (assoc :totalCount total-count))]
+                  (seq query) (assoc :query query))]
      (pt/-get conn url {:params params}))))
 
 (defn create-cursor

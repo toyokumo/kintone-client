@@ -151,6 +151,10 @@ These tests actually interact with a kintone app (not included in CI). These are
 ```
 - try tests
 
+## Note
+- kintone-clj doesn't convert a camelCase keyword (in kintone REST api response map) into kebab-case.
+It costs too much to do so (response map can be so complicated, and keyword can be non-ascii character).
+
 ## License
 
 ```

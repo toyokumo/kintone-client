@@ -67,7 +67,7 @@
                 :res
                 :id)]
       (is (= nil (:err (<!! (record/get-records-by-query conn app)))))
-      (is (= "3" (-> (<!! (record/get-records-by-query conn app {:total-count true}))
+      (is (= "3" (-> (<!! (record/get-records-by-query conn app))
                      :res
                      :totalCount)))
       (is (= nil (:err (<!! (record/get-records-by-query conn app {:fields [:$id]})))))
