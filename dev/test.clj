@@ -119,12 +119,6 @@
                    :records
                    count))))))
 
-;; TODO: FIXME
-(deftest add-record-invalid-argument-test
-  (with-cleanup
-    (let [res (<!! (record/add-record conn app [{:文字列__1行_ {:value "ほげ"}}]))] ;; adds empty records
-      (is (not= nil (:err res))))))
-
 (deftest add-records-test
   (with-cleanup
     (let [res (<!! (record/add-records conn app [{:文字列__1行_ {:value "ほげ1"}}
