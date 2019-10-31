@@ -595,8 +595,7 @@
   To upload the file to an Attachment field,
   the file key is used with the Add Record or Update Record API.
 
-  file - (Clojure) String, InputStream, File, a byte-array,
-                   or an instance of org.apache.http.entity.mime.content.ContentBody
+  file - (Clojure) File
          (ClojureScript) File object
 
   filename - The filename you want to set to
