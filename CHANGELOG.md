@@ -2,15 +2,26 @@
 
 ## Unreleased
 
-## 0.1.2
+## 0.2.0
 ### Added
-- Add as argument to `file-downlaod` API
-
-### Fixed
-- `totalCount` case on `get-records-by-query`
+- Add some tests only work on dev profile ([#4](https://github.com/toyokumo/kintone-clj/pull/4))
+- Add URL utilities that is copied from [cybozu-http-clj](https://github.com/ayato-p/cybozu-http-clj/blob/master/src/cybozu_http/kintone/url.clj) ([#5](https://github.com/toyokumo/kintone-clj/pull/5))
 
 ### Breaking
-- (Only Clojure) Change `file-download` default response body type from String to byte array
+- Make it always `true` the value of `totalCount` which is used on `get-records-by-query` API ([#6](https://github.com/toyokumo/kintone-clj/pull/6))
+
+### Fixed
+- Improve some documents ([#7](https://github.com/toyokumo/kintone-clj/pull/7))
+
+## 0.1.2
+### Added
+- Add as argument to `file-downlaod` API ([#1](https://github.com/toyokumo/kintone-clj/pull/1))
+
+### Fixed
+- `totalCount` case on `get-records-by-query` ([#2](https://github.com/toyokumo/kintone-clj/pull/2))
+
+### Breaking
+- (Only Clojure) Change `file-download` default response body type from String to byte array ([#1](https://github.com/toyokumo/kintone-clj/pull/1))
 
 ## 0.1.1 - 2019-09-04
 ### Fixed
