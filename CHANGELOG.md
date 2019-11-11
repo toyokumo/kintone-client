@@ -1,6 +1,8 @@
 # Change Log
 
 ## Unreleased
+
+## 0.3.0
 ### Added
 - Add support App API ([#8](https://github.com/toyokumo/kintone-clj/pull/8))
 
