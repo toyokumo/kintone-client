@@ -19,6 +19,7 @@ They return a channel of core.async.
 - `kintone.connection` : Make connection object.
 - `kintone.types` : Type definitions such as response object.
 - `kintone.record` : kintone REST Record API.
+- `kintone.app` : kintone REST App API.
 - `kintone.url`: kintone url utilities.
 
 ## Usage

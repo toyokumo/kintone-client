@@ -3,10 +3,10 @@
             [clojure.edn :as edn]
             [clojure.java.io :as io]
             [clojure.test :refer :all]
+            [kintone.app :as app]
             [kintone.authentication :as auth]
             [kintone.connection :as conn]
-            [kintone.record :as record]
-            [kintone.record :as r]))
+            [kintone.record :as record]))
 
 (def conf (edn/read-string (slurp "dev-resources/config.edn")))
 
@@ -239,13 +239,35 @@
                  :res
                  :id)
           res (<!! (record/bulk-request conn
-                                        [(r/add-record app {:文字列__1行_ {:value "いいい"}})
-                                         (r/update-record app {:id id
+                                        [(record/add-record app {:文字列__1行_ {:value "いいい"}})
+                                         (record/update-record app {:id id
                                                                :record {:文字列__1行_ {:value "ううう"}}})]))
           records (<!! (record/get-all-records conn app))]
       (is (= nil (:err res)))
       (is (= (set ["いいい" "ううう"])
              (->> records :res :records (map #(-> % :文字列__1行_ :value)) set))))))
+
+(deftest get-app-test
+  (with-cleanup
+    (let [{:keys [res err]}  (<!! (app/get-app conn app))]
+      (is (nil? err))
+      (is (= "kintone-cljファイルアップロードテスト" (:name res)))
+      (is (= (str app) (:appId res))))))
+
+(deftest get-form-test
+  (with-cleanup
+    (let [{:keys [res err]} (<!! (app/get-form conn app))
+          [number-field single-line-text-field file-field
+           :as props] (some->> res :properties (sort-by :code))
+          test-fields [:type :label :code]]
+      (is (nil? err))
+      (is (= 3 (count props)))
+      (is (= {:type "NUMBER" :code "数値" :label "数値"}
+             (select-keys number-field test-fields)))
+      (is (= {:type "SINGLE_LINE_TEXT" :code "文字列__1行_" :label "文字列 (1行)"}
+             (select-keys single-line-text-field test-fields)))
+      (is (= {:type "FILE" :code "添付ファイル" :label "添付ファイル"}
+             (select-keys file-field test-fields))))))
 
 (comment
  (run-tests 'test))
