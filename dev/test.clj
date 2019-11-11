@@ -6,7 +6,6 @@
             [kintone.authentication :as auth]
             [kintone.connection :as conn]
             [kintone.record :as record]
-            [kintone.record :as r]))
 
 (def conf (edn/read-string (slurp "dev-resources/config.edn")))
 
@@ -239,8 +238,8 @@
                  :res
                  :id)
           res (<!! (record/bulk-request conn
-                                        [(r/add-record app {:文字列__1行_ {:value "いいい"}})
-                                         (r/update-record app {:id id
+                                        [(record/add-record app {:文字列__1行_ {:value "いいい"}})
+                                         (record/update-record app {:id id
                                                                :record {:文字列__1行_ {:value "ううう"}}})]))
           records (<!! (record/get-all-records conn app))]
       (is (= nil (:err res)))
