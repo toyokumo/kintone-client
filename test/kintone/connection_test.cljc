@@ -71,7 +71,7 @@
                   :content-type :json
                   :as :json
                   :async? true
-                  :coerce :always
+                  :coerce :unexceptional
                   :connection-timeout 10000
                   :socket-timeout 30000
                   :form-params {:id 1}}
@@ -155,7 +155,7 @@
                   :content-type :json
                   :as :json
                   :async? true
-                  :coerce :always
+                  :coerce :unexceptional
                   :connection-timeout 10000
                   :socket-timeout 30000
                   :form-params {:id 1}}
@@ -237,7 +237,7 @@
                   :content-type :json
                   :as :json
                   :async? true
-                  :coerce :always
+                  :coerce :unexceptional
                   :connection-timeout 10000
                   :socket-timeout 30000
                   :form-params {:id 1}}
@@ -319,7 +319,7 @@
                   :content-type :json
                   :as :json
                   :async? true
-                  :coerce :always
+                  :coerce :unexceptional
                   :connection-timeout 10000
                   :socket-timeout 30000
                   :form-params {:id 1}}
@@ -493,7 +493,7 @@
                  {:headers {"X-Cybozu-API-Token" "TestApiToken"}
                   :accept :json
                   :as :json
-                  :coerce :always
+                  :coerce :unexceptional
                   :connection-timeout 10000
                   :socket-timeout 30000
                   :multipart [{:id 1}]}

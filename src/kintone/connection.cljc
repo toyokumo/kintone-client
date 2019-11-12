@@ -37,8 +37,9 @@
          {:status status
           :status-text (str status)
           ;; kintone API sometimes returns HTML, for example basic authentication fails
-          :response (if (str/starts-with? (str/lower-case (get headers "Content-Type"))
-                                          "application/json")
+          :response (if (some-> (get headers "Content-Type")
+                                str/lower-case
+                                (str/starts-with? "application/json"))
                       (json/parse-string body true)
                       body)})
 
