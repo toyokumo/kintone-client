@@ -25,9 +25,18 @@
             :keywords? true
             :timeout (* 1000 30)}))
 
-(defn- handler [channel res]
+(defn- default-handler [channel res]
   #?(:clj (put! channel (t/->KintoneResponse (:body res) nil))
      :cljs (put! channel (t/->KintoneResponse res nil))))
+
+(defn- wrap-handler [handler channel]
+  (fn [res]
+    (put! channel (t/->KintoneResponse (handler res) nil))))
+
+(defn- ->handler [handler channel]
+  (if handler
+    (wrap-handler handler channel)
+    (partial default-handler channel)))
 
 #?(:clj
    (defn- format-err [err]
@@ -51,9 +60,18 @@
        :else
        err)))
 
-(defn- err-handler [channel err]
+(defn- default-err-handler [channel err]
   #?(:clj (put! channel (t/->KintoneResponse nil (format-err err)))
      :cljs (put! channel (t/->KintoneResponse nil err))))
+
+(defn- wrap-error-handler [error-handler channel]
+  (fn [err]
+    (put! channel (t/->KintoneResponse nil (error-handler err)))))
+
+(defn- ->error-handler [error-handler channel]
+  (if error-handler
+    (wrap-error-handler error-handler channel)
+    (partial default-err-handler channel)))
 
 #?(:clj
    (defn- build-req
@@ -68,13 +86,13 @@
 
 #?(:cljs
    (defn- build-req
-     [{:keys [auth timeout headers]} req channel]
+     [{:keys [auth timeout headers handler error-handler]} req channel]
      (cond-> (assoc *default-req*
                     :headers (merge (pt/-header auth)
                                     headers
                                     (:headers req))
-                    :handler (partial handler channel)
-                    :error-handler (partial err-handler channel))
+                    :handler (->handler handler channel)
+                    :error-handler (->error-handler error-handler channel))
        timeout (assoc :timeout timeout)
        (:params req) (assoc :params (:params req)))))
 
@@ -83,6 +101,7 @@
 
 (defrecord Connection
   [auth domain guest-space-id
+   handler error-handler
    connection-timeout socket-timeout timeout
    headers]
   pt/IRequest
@@ -98,19 +117,19 @@
   (-post [this url req]
     (let [c (chan)
           req (build-req this req c)]
-      #?(:clj (client/post url req (partial handler c) (partial err-handler c))
+      #?(:clj (client/post url req (->handler handler c) (->error-handler error-handler c))
          :cljs (ajax/POST url req))
       c))
   (-put [this url req]
     (let [c (chan)
           req (build-req this req c)]
-      #?(:clj (client/put url req (partial handler c) (partial err-handler c))
+      #?(:clj (client/put url req (->handler handler c) (->error-handler error-handler c))
          :cljs (ajax/PUT url req))
       c))
   (-delete [this url req]
     (let [c (chan)
           req (build-req this req c)]
-      #?(:clj (client/delete url req (partial handler c) (partial err-handler c))
+      #?(:clj (client/delete url req (->handler handler c) (->error-handler error-handler c))
          :cljs (ajax/DELETE url req))
       c))
   (-get-blob [this url req]
@@ -122,7 +141,7 @@
                  :cljs (-> (build-req this req c)
                            (dissoc :format)
                            (assoc :response-format (ajax/raw-response-format))))]
-      #?(:clj (client/post url req (partial handler c) (partial err-handler c))
+      #?(:clj (client/post url req (->handler handler c) (->error-handler error-handler c))
          :cljs (ajax/POST url req))
       c))
   (-multipart-post [this url req]
@@ -133,14 +152,16 @@
                           (assoc :multipart (:multipart req)))
                  :cljs (-> (build-req this req c)
                            (dissoc :format)
-                           (assoc :body (:multipart req))))]
+                           (assoc :body (:multipart req))))
+          handler (->handler handler c)
+          error-handler (->error-handler error-handler c)]
       #?(:clj (thread
                (try
-                 (handler c (client/post url req))
+                 (handler (client/post url req))
                  (catch ExceptionInfo e
-                   (err-handler c e))
+                   (error-handler e))
                  (catch Exception e
-                   (err-handler c e))))
+                   (error-handler e))))
          :cljs (ajax/POST url req))
       c)))
 
@@ -156,6 +177,18 @@
 
   :guest-space-id - kintone guest space id
                     integer, optional
+
+  :handler - The handler function for successful operation should accept a single parameter
+             which is the response. If you do not provide this,
+             the default-handler above will be called instead.
+             The value it returns will put into the channel, which is the return value.
+             function, optional
+
+  :error-handler - The handler function for error operation should accept a single parameter
+                   which is the response. If you do not provide this,
+                   the default-error-handler above will be called instead.
+                   The value it returns will put into the channel, which is the return value.
+                   function, optional
 
   See: https://github.com/dakrone/clj-http or https://github.com/JulianBirch/cljs-ajax
 
@@ -175,10 +208,12 @@
 
   :headers - map, optional"
   [{:keys [auth domain guest-space-id
+           handler error-handler
            connection-timeout socket-timeout timeout
            headers]}]
   (let [domain #?(:clj domain
                   :cljs (or domain (.-hostname js/location)))]
     (->Connection auth domain guest-space-id
+                  handler error-handler
                   connection-timeout socket-timeout timeout
                   headers)))
