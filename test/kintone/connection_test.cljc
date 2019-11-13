@@ -80,19 +80,35 @@
 
      (testing "Negative"
        (testing "ExceptionInfo"
-         (with-redefs [client/post
-                       (fn [url req h eh]
-                         (eh (ex-info "Test error"
-                                      {:status 400
-                                       :body {:message "Something bad happen"}})))]
-           (is (= (t/->KintoneResponse
-                   nil
-                   {:status 400
-                    :status-text "400"
-                    :response {:message "Something bad happen"}})
-                  (<!! (pt/-get conn url {:params {:id 1}}))))))
+         (testing "JSON response"
+           (with-redefs [client/post
+                         (fn [url req h eh]
+                           (eh (ex-info "Test error"
+                                        {:status 400
+                                         :headers {"Content-Type" "application/json; charset=utf-8"}
+                                         :body "{\"message\":\"Something bad happen\"}"})))]
+             (is (= (t/->KintoneResponse
+                     nil
+                     {:status 400
+                      :status-text "400"
+                      :response {:message "Something bad happen"}})
+                    (<!! (pt/-get conn url {:params {:id 1}}))))))
 
-       (testing "ExceptionInfo"
+         (testing "HTML response"
+           (with-redefs [client/post
+                         (fn [url req h eh]
+                           (eh (ex-info "Test error"
+                                        {:status 400
+                                         :headers {"Content-Type" "text/html; charset=utf-8"}
+                                         :body "<!DOCTYPE html><html></html>"})))]
+             (is (= (t/->KintoneResponse
+                     nil
+                     {:status 400
+                      :status-text "400"
+                      :response "<!DOCTYPE html><html></html>"})
+                    (<!! (pt/-get conn url {:params {:id 1}})))))))
+
+       (testing "Exception"
          (with-redefs [client/post
                        (fn [url req h eh]
                          (eh (Exception. "Test error")))]
@@ -164,19 +180,35 @@
 
      (testing "Negative"
        (testing "ExceptionInfo"
-         (with-redefs [client/post
-                       (fn [url req h eh]
-                         (eh (ex-info "Test error"
-                                      {:status 400
-                                       :body {:message "Something bad happen"}})))]
-           (is (= (t/->KintoneResponse
-                   nil
-                   {:status 400
-                    :status-text "400"
-                    :response {:message "Something bad happen"}})
-                  (<!! (pt/-post conn url {:params {:id 1}}))))))
+         (testing "JSON response"
+           (with-redefs [client/post
+                         (fn [url req h eh]
+                           (eh (ex-info "Test error"
+                                        {:status 400
+                                         :headers {"Content-Type" "application/json; charset=utf-8"}
+                                         :body "{\"message\":\"Something bad happen\"}"})))]
+             (is (= (t/->KintoneResponse
+                     nil
+                     {:status 400
+                      :status-text "400"
+                      :response {:message "Something bad happen"}})
+                    (<!! (pt/-post conn url {:params {:id 1}}))))))
 
-       (testing "ExceptionInfo"
+         (testing "HTML response"
+           (with-redefs [client/post
+                         (fn [url req h eh]
+                           (eh (ex-info "Test error"
+                                        {:status 400
+                                         :headers {"Content-Type" "text/html; charset=utf-8"}
+                                         :body "<!DOCTYPE html><html></html>"})))]
+             (is (= (t/->KintoneResponse
+                     nil
+                     {:status 400
+                      :status-text "400"
+                      :response "<!DOCTYPE html><html></html>"})
+                    (<!! (pt/-post conn url {:params {:id 1}})))))))
+
+       (testing "Exception"
          (with-redefs [client/post
                        (fn [url req h eh]
                          (eh (Exception. "Test error")))]
@@ -246,19 +278,35 @@
 
      (testing "Negative"
        (testing "ExceptionInfo"
-         (with-redefs [client/put
-                       (fn [url req h eh]
-                         (eh (ex-info "Test error"
-                                      {:status 400
-                                       :body {:message "Something bad happen"}})))]
-           (is (= (t/->KintoneResponse
-                   nil
-                   {:status 400
-                    :status-text "400"
-                    :response {:message "Something bad happen"}})
-                  (<!! (pt/-put conn url {:params {:id 1}}))))))
+         (testing "JSON response"
+           (with-redefs [client/put
+                         (fn [url req h eh]
+                           (eh (ex-info "Test error"
+                                        {:status 400
+                                         :headers {"Content-Type" "application/json; charset=utf-8"}
+                                         :body "{\"message\":\"Something bad happen\"}"})))]
+             (is (= (t/->KintoneResponse
+                     nil
+                     {:status 400
+                      :status-text "400"
+                      :response {:message "Something bad happen"}})
+                    (<!! (pt/-put conn url {:params {:id 1}}))))))
 
-       (testing "ExceptionInfo"
+         (testing "HTML response"
+           (with-redefs [client/put
+                         (fn [url req h eh]
+                           (eh (ex-info "Test error"
+                                        {:status 400
+                                         :headers {"Content-Type" "text/html; charset=utf-8"}
+                                         :body "<!DOCTYPE html><html></html>"})))]
+             (is (= (t/->KintoneResponse
+                     nil
+                     {:status 400
+                      :status-text "400"
+                      :response "<!DOCTYPE html><html></html>"})
+                    (<!! (pt/-put conn url {:params {:id 1}})))))))
+
+       (testing "Exception"
          (with-redefs [client/put
                        (fn [url req h eh]
                          (eh (Exception. "Test error")))]
@@ -328,19 +376,35 @@
 
      (testing "Negative"
        (testing "ExceptionInfo"
-         (with-redefs [client/delete
-                       (fn [url req h eh]
-                         (eh (ex-info "Test error"
-                                      {:status 400
-                                       :body {:message "Something bad happen"}})))]
-           (is (= (t/->KintoneResponse
-                   nil
-                   {:status 400
-                    :status-text "400"
-                    :response {:message "Something bad happen"}})
-                  (<!! (pt/-delete conn url {:params {:id 1}}))))))
+         (testing "JSON response"
+           (with-redefs [client/delete
+                         (fn [url req h eh]
+                           (eh (ex-info "Test error"
+                                        {:status 400
+                                         :headers {"Content-Type" "application/json; charset=utf-8"}
+                                         :body "{\"message\":\"Something bad happen\"}"})))]
+             (is (= (t/->KintoneResponse
+                     nil
+                     {:status 400
+                      :status-text "400"
+                      :response {:message "Something bad happen"}})
+                    (<!! (pt/-delete conn url {:params {:id 1}}))))))
 
-       (testing "ExceptionInfo"
+         (testing "HTML response"
+           (with-redefs [client/delete
+                         (fn [url req h eh]
+                           (eh (ex-info "Test error"
+                                        {:status 400
+                                         :headers {"Content-Type" "text/html; charset=utf-8"}
+                                         :body "<!DOCTYPE html><html></html>"})))]
+             (is (= (t/->KintoneResponse
+                     nil
+                     {:status 400
+                      :status-text "400"
+                      :response "<!DOCTYPE html><html></html>"})
+                    (<!! (pt/-delete conn url {:params {:id 1}})))))))
+
+       (testing "Exception"
          (with-redefs [client/delete
                        (fn [url req h eh]
                          (eh (Exception. "Test error")))]
@@ -422,19 +486,35 @@
 
      (testing "Negative"
        (testing "ExceptionInfo"
-         (with-redefs [client/post
-                       (fn [url req h eh]
-                         (eh (ex-info "Test error"
-                                      {:status 400
-                                       :body {:message "Something bad happen"}})))]
-           (is (= (t/->KintoneResponse
-                   nil
-                   {:status 400
-                    :status-text "400"
-                    :response {:message "Something bad happen"}})
-                  (<!! (pt/-get-blob conn url {:params {:id 1}}))))))
+         (testing "JSON response"
+           (with-redefs [client/post
+                         (fn [url req h eh]
+                           (eh (ex-info "Test error"
+                                        {:status 400
+                                         :headers {"Content-Type" "application/json; charset=utf-8"}
+                                         :body "{\"message\":\"Something bad happen\"}"})))]
+             (is (= (t/->KintoneResponse
+                     nil
+                     {:status 400
+                      :status-text "400"
+                      :response {:message "Something bad happen"}})
+                    (<!! (pt/-get-blob conn url {:params {:id 1}}))))))
 
-       (testing "ExceptionInfo"
+         (testing "HTML response"
+           (with-redefs [client/post
+                         (fn [url req h eh]
+                           (eh (ex-info "Test error"
+                                        {:status 400
+                                         :headers {"Content-Type" "text/html; charset=utf-8"}
+                                         :body "<!DOCTYPE html><html></html>"})))]
+             (is (= (t/->KintoneResponse
+                     nil
+                     {:status 400
+                      :status-text "400"
+                      :response "<!DOCTYPE html><html></html>"})
+                    (<!! (pt/-get-blob conn url {:params {:id 1}})))))))
+
+       (testing "Exception"
          (with-redefs [client/post
                        (fn [url req h eh]
                          (eh (Exception. "Test error")))]
@@ -502,20 +582,37 @@
 
      (testing "Negative"
        (testing "ExceptionInfo"
-         (with-redefs [client/post
-                       (fn [url req]
-                         (throw
-                          (ex-info "Test error"
-                                   {:status 400
-                                    :body {:message "Something bad happen"}})))]
-           (is (= (t/->KintoneResponse
-                   nil
-                   {:status 400
-                    :status-text "400"
-                    :response {:message "Something bad happen"}})
-                  (<!! (pt/-multipart-post conn url {:multipart [{:id 1}]}))))))
+         (testing "JSON response"
+           (with-redefs [client/post
+                         (fn [url req]
+                           (throw
+                            (ex-info "Test error"
+                                     {:status 400
+                                      :headers {"Content-Type" "application/json; charset=utf-8"}
+                                      :body "{\"message\":\"Something bad happen\"}"})))]
+             (is (= (t/->KintoneResponse
+                     nil
+                     {:status 400
+                      :status-text "400"
+                      :response {:message "Something bad happen"}})
+                    (<!! (pt/-multipart-post conn url {:multipart [{:id 1}]}))))))
 
-       (testing "ExceptionInfo"
+         (testing "HTML response"
+           (with-redefs [client/post
+                         (fn [url req]
+                           (throw
+                            (ex-info "Test error"
+                                     {:status 400
+                                      :headers {"Content-Type" "text/html; charset=utf-8"}
+                                      :body "<!DOCTYPE html><html></html>"})))]
+             (is (= (t/->KintoneResponse
+                     nil
+                     {:status 400
+                      :status-text "400"
+                      :response "<!DOCTYPE html><html></html>"})
+                    (<!! (pt/-multipart-post conn url {:multipart [{:id 1}]})))))))
+
+       (testing "Exception"
          (with-redefs [client/post
                        (fn [url req]
                          (throw (Exception. "Test error")))]
