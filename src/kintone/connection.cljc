@@ -181,11 +181,13 @@
   :handler - The handler function for successful operation should accept a single parameter
              which is the response. If you do not provide this,
              the default-handler above will be called instead.
+             The value it returns will put into the channel, which is the return value.
              function, optional
 
   :error-handler - The handler function for error operation should accept a single parameter
                    which is the response. If you do not provide this,
                    the default-error-handler above will be called instead.
+                   The value it returns will put into the channel, which is the return value.
                    function, optional
 
   See: https://github.com/dakrone/clj-http or https://github.com/JulianBirch/cljs-ajax
