@@ -1,6 +1,9 @@
 # Change Log
 
 ## Unreleased
+
+## 0.4.0
+### Added
 - See Content-Type of the error response ([#9](https://github.com/toyokumo/kintone-clj/pull/9))
 - Add `handler` and `error-handler` options to `new-connection` ([#10](https://github.com/toyokumo/kintone-clj/pull/10))
 
