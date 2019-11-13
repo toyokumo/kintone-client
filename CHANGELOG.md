@@ -1,6 +1,7 @@
 # Change Log
 
 ## Unreleased
+- See Content-Type of the error response ([#9](https://github.com/toyokumo/kintone-clj/pull/9))
 
 ## 0.3.0
 ### Added
