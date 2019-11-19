@@ -3,10 +3,10 @@
             [clojure.edn :as edn]
             [clojure.java.io :as io]
             [clojure.test :refer :all]
-            [kintone.app :as app]
-            [kintone.authentication :as auth]
-            [kintone.connection :as conn]
-            [kintone.record :as record]))
+            [kintone-client.app :as app]
+            [kintone-client.authentication :as auth]
+            [kintone-client.connection :as conn]
+            [kintone-client.record :as record]))
 
 (def conf (edn/read-string (slurp "dev-resources/config.edn")))
 

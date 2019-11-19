@@ -1,10 +1,10 @@
-(ns kintone.test-helper
+(ns kintone-client.test-helper
   (:require #?@(:clj  [[clojure.core.async :refer [<!! chan put!]]]
                 :cljs [[cljs.core.async :refer [<! chan put!] :refer-macros [go]]])
-            [kintone.authentication :as auth]
-            [kintone.connection :as conn]
-            [kintone.types :as t]
-            [kintone.protocols :as pt]))
+            [kintone-client.authentication :as auth]
+            [kintone-client.connection :as conn]
+            [kintone-client.types :as t]
+            [kintone-client.protocols :as pt]))
 
 (def ^:private auth
   (auth/new-auth {:api-token "MyToken"}))

@@ -1,4 +1,4 @@
-(ns kintone.constant.path.app
+(ns kintone-client.constant.path.app
   {:no-doc true})
 
 (def app "/v1/app.json")

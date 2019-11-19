@@ -1,9 +1,9 @@
-(ns kintone.record
+(ns kintone-client.record
   (:require #?(:clj [clojure.core.async :refer [go go-loop <!]]
                :cljs [cljs.core.async :refer [<!] :refer-macros [go go-loop]])
-            [kintone.constant.path.record :as path]
-            [kintone.protocols :as pt]
-            [kintone.types :as t]))
+            [kintone-client.constant.path.record :as path]
+            [kintone-client.protocols :as pt]
+            [kintone-client.types :as t]))
 
 (defn get-record
   "Retrieves details of 1 record from an app.

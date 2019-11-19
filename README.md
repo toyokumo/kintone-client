@@ -1,10 +1,10 @@
-# kintone-clj
+# kintone-client
 
-A [kintone](https://www.kintone.com) SDK for Clojure and ClojureScript.
+A [kintone](https://www.kintone.com) client for Clojure and ClojureScript.
 
-[![CircleCI](https://circleci.com/gh/toyokumo/kintone-clj.svg?style=svg)](https://circleci.com/gh/toyokumo/kintone-clj)
-[![cljdoc badge](https://cljdoc.org/badge/toyokumo/kintone-clj)](https://cljdoc.org/d/toyokumo/kintone-clj/CURRENT)
-[![Clojars Project](https://img.shields.io/clojars/v/toyokumo/kintone-clj.svg)](https://clojars.org/toyokumo/kintone-clj)
+[![CircleCI](https://circleci.com/gh/toyokumo/kintone-client.svg?style=svg)](https://circleci.com/gh/toyokumo/kintone-client)
+[![cljdoc badge](https://cljdoc.org/badge/toyokumo/kintone-client)](https://cljdoc.org/d/toyokumo/kintone-client/CURRENT)
+[![Clojars Project](https://img.shields.io/clojars/v/toyokumo/kintone-client.svg)](https://clojars.org/toyokumo/kintone-client)
 
 ## Overview
 
@@ -15,12 +15,12 @@ Every API run asynchronously to use [clj-http](https://github.com/dakrone/clj-ht
 [core.async](https://github.com/clojure/core.async).
 They return a channel of core.async.
 
-- `kintone.authentication` : Make Auth object.
-- `kintone.connection` : Make connection object.
-- `kintone.types` : Type definitions such as response object.
-- `kintone.record` : kintone REST Record API.
-- `kintone.app` : kintone REST App API.
-- `kintone.url`: kintone url utilities.
+- `kintone-client.authentication` : Make Auth object.
+- `kintone-client.connection` : Make connection object.
+- `kintone-client.types` : Type definitions such as response object.
+- `kintone-client.record` : kintone REST Record API.
+- `kintone-client.app` : kintone REST App API.
+- `kintone-client.url`: kintone url utilities.
 
 ## Usage
 
@@ -38,7 +38,7 @@ This step is not necessary in case that you run JavaScript(ClojureScript)
 on kintone as customize script for kintone app or portal.
 
 ```clojure
-(require '[kintone.authentication :as auth])
+(require '[kintone-client.authentication :as auth])
 
 ;; API token
 (auth/new-auth {:api-token "xyz..."})
@@ -58,8 +58,8 @@ on kintone as customize script for kintone app or portal.
 ### Make `Connection` object
 
 ```clojure
-(require '[kintone.authentication :as auth])
-(require '[kintone.connection :as conn])
+(require '[kintone-client.authentication :as auth])
+(require '[kintone-client.connection :as conn])
 
 ;; Auth and domain
 (conn/new-connection {:auth (auth/new-auth {:api-token "xyz.."})
@@ -79,9 +79,9 @@ on kintone as customize script for kintone app or portal.
 You should use `Connection` object as the first argument on every API call.
 
 ```clojure
-(require '[kintone.authentication :as auth])
-(require '[kintone.connection :as conn])
-(require '[kintone.record :as record])
+(require '[kintone-client.authentication :as auth])
+(require '[kintone-client.connection :as conn])
+(require '[kintone-client.record :as record])
 
 ;; Clojure
 (require '[clojure.core.async :refer [<!!]])
@@ -93,7 +93,7 @@ You should use `Connection` object as the first argument on every API call.
       id 1
       ;; Block the thread and get response
       res (<!! (record/get-record conn app id))]
-  ;; Every API response is kintone.types/KintoneResonse
+  ;; Every API response is kintone-client.types/KintoneResonse
   (if (:err res)
     (log/error "Something bad happen")
     (:res res)))
@@ -158,12 +158,12 @@ You can do insert, update, delete at once with `bulk-request`.
 ;; => true
 ```
 
-For more information, See [API documents](https://cljdoc.org/d/toyokumo/kintone-clj/CURRENT), `test/`, and `dev/test.clj`.
+For more information, See [API documents](https://cljdoc.org/d/toyokumo/kintone-client/CURRENT), `test/`, and `dev/test.clj`.
 
 ## dev/test.clj
-These tests actually interact with a kintone app (not included in CI). These are good examples of the usage of kintone-clj.
+These tests actually interact with a kintone app (not included in CI). These are good examples of the usage of kintone-client.
 
-### how to run
+### How to run
 - import dev-resources/kintone-clj-test.zip
 - fill dev-resources/config.edn
 ```edn
@@ -175,7 +175,7 @@ These tests actually interact with a kintone app (not included in CI). These are
 - try tests
 
 ## Note
-- kintone-clj doesn't convert a camelCase keyword (in kintone REST api response map) into kebab-case.
+- kintone-client doesn't convert a camelCase keyword (in kintone REST api response map) into kebab-case.
 It costs too much to do so (response map can be so complicated, and keyword can be non-ascii character).
 
 ## License

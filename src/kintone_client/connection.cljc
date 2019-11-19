@@ -1,4 +1,4 @@
-(ns kintone.connection
+(ns kintone-client.connection
   "Connection object has connection information to call kintone API"
   (:require #?(:clj [cheshire.core :as json])
             #?(:clj [clj-http.client :as client]
@@ -6,8 +6,8 @@
             #?(:clj [clojure.core.async :refer [chan put! thread]]
                :cljs [cljs.core.async :refer [chan put!]])
             #?(:clj [clojure.string :as str])
-            [kintone.protocols :as pt]
-            [kintone.types :as t]
+            [kintone-client.protocols :as pt]
+            [kintone-client.types :as t]
             #?(:cljs [goog.object :as go]))
   #?(:clj (:import (clojure.lang ExceptionInfo)
                    (java.lang Exception))))
@@ -103,7 +103,7 @@
 
 #?(:cljs
    (defn- get-csrf-token []
-     (when-let [f (go/get js/kintone "getRequestToken")]
+     (when-let [f (go/getValueByKeys js/window "kintone" "getRequestToken")]
        (f))))
 
 #?(:cljs
@@ -179,7 +179,7 @@
 (defn new-connection
   "Make a new connection object.
 
-  :auth - kintone.authentication/Auth object
+  :auth - kintone-client.authentication/Auth object
           required
 
   :domain - kintone domain name string

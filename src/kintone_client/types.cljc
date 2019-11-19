@@ -1,4 +1,4 @@
-(ns kintone.types)
+(ns kintone-client.types)
 
 (defrecord KintoneResponse [res err])
 

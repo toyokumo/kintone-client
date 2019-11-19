@@ -1,6 +1,6 @@
-(ns kintone.app
-  (:require [kintone.constant.path.app :as path]
-            [kintone.protocols :as pt]))
+(ns kintone-client.app
+  (:require [kintone-client.constant.path.app :as path]
+            [kintone-client.protocols :as pt]))
 
 (defn get-app
   "Gets general information of an App, including the name, description, related Space, creator and updater information.

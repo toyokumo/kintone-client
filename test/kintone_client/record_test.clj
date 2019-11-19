@@ -1,9 +1,9 @@
-(ns kintone.record-test
+(ns kintone-client.record-test
   (:require [clojure.core.async :refer [<!! chan put!]]
             [clojure.test :refer :all]
-            [kintone.record :as r]
-            [kintone.test-helper :as h]
-            [kintone.types :as t]))
+            [kintone-client.record :as r]
+            [kintone-client.test-helper :as h]
+            [kintone-client.types :as t]))
 
 (def app (rand-int 100))
 

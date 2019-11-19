@@ -1,14 +1,14 @@
-(ns kintone.connection-test
+(ns kintone-client.connection-test
   (:require #?(:clj [clojure.test :refer :all]
                :cljs [cljs.test :refer-macros [deftest is testing async]])
             #?(:clj [clj-http.client :as client]
                :cljs [ajax.core :as ajax])
             #?(:clj [clojure.core.async :refer [<!!]]
                :cljs [cljs.core.async :refer [<!] :refer-macros [go]])
-            [kintone.authentication :as auth]
-            [kintone.connection :refer [new-connection]]
-            [kintone.protocols :as pt]
-            [kintone.types :as t]))
+            [kintone-client.authentication :as auth]
+            [kintone-client.connection :refer [new-connection]]
+            [kintone-client.protocols :as pt]
+            [kintone-client.types :as t]))
 
 (def ^:private auth
   (auth/new-auth {:api-token "TestApiToken"}))
