@@ -1,6 +1,8 @@
 # Change Log
 
 ## Unreleased
+
+## 0.5.0
 ### Fixed
 - Add CSRF Token and `X-Requested-With` header to each request of connection of ClojureScript ([#12](https://github.com/toyokumo/kintone-client/pull/12))
 ### Breaking
