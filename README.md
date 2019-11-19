@@ -196,7 +196,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ```
 
-For src/kintone/url.cljc and test/kintone/url_test.cljc:
+For src/kintone_client/url.cljc and test/kintone_client/url_test.cljc:
 
 ```
 MIT License
