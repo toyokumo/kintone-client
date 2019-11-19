@@ -181,7 +181,8 @@
                                  :error-handler)))]
           (is (= (t/->KintoneResponse
                   {:headers {"X-Cybozu-API-Token" "TestApiToken"
-                             "X-HTTP-Method-Override" "GET"}
+                             "X-HTTP-Method-Override" "GET"
+                             "X-Requested-With" "XMLHttpRequest"}
                    :format :json
                    :response-format :json
                    :keywords? true
@@ -342,7 +343,8 @@
                                  :handler
                                  :error-handler)))]
           (is (= (t/->KintoneResponse
-                  {:headers {"X-Cybozu-API-Token" "TestApiToken"}
+                  {:headers {"X-Cybozu-API-Token" "TestApiToken"
+                             "X-Requested-With" "XMLHttpRequest"}
                    :format :json
                    :response-format :json
                    :keywords? true
@@ -501,7 +503,8 @@
                                  :handler
                                  :error-handler)))]
           (is (= (t/->KintoneResponse
-                  {:headers {"X-Cybozu-API-Token" "TestApiToken"}
+                  {:headers {"X-Cybozu-API-Token" "TestApiToken"
+                             "X-Requested-With" "XMLHttpRequest"}
                    :format :json
                    :response-format :json
                    :keywords? true
@@ -523,7 +526,8 @@
                                  :handler
                                  :error-handler)))]
           (is (= (t/->KintoneResponse
-                  {:headers {"X-Cybozu-API-Token" "TestApiToken"}
+                  {:headers {"X-Cybozu-API-Token" "TestApiToken"
+                             "X-Requested-With" "XMLHttpRequest"}
                    :format :json
                    :response-format :json
                    :keywords? true
@@ -665,7 +669,8 @@
                                  :handler
                                  :error-handler)))]
           (is (= (t/->KintoneResponse
-                  {:headers {"X-Cybozu-API-Token" "TestApiToken"}
+                  {:headers {"X-Cybozu-API-Token" "TestApiToken"
+                             "X-Requested-With" "XMLHttpRequest"}
                    :format :json
                    :response-format :json
                    :keywords? true
@@ -837,7 +842,8 @@
                                  :error-handler)))]
           (let [{:keys [res err]} (<! (pt/-get-blob conn url {:params {:id 1}}))]
             (is (= {:headers {"X-Cybozu-API-Token" "TestApiToken"
-                              "X-HTTP-Method-Override" "GET"}
+                              "X-HTTP-Method-Override" "GET"
+                              "X-Requested-With" "XMLHttpRequest"}
                     :keywords? true
                     :timeout 30000
                     :params {:id 1}}
@@ -996,7 +1002,8 @@
                                  :handler
                                  :error-handler)))]
           (let [{:keys [res err]} (<! (pt/-multipart-post conn url {:multipart [{:id 1}]}))]
-            (is (= {:headers {"X-Cybozu-API-Token" "TestApiToken"}
+            (is (= {:headers {"X-Cybozu-API-Token" "TestApiToken"
+                              "X-Requested-With" "XMLHttpRequest"}
                     :response-format :json
                     :keywords? true
                     :timeout 30000

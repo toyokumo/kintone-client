@@ -1,7 +1,13 @@
+.PHONY: test
+
+clean:
+	lein clean
+
 test-clj:
-	@lein test
+	lein test
 
 test-cljs:
-	@lein test:cljs
+	lein test:cljs
 
-test: test-clj test-cljs
+test:
+	lein do clean, test, test:cljs

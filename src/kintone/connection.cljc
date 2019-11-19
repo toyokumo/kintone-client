@@ -7,7 +7,8 @@
                :cljs [cljs.core.async :refer [chan put!]])
             #?(:clj [clojure.string :as str])
             [kintone.protocols :as pt]
-            [kintone.types :as t])
+            [kintone.types :as t]
+            #?(:cljs [goog.object :as go]))
   #?(:clj (:import (clojure.lang ExceptionInfo)
                    (java.lang Exception))))
 
@@ -89,6 +90,7 @@
      [{:keys [auth timeout headers handler error-handler]} req channel]
      (cond-> (assoc *default-req*
                     :headers (merge (pt/-header auth)
+                                    {"X-Requested-With" "XMLHttpRequest"}
                                     headers
                                     (:headers req))
                     :handler (->handler handler channel)
@@ -98,6 +100,15 @@
 
 (defn- post-as-get [req]
   (assoc-in req [:headers "X-HTTP-Method-Override"] "GET"))
+
+#?(:cljs
+   (defn- get-csrf-token []
+     (when-let [f (go/get js/kintone "getRequestToken")]
+       (f))))
+
+#?(:cljs
+   (defn- add-csrf-token-to-url [url]
+     (str url "?__REQUEST_TOKEN__=" (get-csrf-token))))
 
 (defrecord Connection
   [auth domain guest-space-id
@@ -118,19 +129,19 @@
     (let [c (chan)
           req (build-req this req c)]
       #?(:clj (client/post url req (->handler handler c) (->error-handler error-handler c))
-         :cljs (ajax/POST url req))
+         :cljs (ajax/POST (add-csrf-token-to-url url) req))
       c))
   (-put [this url req]
     (let [c (chan)
           req (build-req this req c)]
       #?(:clj (client/put url req (->handler handler c) (->error-handler error-handler c))
-         :cljs (ajax/PUT url req))
+         :cljs (ajax/PUT (add-csrf-token-to-url url) req))
       c))
   (-delete [this url req]
     (let [c (chan)
           req (build-req this req c)]
       #?(:clj (client/delete url req (->handler handler c) (->error-handler error-handler c))
-         :cljs (ajax/DELETE url req))
+         :cljs (ajax/DELETE (add-csrf-token-to-url url) req))
       c))
   (-get-blob [this url req]
     (let [c (chan)
@@ -142,7 +153,7 @@
                            (dissoc :format)
                            (assoc :response-format (ajax/raw-response-format))))]
       #?(:clj (client/post url req (->handler handler c) (->error-handler error-handler c))
-         :cljs (ajax/POST url req))
+         :cljs (ajax/POST (add-csrf-token-to-url url) req))
       c))
   (-multipart-post [this url req]
     (let [c (chan)
@@ -162,7 +173,7 @@
                    (error-handler e))
                  (catch Exception e
                    (error-handler e))))
-         :cljs (ajax/POST url req))
+         :cljs (ajax/POST (add-csrf-token-to-url url) req))
       c)))
 
 (defn new-connection

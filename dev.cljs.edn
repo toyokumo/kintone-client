@@ -1,8 +1,11 @@
 ^{:watch-dirs ["src" "dev" "test"]
-  :mode :repl}
+  :mode :serve}
 {:main cljs.user
  :optimizations :none
  :warnings true
  :output-wrapper true
  :source-map true
- :closure-defines {cljs.user/DEBUG true}}
+ :closure-defines {cljs.user/DEBUG true}
+ :asset-path "https://localhost/js/out"
+ :output-dir "target/public/js/out"
+ :output-to "target/public/js/main.js"}
