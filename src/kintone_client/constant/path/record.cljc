@@ -1,4 +1,4 @@
-(ns kintone.constant.path.record
+(ns kintone-client.constant.path.record
   {:no-doc true}
   (:refer-clojure :exclude [comment]))
 

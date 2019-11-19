@@ -1,9 +1,9 @@
-(ns kintone.record-test
+(ns kintone-client.record-test
   (:require [cljs.test :refer-macros [deftest is testing async]]
             [cljs.core.async :refer [<! chan put!] :refer-macros [go]]
-            [kintone.record :as r]
-            [kintone.test-helper :as h]
-            [kintone.types :as t]))
+            [kintone-client.record :as r]
+            [kintone-client.test-helper :as h]
+            [kintone-client.types :as t]))
 
 (def app (rand-int 100))
 

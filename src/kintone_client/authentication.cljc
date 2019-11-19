@@ -1,9 +1,9 @@
-(ns kintone.authentication
+(ns kintone-client.authentication
   "Authentication module is used to make Connection object.
   This module allows authenticating with the Kintone app
   by password authenticator or API token authenticator.
   This module is also supported the basic authenticator"
-  (:require [kintone.protocols :as pt]
+  (:require [kintone-client.protocols :as pt]
             #?(:cljs [goog.crypt.base64 :as goog.base64]))
   #?(:clj (:import java.util.Base64)))
 

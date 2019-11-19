@@ -1,8 +1,8 @@
-(ns kintone.authentication-test
+(ns kintone-client.authentication-test
   (:require #?(:clj [clojure.test :refer :all]
                :cljs [cljs.test :refer-macros [deftest is]])
-            [kintone.authentication :refer [new-auth]]
-            [kintone.protocols :as pt]))
+            [kintone-client.authentication :refer [new-auth]]
+            [kintone-client.protocols :as pt]))
 
 (deftest new-auth-test
   #?(:cljs

@@ -19,10 +19,10 @@
 ;LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 ;OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 ;SOFTWARE.
-(ns kintone.url-test
+(ns kintone-client.url-test
   (:require #?(:clj [clojure.test :refer :all]
                :cljs [cljs.test :refer-macros [deftest testing are run-tests]])
-            [kintone.url :as sut]))
+            [kintone-client.url :as sut]))
 
 (deftest extract-base-url-test
   (are [url base-url] (= (sut/extract-base-url url) base-url)
