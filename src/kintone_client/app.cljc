@@ -31,9 +31,9 @@
                  (seq codes) (assoc :codes codes)
                  (some? name) (assoc :name name)
                  (seq ids) (assoc :ids ids)
-                 (seq space-ids) (assoc :spaceIds space-ids))]
-    (let [url (pt/-url conn path/apps)]
-      (pt/-get conn url {:params params}))))
+                 (seq space-ids) (assoc :spaceIds space-ids))
+        url (pt/-url conn path/apps)]
+    (pt/-get conn url {:params params})))
 
 (defn get-form-layout
   ""
