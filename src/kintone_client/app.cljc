@@ -23,7 +23,27 @@
     (pt/-get conn url {:params {:app app}})))
 
 (defn get-apps
-  ""
+  "Gets general information of multiple Apps, including the name, description, related Space, creator and updater information.
+
+  opts
+
+    :offset - The number of retrievals that will be skipped.
+              integer
+
+    :limit - The number of Apps to retrieve.
+             integer
+
+    :codes - The App Code.
+             sequence of string
+
+    :name - The App Name.
+            string
+
+    :ids - The App IDs.
+           sequence of integer
+
+    :space-ids - The Space ID of where the App resides in.
+                 sequence of integer"
   [conn {:keys [offset limit codes name ids space-ids]}]
   (let [params (cond-> {}
                  (some? offset) (assoc :offset offset)
@@ -36,7 +56,14 @@
     (pt/-get conn url {:params params})))
 
 (defn get-form-layout
-  ""
+  "Gets form layout of an App.
+
+  app - The kintone app ID.
+        integer
+
+  opts
+
+    :is-preview? - Gets from pre-live settings."
   [conn app {:keys [is-preview?]}]
   (let [url (pt/-url conn (if is-preview?
                             path/preview-form-layout
@@ -44,7 +71,13 @@
     (pt/-get conn url {:params {:app app}})))
 
 (defn update-form-layout
-  ""
+  "Updates the field layout info of a form in an App.
+  app - The kintone app ID
+        integer
+
+  layout - A list of field layouts for each row.
+           See API reference regarding form layout format.
+           sequence of map"
   [conn app layout {:keys [revision]}]
   (let [params (cond-> {:app app :layout layout}
                  (some? revision) (assoc :revision revision))
@@ -52,7 +85,18 @@
     (pt/-put conn url {:params params})))
 
 (defn get-form-fields
-  ""
+  "Gets the list of fields and field settings of an App.
+
+  app - The kintone app ID.
+        integer
+
+  opts
+
+    :lang - The localized language to retrieve the data.
+            string
+
+    :is-preview? - Gets from pre-live settings.
+                   boolean"
   [conn app {:keys [lang is-preview?]}]
   (let [params (cond-> {:app app}
                  (some? lang) (assoc :lang lang))
@@ -62,7 +106,19 @@
     (pt/-get conn url {:params params})))
 
 (defn add-form-fields
-  ""
+  "Adds fields to a form of an App..
+
+  app - The kintone app ID.
+        integer
+
+  fields - The field settings.
+           See API reference regarding field format.
+           map
+
+  opts
+
+    :revision - Specify the revision number of the settings that will be deployed.
+                integer"
   [conn app fields {:keys [revision]}]
   (let [params (cond-> {:app app :properties fields}
                  (some? revision) (assoc :revision revision))
@@ -70,7 +126,19 @@
     (pt/-post conn url {:params params})))
 
 (defn update-form-fields
-  ""
+  "Updates the field settings of fields in a form of an App.
+
+  app - The kintone app ID.
+        integer
+
+  fields - The field settings.
+           See API reference regarding record format.
+           map
+
+  opts
+
+    :revision - Specify the revision number of the settings that will be deployed.
+                integer"
   [conn app fields {:keys [revision]}]
   (let [params (cond-> {:app app :properties fields}
                  (some? revision) (assoc :revision revision))
@@ -78,7 +146,19 @@
     (pt/-put conn url {:params params})))
 
 (defn delete-form-fields
-  ""
+  "Deletes fields from a form of an App.
+
+  app - The kintone app ID.
+        integer
+
+  codes - The list of field codes of the fields to delete.
+          Up to 100 field codes can be specified.
+          sequence
+
+  opts
+
+    :revision - Specify the revision number of the settings that will be deployed.
+                integer"
   [conn app codes {:keys [revision]}]
   (let [params (cond-> {:app app :fields codes}
                  (some? revision) (assoc :revision revision))
@@ -86,7 +166,19 @@
     (pt/-delete conn url {:params params})))
 
 (defn add-preview-app
-  ""
+  "Creates a preview App.
+
+  opts
+
+    :name - The App name. (Required)
+            string
+
+    :space - The Space ID of where the App will be created.
+             integer
+
+    :thread - The Thread ID of the thread in the Space where the App will be created.
+              integer
+  "
   [conn {:keys [name space thread]}]
   (let [params (cond-> {:name name}
                  (some? space) (assoc :space space)
@@ -95,7 +187,15 @@
     (pt/-post conn url {:params params})))
 
 (defn deploy-app-settings
-  ""
+  "Updates the settings of a pre-live App to the live App.
+
+  apps - The list of Apps to deploy the pre-live settings to the live Apps.
+         sequence of integer
+
+  opts
+
+    :revert - Specify true to cancel all changes made to the pre-live settings.
+              boolean"
   [conn apps {:keys [revert]}]
   (let [params (cond-> {:apps apps}
                  (some? revert) (assoc :revert revert))
@@ -103,14 +203,28 @@
     (pt/-post conn url {:params params})))
 
 (defn get-app-deploy-status
-  ""
+  "Gets the deployment status of the App settings for multiple Apps.
+
+  apps - Sequence of kintone app ID.
+         sequence of integer"
   [conn apps]
   (let [params {:apps apps}
         url (pt/-url conn path/preview-deploy)]
     (pt/-get conn url {:params params})))
 
 (defn get-views
-  ""
+  "Gets the View settings of an App.
+
+  app - The kintone app ID.
+        integer
+
+  opts
+
+    :lang - The localized language to retrieve the data.
+            string
+
+    :is-preview? - Gets from pre-live settings.
+                   boolean"
   [conn app {:keys [lang is-preview?]}]
   (let [params (cond-> {:app app}
                  (some? lang) (assoc :lang lang))
@@ -120,7 +234,18 @@
     (pt/-get conn url {:params params})))
 
 (defn update-views
-  ""
+  "Updates the View settings of an App.
+
+  app - The kintone app ID.
+
+  views - The view settings.
+          See API reference regarding record format.
+          map
+
+  opts
+
+    :revision - Specify the revision number of the settings that will be deployed.
+                integer"
   [conn app views {:keys [revision]}]
   (let [params (cond-> {:app app :views views}
                  (some? revision) (assoc :revision revision))
@@ -128,7 +253,18 @@
     (pt/-put conn url {:params params})))
 
 (defn get-general-settings
-  ""
+  "Gets the description, name, icon, revision and color theme of an App.
+
+  app - The kintone app ID.
+        integer
+
+  opts
+
+    :lang - The localized language to retrieve the data.
+            string
+
+    :is-preview? - Gets from pre-live settings.
+                   boolean"
   [conn app {:keys [lang is-preview?]}]
   (let [params (cond-> {:app app}
                  (some? lang) (assoc :lang lang))
@@ -138,7 +274,39 @@
     (pt/-get conn url {:params params})))
 
 (defn update-general-settings
-  ""
+  "Updates the description, name, icon, revision and color theme of an App.
+
+  app - The kintone app ID.
+
+  settings - The general settings.
+             Parameters that are ignored will not be updated.
+             See API reference regarding general settings format.
+             map
+
+    :name - The App name.
+            string
+
+    :icon - The app icon.
+            map
+
+      :type - The icon type. \"FILE\" or \"PRESET\"
+              string
+
+      :key - The key identifier of the icon.
+             string
+
+      :file - The key identifier of the icon.
+              map
+
+        :fileKey - The file key of the icon.
+                   string
+
+    :theme - The Color theme.
+
+  opts
+
+    :revision - Specify the revision number of the settings that will be deployed.
+                integer"
   [conn app settings {:keys [revision]}]
   (let [params (cond-> (merge {:app app} settings)
                  (some? revision) (assoc :revision revision))
@@ -146,7 +314,18 @@
     (pt/-put conn url {:params params})))
 
 (defn get-status
-  ""
+  "Gets the process management settings of an App.
+
+  app - The kintone app ID.
+        integer
+
+  opts
+
+    :lang - The localized language to retrieve the data.
+            string
+
+    :is-preview? - Gets from pre-live settings.
+                   boolean"
   [conn app {:keys [lang is-preview?]}]
   (let [params (cond-> {:app app}
                  (some? lang) (assoc :lang lang))
@@ -156,7 +335,27 @@
     (pt/-get conn url {:params params})))
 
 (defn update-status
-  ""
+  "Updates the process management settings of an App.
+
+  app - The kintone App ID.
+
+  status - The process management setting.
+           See API reference regarding process management format.
+           map
+
+    :enable - The on/off settings of the process management settings.
+              string
+
+    :states - The process management statuses.
+              map
+
+    :actions - The actions.
+               sequence of map
+
+  opts
+
+    :revision - Specify the revision number of the settings that will be deployed.
+                integer"
   [conn app status {:keys [revision]}]
   (let [params (cond-> (merge {:app app} status)
                  (some? revision) (assoc :revision revision))
@@ -164,7 +363,15 @@
     (pt/-put conn url {:params params})))
 
 (defn get-customize
-  ""
+  "Gets the JavaScript and CSS Customization settings of an App.
+
+  app - The kintone app ID.
+        integer
+
+  opts
+
+    :is-preview? - Gets from pre-live settings.
+                   boolean"
   [conn app {:keys [is-preview?]}]
   (let [params {:app app}
         url (pt/-url conn (if is-preview?
@@ -173,7 +380,28 @@
     (pt/-get conn url {:params params})))
 
 (defn update-customize
-  ""
+  "Updates the JavaScript and CSS Customization settings of an App.
+
+  app - The kintone app ID.
+        integer
+
+  customize - Customize setting.
+              See API reference regarding customize format.
+              map
+
+    :desktop - The setting of JavaScript and CSS files for the desktop.
+               map
+
+    :mobile - The setting of JavaScript and CSS files for the desktop.
+              map
+
+    :scope - The scope of customization.
+             string
+
+  opts
+
+    :revision - Specify the revision number of the settings that will be deployed.
+                integer"
   [conn app customize {:keys [revision]}]
   (let [params (cond-> (merge {:app app} customize)
                  (some? revision) (assoc :revision revision))
@@ -181,7 +409,15 @@
     (pt/-put conn url {:params params})))
 
 (defn get-acl
-  ""
+  "Gets the App permissions of an app.
+
+  app - The kintone app ID.
+        integer
+
+  opts
+
+    :is-preview? - Gets from pre-live settings.
+                   boolean"
   [conn app {:keys [is-preview?]}]
   (let [params {:app app}
         url (pt/-url conn (if is-preview?
@@ -190,7 +426,18 @@
     (pt/-get conn url {:params params})))
 
 (defn update-acl
-  ""
+  "Updates the App permissions of an App.
+
+  app - The kintone app ID.
+
+  rights - The permission settings.
+           See API reference regarding permission format.
+           sequence of map
+
+  opts
+
+    :revision - Specify the revision number of the settings that will be deployed.
+                integer"
   [conn app rights {:keys [revision]}]
   (let [params (cond-> {:app app :rights rights}
                  (some? revision) (assoc :revision revision))
@@ -198,7 +445,15 @@
     (pt/-put conn url {:params params})))
 
 (defn get-field-acl
-  ""
+  "Gets the Field permission settings of an App.
+
+  app - The kintone app ID.
+        integer
+
+  opts
+
+  :is-preview? - Gets from pre-live settings.
+                 boolean"
   [conn app {:keys [is-preview?]}]
   (let [params {:app app}
         url (pt/-url conn (if is-preview?
@@ -207,7 +462,18 @@
     (pt/-get conn url {:params params})))
 
 (defn update-field-acl
-  ""
+  "Updates the Field permission settings of an App.
+
+  app - The kintone app ID.
+
+  rights - The field permission settings.
+           See API reference regarding field permission format.
+           sequence of map
+
+  opts
+
+    :revision - Specify the revision number of the settings that will be deployed.
+                integer"
   [conn app rights {:keys [revision]}]
   (let [params (cond-> {:app app :rights rights}
                  (some? revision) (assoc :revision revision))
@@ -215,7 +481,18 @@
     (pt/-put conn url {:params params})))
 
 (defn update-live-field-acl
-  ""
+  "Updates the Field permission settings of LIVE ENVIRONMENT an App.
+
+  app - The kintone app ID.
+
+  rights - The field permission settings.
+           See API reference regarding field permission format.
+           sequence of map
+
+  opts
+
+    :revision - Specify the revision number of the settings that will be deployed.
+                integer"
   [conn app rights {:keys [revision]}]
   (let [params (cond-> {:app app :rights rights}
                  (some? revision) (assoc :revision revision))
