@@ -298,8 +298,27 @@
              (select-keys file-field test-fields))))))
 
 (deftest get-apps-test
-  ; TODO
-  )
+  (let [names ["test-app1" "test-app2" "dev-app3"]
+        apps (map #(-> (<!! (app/add-preview-app conn {:name %
+                                                       :space space
+                                                       :thread space}))
+                       :res
+                       :app
+                       Integer/parseInt)
+                  names)
+        [app1 app2 app3] apps]
+    (<!! (app/deploy-app-settings conn (map (fn [app] {:app app}) apps) {}))
+    (<!! (timeout 10000))                                 ; wait 10 seconds
+    (let [{:keys [res err]} (<!! (app/get-apps conn {:name "test-app" :space-ids [space] :ids apps}))]
+      (is (nil? err))
+      (is (= (map str [app1 app2]) (->> res
+                                        :apps
+                                        (map :appId)))))
+    (let [{:keys [res err]} (<!! (app/get-apps conn {:offset 1 :space-ids [space] :ids apps}))]
+      (is (nil? err))
+      (is (= (map str [app2 app3]) (->> res
+                                        :apps
+                                        (map :appId)))))))
 
 (deftest get-form-layout-test
   (let [{:keys [res err]} (<!! (app/get-form-layout conn app {}))
@@ -438,7 +457,7 @@
                 Integer/parseInt)]
     (is (nil? err))
     (<!! (app/deploy-app-settings conn [{:app app}] {}))
-    (Thread/sleep 3000)
+    (wait-app-deploy conn app)
     (let [{:keys [res]} (<!! (app/get-app conn app))]
       (is (= "ADD-APP-TEST" (:name res)))
       (is (= (str app) (:appId res)))
@@ -449,23 +468,23 @@
   (let [app (-> (<!! (app/add-preview-app conn {:space space
                                                 :name "kintone-client-dev-app"
                                                 :thread space}))
-                 :res
-                 :app
-                 Integer/parseInt)]
+                :res
+                :app
+                Integer/parseInt)]
     (<!! (app/add-form-fields conn app {:TEXT1 {:code "TEXT1"
                                                 :type "SINGLE_LINE_TEXT"
                                                 :label "text"}} {}))
     (is (-> (app/get-form-fields conn app {})
-             <!!
-             :res
-             :properties
-             (contains? :TEXT1)
-             not))
+            <!!
+            :res
+            :properties
+            (contains? :TEXT1)
+            not))
     (is (-> (app/get-form-fields conn app {:is-preview? true})
-             <!!
-             :res
-             :properties
-             (contains? :TEXT1)))
+            <!!
+            :res
+            :properties
+            (contains? :TEXT1)))
     (let [{:keys [err]} (<!! (app/deploy-app-settings conn [{:app app}] {}))]
       (is (nil? err))
       (wait-app-deploy conn app)
@@ -501,8 +520,17 @@
     ))
 
 (deftest get-app-deploy-status-test
-  ;TODO
-  )
+  (with-app app
+    (<!! (app/deploy-app-settings conn [{:app app}] {}))
+    (let [{:keys [res err]} (<!! (app/get-app-deploy-status conn [app]))]
+      (is (nil? err))
+      (is (= "PROCESSING"
+             (get-in res [:apps 0 :status])))
+      (<!! (timeout 10000))                                 ; wait 10 seconds
+      (let [{:keys [res err]} (<!! (app/get-app-deploy-status conn [app]))]
+        (is (nil? err))
+        (is (= "SUCCESS"
+               (get-in res [:apps 0 :status])))))))
 
 (deftest get-views-test
   (let [{:keys [res err]} (<!! (app/get-views conn app {}))]
