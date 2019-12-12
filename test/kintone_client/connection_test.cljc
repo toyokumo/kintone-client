@@ -112,6 +112,21 @@
                    nil)
                   (<!! (pt/-get conn url {:params {:id 1}}))))))
 
+       (testing "default-handler-user-api"
+         (with-redefs [client/get (fn [url req h eh]
+                                    (h {:body req}))]
+           (is (= (t/->KintoneResponse
+                   {:headers {"X-Cybozu-API-Token" "TestApiToken"}
+                    :accept :json
+                    :as :json
+                    :async? true
+                    :coerce :unexceptional
+                    :connection-timeout 10000
+                    :socket-timeout 30000
+                    :query-params {:id 1}}
+                   nil)
+                  (<!! (pt/-get conn user-api-url {:params {:id 1}}))))))
+
        (testing "custom handler"
          (with-redefs [client/post (fn [url req h eh]
                                      (h {:body req}))]
@@ -129,6 +144,23 @@
                    nil)
                   (<!! (pt/-get (assoc conn :handler identity)
                                 url
+                                {:params {:id 1}}))))))
+
+       (testing "custom handler user api"
+         (with-redefs [client/get (fn [url req h eh]
+                                    (h {:body req}))]
+           (is (= (t/->KintoneResponse
+                   {:body {:headers {"X-Cybozu-API-Token" "TestApiToken"}
+                           :accept :json
+                           :as :json
+                           :async? true
+                           :coerce :unexceptional
+                           :connection-timeout 10000
+                           :socket-timeout 30000
+                           :query-params {:id 1}}}
+                   nil)
+                  (<!! (pt/-get (assoc conn :handler identity)
+                                user-api-url
                                 {:params {:id 1}})))))))
 
      (testing "Negative"
@@ -147,6 +179,20 @@
                       :response {:message "Something bad happen"}})
                     (<!! (pt/-get conn url {:params {:id 1}}))))))
 
+         (testing "JSON response user api"
+           (with-redefs [client/get
+                         (fn [url req h eh]
+                           (eh (ex-info "Test error"
+                                        {:status 400
+                                         :headers {"Content-Type" "application/json; charset=utf-8"}
+                                         :body "{\"message\":\"Something bad happen\"}"})))]
+             (is (= (t/->KintoneResponse
+                     nil
+                     {:status 400
+                      :status-text "400"
+                      :response {:message "Something bad happen"}})
+                    (<!! (pt/-get conn user-api-url {:params {:id 1}}))))))
+
          (testing "HTML response"
            (with-redefs [client/post
                          (fn [url req h eh]
@@ -161,6 +207,20 @@
                       :response "<!DOCTYPE html><html></html>"})
                     (<!! (pt/-get conn url {:params {:id 1}}))))))
 
+         (testing "HTML response user api"
+           (with-redefs [client/get
+                         (fn [url req h eh]
+                           (eh (ex-info "Test error"
+                                        {:status 400
+                                         :headers {"Content-Type" "text/html; charset=utf-8"}
+                                         :body "<!DOCTYPE html><html></html>"})))]
+             (is (= (t/->KintoneResponse
+                     nil
+                     {:status 400
+                      :status-text "400"
+                      :response "<!DOCTYPE html><html></html>"})
+                    (<!! (pt/-get conn user-api-url {:params {:id 1}}))))))
+
          (testing "custom error-handler"
            (with-redefs [client/post
                          (fn [url req h eh]
@@ -173,6 +233,20 @@
                      "{\"message\":\"Something bad happen\"}")
                     (<!! (pt/-get (assoc conn :error-handler (fn [err] (:body (ex-data err))))
                                   url
+                                  {:params {:id 1}}))))))
+
+         (testing "custom error-handler user api"
+           (with-redefs [client/get
+                         (fn [url req h eh]
+                           (eh (ex-info "Test error"
+                                        {:status 400
+                                         :headers {"Content-Type" "application/json; charset=utf-8"}
+                                         :body "{\"message\":\"Something bad happen\"}"})))]
+             (is (= (t/->KintoneResponse
+                     nil
+                     "{\"message\":\"Something bad happen\"}")
+                    (<!! (pt/-get (assoc conn :error-handler (fn [err] (:body (ex-data err))))
+                                  user-api-url
                                   {:params {:id 1}})))))))
 
        (testing "Exception"
@@ -181,6 +255,16 @@
                          (eh (Exception. "Test error")))]
            (let [{:keys [status status-text response]}
                  (:err (<!! (pt/-get conn url {:params {:id 1}})))]
+             (is (= status -1))
+             (is (= status-text "Test error"))
+             (is (= (type response) Exception)))))
+
+       (testing "Exception user api"
+         (with-redefs [client/get
+                       (fn [url req h eh]
+                         (eh (Exception. "Test error")))]
+           (let [{:keys [status status-text response]}
+                 (:err (<!! (pt/-get conn user-api-url {:params {:id 1}})))]
              (is (= status -1))
              (is (= status-text "Test error"))
              (is (= (type response) Exception))))))))
@@ -210,6 +294,29 @@
         (done)))))
 
 #?(:cljs
+   (deftest -get-test-positive-user-api
+     (async done
+       (go
+        (with-redefs [ajax.easy/easy-ajax-request
+                      (fn [uri method opts]
+                        (is (= method "GET"))
+                        ((:handler opts)
+                         (dissoc opts
+                                 :handler
+                                 :error-handler)))]
+          (is (= (t/->KintoneResponse
+                  {:headers {"X-Cybozu-API-Token" "TestApiToken"
+                             "X-Requested-With" "XMLHttpRequest"}
+                   :format :json
+                   :response-format :json
+                   :keywords? true
+                   :timeout 30000
+                   :query-params {:id 1}}
+                  nil)
+                 (<! (pt/-get conn user-api-url {:params {:id 1}})))))
+        (done)))))
+
+#?(:cljs
    (deftest -get-test-positive-with-custom-handler
      (async done
        (go
@@ -225,6 +332,25 @@
                   nil)
                  (<! (pt/-get (assoc conn :handler :params)
                               url
+                              {:params {:id 1}})))))
+        (done)))))
+
+#?(:cljs
+   (deftest -get-test-positive-with-custom-handler-user-api
+     (async done
+       (go
+        (with-redefs [ajax.easy/easy-ajax-request
+                      (fn [uri method opts]
+                        (is (= method "GET"))
+                        ((:handler opts)
+                         (dissoc opts
+                                 :handler
+                                 :error-handler)))]
+          (is (= (t/->KintoneResponse
+                  {:id 1}
+                  nil)
+                 (<! (pt/-get (assoc conn :handler :query-params)
+                              user-api-url
                               {:params {:id 1}})))))
         (done)))))
 
@@ -248,6 +374,24 @@
         (done)))))
 
 #?(:cljs
+   (deftest -get-test-negative-user-api
+     (async done
+       (go
+        (with-redefs [ajax.easy/easy-ajax-request
+                      (fn [uri method opts]
+                        (is (= method "GET"))
+                        ((:error-handler opts)
+                         {:status 400
+                          :status-text "400"
+                          :response {:message "Something bad happen"}}))]
+          (is (= (t/->KintoneResponse
+                  nil
+                  {:status 400 :status-text "400"
+                   :response {:message "Something bad happen"}})
+                 (<! (pt/-get conn user-api-url {:params {:id 1}})))))
+        (done)))))
+
+#?(:cljs
    (deftest -get-test-negative-with-custom-error-handler
      (async done
        (go
@@ -263,6 +407,25 @@
                   {:message "Something bad happen"})
                  (<! (pt/-get (assoc conn :error-handler :response)
                               url
+                              {:params {:id 1}})))))
+        (done)))))
+
+#?(:cljs
+   (deftest -get-test-negative-with-custom-error-handler-user-api
+     (async done
+       (go
+        (with-redefs [ajax.easy/easy-ajax-request
+                      (fn [uri method opts]
+                        (is (= method "GET"))
+                        ((:error-handler opts)
+                         {:status 400
+                          :status-text "400"
+                          :response {:message "Something bad happen"}}))]
+          (is (= (t/->KintoneResponse
+                  nil
+                  {:message "Something bad happen"})
+                 (<! (pt/-get (assoc conn :error-handler :response)
+                              user-api-url
                               {:params {:id 1}})))))
         (done)))))
 
