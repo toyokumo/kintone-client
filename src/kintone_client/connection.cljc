@@ -122,6 +122,8 @@
       (str "/k" path)))
   (-url [this path]
     (str "https://" domain (pt/-path this path)))
+  (-user-api-url [_ path]
+    (str "https://" domain path))
   (-get [this url req]
    ;; Use POST method to pass the URL bytes limitation.
     (pt/-post this url (post-as-get req)))

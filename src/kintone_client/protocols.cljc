@@ -8,6 +8,7 @@
   "HTTP request abstraction."
   (-path [_ path])
   (-url [_ path])
+  (-user-api-url [_ path])
   (-get [_ url req])
   (-post [_ url req])
   (-put [_ url req])

@@ -68,12 +68,29 @@
                   "/mypath"))
       "In guest space"))
 
+(deftest -user-api-url-test
+  (is (= "https://sample.kintone.com/mypath"
+         (pt/-user-api-url (new-connection {:auth auth
+                                            :domain "sample.kintone.com"})
+                           "/mypath"))
+      "Not in guest space")
+
+  (is (= "https://guest.kintone.com/mypath"
+         (pt/-user-api-url (new-connection {:auth auth
+                                            :domain "guest.kintone.com"
+                                            :guest-space-id 2})
+                           "/mypath"))
+      "In guest space"))
+
 (def ^:private conn
   (new-connection {:auth auth
                    :domain "sample.kintone.com"}))
 
 (def ^:private url
   (pt/-url conn "/mypath"))
+
+(def ^:private user-api-url
+  (pt/-user-api-url conn "/mypath"))
 
 #?(:clj
    (deftest -get-test
