@@ -16,12 +16,17 @@
 (defn- fake-url [path]
   (pt/-url conn path))
 
+(defn- fake-user-api-url [path]
+  (pt/-user-api-url conn path))
+
 (def fake-conn
   (reify pt/IRequest
     (-path [_ path]
       (str "/k" path))
     (-url [_ path]
       (fake-url path))
+    (-user-api-url [_ path]
+     (fake-user-api-url path))
     (-get [_ url req]
       (let [c (chan)]
         (put! c (t/->KintoneResponse {:url url :req req} nil))
