@@ -353,7 +353,7 @@
                                          :size {:width "300"}}]}]
           {:keys [err]} (<!! (app/update-form-layout conn app layout {}))]
       (is (nil? err))
-      (let [{:keys [res]} (<!! (app/get-form-layout conn app {:is-preview? true}))]
+      (let [{:keys [res]} (<!! (app/get-form-layout conn app {:preview? true}))]
         (is (= layout (:layout res)))))))
 
 (deftest get-form-fields-test
@@ -391,7 +391,7 @@
                                         :defaultValue ["A"]}}
           {:keys [err]} (<!! (app/add-form-fields conn app additional-fields {}))]
       (is (nil? err))
-      (let [new-fields (-> (<!! (app/get-form-fields conn app {:is-preview? true}))
+      (let [new-fields (-> (<!! (app/get-form-fields conn app {:preview? true}))
                            :res
                            :properties)]
         (is (map-includes? new-fields original-fields))
@@ -419,7 +419,7 @@
       (<!! (app/add-form-fields conn app additional-field {}))
       (let [{:keys [err]} (<!! (app/update-form-fields conn app modified-field {}))]
         (is (nil? err))
-        (let [new-fields (-> (<!! (app/get-form-fields conn app {:is-preview? true}))
+        (let [new-fields (-> (<!! (app/get-form-fields conn app {:preview? true}))
                              :res
                              :properties)]
           (is (map-includes? new-fields original-fields))
@@ -440,7 +440,7 @@
       (<!! (app/add-form-fields conn app additional-field {}))
       (let [{:keys [err]} (<!! (app/delete-form-fields conn app [:TEXT1] {}))]
         (is (nil? err))
-        (let [new-fields (-> (<!! (app/get-form-fields conn app {:is-preview? true}))
+        (let [new-fields (-> (<!! (app/get-form-fields conn app {:preview? true}))
                              :res
                              :properties)]
           (is (map-includes? new-fields original-fields))
@@ -480,7 +480,7 @@
             :properties
             (contains? :TEXT1)
             not))
-    (is (-> (app/get-form-fields conn app {:is-preview? true})
+    (is (-> (app/get-form-fields conn app {:preview? true})
             <!!
             :res
             :properties
@@ -503,7 +503,7 @@
             :properties
             (contains? :TEXT1)
             not))
-    (is (-> (app/get-form-fields conn app {:is-preview? true})
+    (is (-> (app/get-form-fields conn app {:preview? true})
             <!!
             :res
             :properties
@@ -511,7 +511,7 @@
     (let [{:keys [err]} (<!! (app/deploy-app-settings conn [{:app app}] {:revert true}))]
       (is (nil? err))
       (wait-app-deploy conn app)
-      (is (-> (app/get-form-fields conn app {:is-preview? true})
+      (is (-> (app/get-form-fields conn app {:preview? true})
               <!!
               :res
               :properties
@@ -550,7 +550,7 @@
                        :name "cal"}}
           {:keys [err]} (<!! (app/update-views conn app views {}))]
       (is (nil? err))
-      (let [{:keys [res]} (<!! (app/get-views conn app {:is-preview? true}))]
+      (let [{:keys [res]} (<!! (app/get-views conn app {:preview? true}))]
         (is (map-includes? (get-in res [:views :view1]) (:view1 views)))
         (is (map-includes? (get-in res [:views :cal]) (:cal views)))))))
 
@@ -574,7 +574,7 @@
           {:keys [err]} (<!! (app/update-general-settings conn app new-setting {}))]
       (is (nil? err))
       (is (= new-setting
-             (-> (<!! (app/get-general-settings conn app {:is-preview? true}))
+             (-> (<!! (app/get-general-settings conn app {:preview? true}))
                  :res
                  (select-keys (keys new-setting))))))))
 
@@ -607,7 +607,7 @@
                                  :to "s3"}]}
           {:keys [err]} (<!! (app/update-status conn app new-status {}))]
       (is (nil? err))
-      (let [{:keys [res]} (<!! (app/get-status conn app {:is-preview? true}))]
+      (let [{:keys [res]} (<!! (app/get-status conn app {:preview? true}))]
         (is (= true (:enable res)))
         (is (map-includes? (get-in res [:states :s1]) (get-in new-status [:states :s1])))
         (is (map-includes? (get-in res [:states :s2]) (get-in new-status [:states :s2])))
@@ -648,7 +648,7 @@
                                      :url "https://example.net/mobile.css"}]}}
           {:keys [err]} (<!! (app/update-customize conn app customize {}))]
       (is (nil? err))
-      (let [{:keys [res]} (<!! (app/get-customize conn app {:is-preview? true}))
+      (let [{:keys [res]} (<!! (app/get-customize conn app {:preview? true}))
             {:keys [scope desktop mobile]} res]
         (is (= "ADMIN" scope))
         (is (= {:type "URL"
@@ -707,7 +707,7 @@
                    :recordExportable true}]
           {:keys [err]} (<!! (app/update-acl conn app rights {}))]
       (is (nil? err))
-      (let [{:keys [res]} (<!! (app/get-acl conn app {:is-preview? true}))]
+      (let [{:keys [res]} (<!! (app/get-acl conn app {:preview? true}))]
         (is (map-includes? (get-in res [:rights 0]) (get rights 0)))
         (is (map-includes? (get-in res [:rights 1]) (-> rights
                                                         (get 1)
@@ -739,7 +739,7 @@
                                         :code "Administrators"}}]}]
           {:keys [err]} (<!! (app/update-field-acl conn app rights {}))]
       (is (= err nil))
-      (let [{:keys [res]} (<!! (app/get-field-acl conn app {:is-preview? true}))]
+      (let [{:keys [res]} (<!! (app/get-field-acl conn app {:preview? true}))]
         (is (= [{:code "TEXT1"
                  :entities [{:entity {:type "GROUP"
                                       :code "Administrators"}

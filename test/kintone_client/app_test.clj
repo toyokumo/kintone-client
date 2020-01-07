@@ -47,7 +47,7 @@
   (is (= (t/->KintoneResponse {:url "https://test.kintone.com/k/v1/preview/app/form/layout.json"
                                :req {:params {:app 100}}}
                               nil)
-         (<!! (app/get-form-layout h/fake-conn 100 {:is-preview? true})))))
+         (<!! (app/get-form-layout h/fake-conn 100 {:preview? true})))))
 
 
 (deftest update-form-layout-test
@@ -261,7 +261,7 @@
                                :req {:params {:app 100
                                               :lang "en"}}}
                               nil)
-         (<!! (app/get-views h/fake-conn 100 {:lang "en" :is-preview? true})))))
+         (<!! (app/get-views h/fake-conn 100 {:lang "en" :preview? true})))))
 
 
 (deftest update-views-test
@@ -295,7 +295,7 @@
                                :req {:params {:app 100
                                               :lang "en"}}}
                               nil)
-         (<!! (app/get-general-settings h/fake-conn 100 {:lang "en" :is-preview? true})))))
+         (<!! (app/get-general-settings h/fake-conn 100 {:lang "en" :preview? true})))))
 
 
 (deftest update-general-settings-test
@@ -337,7 +337,7 @@
                                :req {:params {:app 100
                                               :lang "en"}}}
                               nil)
-         (<!! (app/get-status h/fake-conn 100 {:lang "en" :is-preview? true})))))
+         (<!! (app/get-status h/fake-conn 100 {:lang "en" :preview? true})))))
 
 
 (deftest update-status-test
@@ -390,7 +390,7 @@
   (is (= (t/->KintoneResponse {:url "https://test.kintone.com/k/v1/preview/app/customize.json"
                                :req {:params {:app 100}}}
                               nil)
-         (<!! (app/get-customize h/fake-conn 100 {:is-preview? true})))))
+         (<!! (app/get-customize h/fake-conn 100 {:preview? true})))))
 
 
 (deftest update-customize-test
@@ -461,7 +461,7 @@
   (is (= (t/->KintoneResponse {:url "https://test.kintone.com/k/v1/preview/app/acl.json"
                                :req {:params {:app 100}}}
                               nil)
-         (<!! (app/get-acl h/fake-conn 100 {:is-preview? true})))))
+         (<!! (app/get-acl h/fake-conn 100 {:preview? true})))))
 
 
 (deftest update-acl-test
@@ -534,7 +534,7 @@
   (is (= (t/->KintoneResponse {:url "https://test.kintone.com/k/v1/preview/field/acl.json"
                                :req {:params {:app 100}}}
                               nil)
-         (<!! (app/get-field-acl h/fake-conn 100 {:is-preview? true})))))
+         (<!! (app/get-field-acl h/fake-conn 100 {:preview? true})))))
 
 
 (deftest update-field-acl-test

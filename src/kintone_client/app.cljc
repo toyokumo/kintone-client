@@ -66,9 +66,9 @@
 
   opts
 
-    :is-preview? - Gets from pre-live settings."
-  [conn app {:keys [is-preview?]}]
-  (let [url (pt/-url conn (if is-preview?
+    :preview? - Gets from pre-live settings."
+  [conn app {:keys [preview?]}]
+  (let [url (pt/-url conn (if preview?
                             path/preview-form-layout
                             path/form-layout))]
     (pt/-get conn url {:params {:app app}})))
@@ -108,12 +108,12 @@
             The default value is default if this is not assigned.
             string
 
-    :is-preview? - Gets from pre-live settings.
+    :preview? - Gets from pre-live settings.
                    boolean"
-  [conn app {:keys [lang is-preview?]}]
+  [conn app {:keys [lang preview?]}]
   (let [params (cond-> {:app app}
                  (some? lang) (assoc :lang lang))
-        url (pt/-url conn (if is-preview?
+        url (pt/-url conn (if preview?
                             path/preview-form-fields
                             path/form-fields))]
     (pt/-get conn url {:params params})))
@@ -249,12 +249,12 @@
             The default value is default if this is not assigned.
             string
 
-    :is-preview? - Gets from pre-live settings.
+    :preview? - Gets from pre-live settings.
                    boolean"
-  [conn app {:keys [lang is-preview?]}]
+  [conn app {:keys [lang preview?]}]
   (let [params (cond-> {:app app}
                  (some? lang) (assoc :lang lang))
-        url (pt/-url conn (if is-preview?
+        url (pt/-url conn (if preview?
                             path/preview-views
                             path/views))]
     (pt/-get conn url {:params params})))
@@ -298,12 +298,12 @@
             The default value is default if this is not assigned.
             string
 
-    :is-preview? - Gets from pre-live settings.
+    :preview? - Gets from pre-live settings.
                    boolean"
-  [conn app {:keys [lang is-preview?]}]
+  [conn app {:keys [lang preview?]}]
   (let [params (cond-> {:app app}
                  (some? lang) (assoc :lang lang))
-        url (pt/-url conn (if is-preview?
+        url (pt/-url conn (if preview?
                             path/preview-settings
                             path/settings))]
     (pt/-get conn url {:params params})))
@@ -368,12 +368,12 @@
             The default value is default if this is not assigned.
             string
 
-    :is-preview? - Gets from pre-live settings.
+    :preview? - Gets from pre-live settings.
                    boolean"
-  [conn app {:keys [lang is-preview?]}]
+  [conn app {:keys [lang preview?]}]
   (let [params (cond-> {:app app}
                  (some? lang) (assoc :lang lang))
-        url (pt/-url conn (if is-preview?
+        url (pt/-url conn (if preview?
                             path/preview-status
                             path/status))]
     (pt/-get conn url {:params params})))
@@ -416,11 +416,11 @@
 
   opts
 
-    :is-preview? - Gets from pre-live settings.
+    :preview? - Gets from pre-live settings.
                    boolean"
-  [conn app {:keys [is-preview?]}]
+  [conn app {:keys [preview?]}]
   (let [params {:app app}
-        url (pt/-url conn (if is-preview?
+        url (pt/-url conn (if preview?
                             path/preview-customize
                             path/customize))]
     (pt/-get conn url {:params params})))
@@ -464,11 +464,11 @@
 
   opts
 
-    :is-preview? - Gets from pre-live settings.
+    :preview? - Gets from pre-live settings.
                    boolean"
-  [conn app {:keys [is-preview?]}]
+  [conn app {:keys [preview?]}]
   (let [params {:app app}
-        url (pt/-url conn (if is-preview?
+        url (pt/-url conn (if preview?
                             path/preview-acl
                             path/acl))]
     (pt/-get conn url {:params params})))
@@ -502,11 +502,11 @@
 
   opts
 
-  :is-preview? - Gets from pre-live settings.
+  :preview? - Gets from pre-live settings.
                  boolean"
-  [conn app {:keys [is-preview?]}]
+  [conn app {:keys [preview?]}]
   (let [params {:app app}
-        url (pt/-url conn (if is-preview?
+        url (pt/-url conn (if preview?
                             path/preview-field-acl
                             path/field-acl))]
     (pt/-get conn url {:params params})))
