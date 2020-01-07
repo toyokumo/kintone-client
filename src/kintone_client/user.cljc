@@ -14,9 +14,11 @@
              sequence of string
 
     :offset - The offset.
+              The default value is 0 if this is not assigned.
               integer
 
     :size - The maximum number of User information to get.
+            The default value is 100 if this is not assigned.
             integer"
   [conn {:keys [ids codes offset size]}]
   (let [params (cond-> {}
@@ -54,12 +56,12 @@
   "Updates user codes of users.
 
   codes - sequence of map
+          A map includes these keys
+            :currentCode - The current User Code (log-in name).
+                           string
 
-    [] :currentCode - The current User Code (log-in name).
-                      string
-
-    [] :newCode - The new User Code (log-in name).
-                  string"
+            :newCode - The new User Code (log-in name).
+                       string"
   [conn codes]
   (pt/-put conn (pt/-user-api-url conn path/user-codes) {:params {:codes codes}}))
 
@@ -75,9 +77,11 @@
              sequence of string
 
     :offset - The offset.
+              The default value is 0 if this is not assigned.
               integer
 
     :size - The maximum number of Organization information to get.
+            The default value is 100 if this is not assigned.
             integer"
   [conn {:keys [ids codes offset size]}]
   (let [params (cond-> {}
@@ -115,12 +119,12 @@
   "Updates organization codes of organizations.
 
   codes - sequence of map
+          A map includes these keys
+            :currentCode - The current Organization Code.
+                           string
 
-    [] :currentCode - The current Organization Code.
-                      string
-
-    [] :newCode - The new Organization Code.
-                  string"
+            :newCode - The new Organization Code.
+                       string"
   [conn codes]
   (pt/-put conn (pt/-user-api-url conn path/organization-codes) {:params {:codes codes}}))
 
@@ -144,9 +148,11 @@
              sequence of string
 
     :offset - The offset.
+              The default value is 0 if this is not assigned.
               integer
 
     :size - The maximum number of Group information to get.
+            The default value is 100 if this is not assigned.
             integer"
   [conn {:keys [ids codes offset size]}]
   (let [params (cond-> {}
@@ -173,7 +179,7 @@
   (pt/-get conn (pt/-user-api-url conn path/user-groups) {:params {:code user-code}}))
 
 (defn get-organization-users
-  "Gets information of Users that belong to a organization, including their Job title.
+  "Gets information of users that belong to the organization. Each of userTitles may have \"title\" of the job
 
   code - The organization code.
          string
@@ -181,9 +187,11 @@
   opts
 
     :offset - The offset.
+              The default value is 0 if this is not assigned.
               integer
 
     :size - The maximum number of Organization information to get.
+            The default value is 100 if this is not assigned.
             integer"
   [conn code {:keys [offset size]}]
   (let [params (cond-> {:code code}
@@ -200,9 +208,11 @@
   opts
 
     :offset - The offset.
+              The default value is 0 if this is not assigned.
               integer
 
     :size - The maximum number of Group information to get.
+            The default value is 100 if this is not assigned.
             integer"
   [conn code {:keys [offset size]}]
   (let [params (cond-> {:code code}
