@@ -75,6 +75,7 @@
 
 (defn update-form-layout
   "Updates the field layout info of a form in an App.
+  After using this API, use the `deploy-app-settings` to deploy the settings to the live App.
   API Tokens cannot be used with this API.
 
   app - The kintone app ID
@@ -120,6 +121,7 @@
 
 (defn add-form-fields
   "Adds fields to a form of an App.
+  After using this API, use the `deploy-app-settings` to deploy the settings to the live App.
   API Tokens cannot be used with this API.
 
   app - The kintone app ID.
@@ -141,6 +143,7 @@
 
 (defn update-form-fields
   "Updates the field settings of fields in a form of an App.
+  After using this API, use the `deploy-app-settings` to deploy the settings to the live App.
   API Tokens cannot be used with this API.
 
   app - The kintone app ID.
@@ -162,6 +165,7 @@
 
 (defn delete-form-fields
   "Deletes fields from a form of an App.
+  After using this API, use the `deploy-app-settings` to deploy the settings to the live App.
   API Tokens cannot be used with this API.
 
   app - The kintone app ID.
@@ -183,6 +187,7 @@
 
 (defn add-preview-app
   "Creates a preview App.
+  The `deploy-app-settings` must be used on the created preview App for the App to become live.
   API Tokens cannot be used with this API.
 
   opts
@@ -261,6 +266,7 @@
 
 (defn update-views
   "Updates the View settings of an App.
+  After using this API, use the `deploy-app-settings` to deploy the settings to the live App.
   API Tokens cannot be used with this API.
 
   app - The kintone app ID.
@@ -310,6 +316,7 @@
 
 (defn update-general-settings
   "Updates the description, name, icon, revision and color theme of an App.
+  After using this API, use the `deploy-app-settings` to deploy the settings to the live App.
   API Tokens cannot be used with this API.
 
   app - The kintone app ID.
@@ -380,6 +387,7 @@
 
 (defn update-status
   "Updates the process management settings of an App.
+  After using this API, use the `deploy-app-settings` to deploy the settings to the live App.
   API Tokens cannot be used with this API.
 
   app - The kintone App ID.
@@ -427,6 +435,7 @@
 
 (defn update-customize
   "Updates the JavaScript and CSS Customization settings of an App.
+  After using this API, use the `deploy-app-settings` to deploy the settings to the live App.
   API Tokens cannot be used with this API.
 
   app - The kintone app ID.
@@ -475,6 +484,7 @@
 
 (defn update-acl
   "Updates the App permissions of an App.
+  After using this API, use the `deploy-app-settings` to deploy the settings to the live App.
   API Tokens cannot be used with this API.
 
   app - The kintone app ID.
@@ -513,6 +523,7 @@
 
 (defn update-field-acl
   "Updates the Field permission settings of an App.
+  After using this API, use the `deploy-app-settings` to deploy the settings to the live App.
   API Tokens cannot be used with this API.
 
   app - The kintone app ID.
