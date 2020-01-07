@@ -20,6 +20,7 @@ They return a channel of core.async.
 - `kintone-client.types` : Type definitions such as response object.
 - `kintone-client.record` : kintone REST Record API.
 - `kintone-client.app` : kintone REST App API.
+- `kintone-client.user`: cybozu.com User API. (API Tokens cannot be used with user API.)
 - `kintone-client.url`: kintone url utilities.
 
 ## Usage
