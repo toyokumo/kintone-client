@@ -28,9 +28,11 @@
   opts
 
     :offset - The number of retrievals that will be skipped.
+              The default value is 0 if this is not assigned.
               integer
 
     :limit - The number of Apps to retrieve.
+             The default value is 100 if this is not assigned.
              integer
 
     :codes - The App Code.
@@ -42,7 +44,7 @@
     :ids - The App IDs.
            sequence of integer
 
-    :space-ids - The Space ID of where the App resides in.
+    :space-ids - The space id where the app resides.
                  sequence of integer"
   [conn {:keys [offset limit codes name ids space-ids]}]
   (let [params (cond-> {}
@@ -57,6 +59,7 @@
 
 (defn get-form-layout
   "Gets form layout of an App.
+  API Tokens cannot be used with this API.
 
   app - The kintone app ID.
         integer
@@ -72,6 +75,8 @@
 
 (defn update-form-layout
   "Updates the field layout info of a form in an App.
+  API Tokens cannot be used with this API.
+
   app - The kintone app ID
         integer
 
@@ -86,6 +91,7 @@
 
 (defn get-form-fields
   "Gets the list of fields and field settings of an App.
+  API Tokens cannot be used with this API.
 
   app - The kintone app ID.
         integer
@@ -93,6 +99,13 @@
   opts
 
     :lang - The localized language to retrieve the data.
+            Support:
+              default: default name
+              ja: Japanese
+              zh: Chinese
+              en: English
+              user: the language setting set on the user used for the authentication
+            The default value is default if this is not assigned.
             string
 
     :is-preview? - Gets from pre-live settings.
@@ -106,7 +119,8 @@
     (pt/-get conn url {:params params})))
 
 (defn add-form-fields
-  "Adds fields to a form of an App..
+  "Adds fields to a form of an App.
+  API Tokens cannot be used with this API.
 
   app - The kintone app ID.
         integer
@@ -127,6 +141,7 @@
 
 (defn update-form-fields
   "Updates the field settings of fields in a form of an App.
+  API Tokens cannot be used with this API.
 
   app - The kintone app ID.
         integer
@@ -147,6 +162,7 @@
 
 (defn delete-form-fields
   "Deletes fields from a form of an App.
+  API Tokens cannot be used with this API.
 
   app - The kintone app ID.
         integer
@@ -167,6 +183,7 @@
 
 (defn add-preview-app
   "Creates a preview App.
+  API Tokens cannot be used with this API.
 
   opts
 
@@ -177,8 +194,7 @@
              integer
 
     :thread - The Thread ID of the thread in the Space where the App will be created.
-              integer
-  "
+              integer"
   [conn {:keys [name space thread]}]
   (let [params (cond-> {:name name}
                  (some? space) (assoc :space space)
@@ -188,6 +204,7 @@
 
 (defn deploy-app-settings
   "Updates the settings of a pre-live App to the live App.
+  API Tokens cannot be used with this API.
 
   apps - The list of Apps to deploy the pre-live settings to the live Apps.
          sequence of integer
@@ -204,6 +221,7 @@
 
 (defn get-app-deploy-status
   "Gets the deployment status of the App settings for multiple Apps.
+  API Tokens cannot be used with this API.
 
   apps - Sequence of kintone app ID.
          sequence of integer"
@@ -214,6 +232,7 @@
 
 (defn get-views
   "Gets the View settings of an App.
+  API Tokens cannot be used with this API.
 
   app - The kintone app ID.
         integer
@@ -221,6 +240,13 @@
   opts
 
     :lang - The localized language to retrieve the data.
+            Support:
+              default: default name
+              ja: Japanese
+              zh: Chinese
+              en: English
+              user: the language setting set on the user used for the authentication
+            The default value is default if this is not assigned.
             string
 
     :is-preview? - Gets from pre-live settings.
@@ -235,6 +261,7 @@
 
 (defn update-views
   "Updates the View settings of an App.
+  API Tokens cannot be used with this API.
 
   app - The kintone app ID.
 
@@ -254,6 +281,7 @@
 
 (defn get-general-settings
   "Gets the description, name, icon, revision and color theme of an App.
+  API Tokens cannot be used with this API.
 
   app - The kintone app ID.
         integer
@@ -261,6 +289,13 @@
   opts
 
     :lang - The localized language to retrieve the data.
+            Support:
+              default: default name
+              ja: Japanese
+              zh: Chinese
+              en: English
+              user: the language setting set on the user used for the authentication
+            The default value is default if this is not assigned.
             string
 
     :is-preview? - Gets from pre-live settings.
@@ -275,6 +310,7 @@
 
 (defn update-general-settings
   "Updates the description, name, icon, revision and color theme of an App.
+  API Tokens cannot be used with this API.
 
   app - The kintone app ID.
 
@@ -315,6 +351,7 @@
 
 (defn get-status
   "Gets the process management settings of an App.
+  API Tokens cannot be used with this API.
 
   app - The kintone app ID.
         integer
@@ -322,6 +359,13 @@
   opts
 
     :lang - The localized language to retrieve the data.
+            Support:
+              default: default name
+              ja: Japanese
+              zh: Chinese
+              en: English
+              user: the language setting set on the user used for the authentication
+            The default value is default if this is not assigned.
             string
 
     :is-preview? - Gets from pre-live settings.
@@ -336,6 +380,7 @@
 
 (defn update-status
   "Updates the process management settings of an App.
+  API Tokens cannot be used with this API.
 
   app - The kintone App ID.
 
@@ -364,6 +409,7 @@
 
 (defn get-customize
   "Gets the JavaScript and CSS Customization settings of an App.
+  API Tokens cannot be used with this API.
 
   app - The kintone app ID.
         integer
@@ -381,6 +427,7 @@
 
 (defn update-customize
   "Updates the JavaScript and CSS Customization settings of an App.
+  API Tokens cannot be used with this API.
 
   app - The kintone app ID.
         integer
@@ -410,6 +457,7 @@
 
 (defn get-acl
   "Gets the App permissions of an app.
+  API Tokens cannot be used with this API.
 
   app - The kintone app ID.
         integer
@@ -427,6 +475,7 @@
 
 (defn update-acl
   "Updates the App permissions of an App.
+  API Tokens cannot be used with this API.
 
   app - The kintone app ID.
 
@@ -446,6 +495,7 @@
 
 (defn get-field-acl
   "Gets the Field permission settings of an App.
+  API Tokens cannot be used with this API.
 
   app - The kintone app ID.
         integer
@@ -463,6 +513,7 @@
 
 (defn update-field-acl
   "Updates the Field permission settings of an App.
+  API Tokens cannot be used with this API.
 
   app - The kintone app ID.
 
@@ -482,6 +533,7 @@
 
 (defn update-live-field-acl
   "Updates the Field permission settings of LIVE ENVIRONMENT an App.
+  API Tokens cannot be used with this API.
 
   app - The kintone app ID.
 
