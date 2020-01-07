@@ -373,7 +373,7 @@
          (is (= "" (get-in res [:organizations 1 :description])))))
 
      (testing "update-org-codes-test"
-       (let [{:keys [err]} (<!! (user/update-org-codes conn [{:currentCode org1
+       (let [{:keys [err]} (<!! (user/update-organization-codes conn [{:currentCode org1
                                                               :newCode new-code1}
                                                              {:currentCode org2
                                                               :newCode new-code2}]))]

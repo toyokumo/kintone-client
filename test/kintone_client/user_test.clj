@@ -156,7 +156,7 @@
                                                       {:currentCode "code1"
                                                        :newCode "code2"}]}}}
                               nil)
-         (<!! (user/update-org-codes h/fake-conn [{:currentCode "old"
+         (<!! (user/update-organization-codes h/fake-conn [{:currentCode "old"
                                                    :newCode "new"}
                                                   {:currentCode "code1"
                                                    :newCode "code2"}])))))

@@ -115,7 +115,7 @@
   [conn org-codes]
   (pt/-delete conn (pt/-user-api-url conn path/organizations) {:params {:codes org-codes}}))
 
-(defn update-org-codes
+(defn update-organization-codes
   "Updates organization codes of organizations.
 
   codes - sequence of map
