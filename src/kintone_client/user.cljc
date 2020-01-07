@@ -1,6 +1,9 @@
 (ns kintone-client.user
-  (:require [kintone-client.constant.path.user :as path]
-            [kintone-client.protocols :as pt]))
+  (:require #?(:clj  [clojure.core.async :refer [go go-loop <!]]
+               :cljs [cljs.core.async :refer [<!] :refer-macros [go go-loop]])
+            [kintone-client.constant.path.user :as path]
+            [kintone-client.protocols :as pt]
+            [kintone-client.types :as t]))
 
 (defn get-users
   "Gets information of users.
@@ -220,3 +223,91 @@
                  (some? size) (assoc :size size))]
     (pt/-get conn (pt/-user-api-url conn path/group-users) {:params params})))
 
+(defn- get-all-by
+  [conn func query-key response-key values]
+  (go-loop [[parted :as rests] (partition-all 100 values)
+            ret []]
+    (if (empty? parted)
+      (t/->KintoneResponse {response-key ret} nil)
+      (let [res (<! (func conn {query-key parted}))]
+        (if (:err res)
+          res
+          (recur (rest rests) (concat ret (-> res :res response-key))))))))
+
+(defn- get-all
+  [conn func response-key]
+  (let [max-size 100]
+    (go-loop [ret []]
+      (let [res (<! (func conn {:offset (count ret)
+                                :size max-size}))]
+        (if (:err res)
+          res
+          (let [users (-> res :res response-key)
+                ret (concat ret users)]
+            (if (< (count users) max-size)
+              (t/->KintoneResponse {response-key ret} nil)
+              (recur ret))))))))
+
+(defn get-all-users
+  "Gets information of all users.
+
+  opts - If :ids and :codes are both set, an error will return. Only one can be set.
+
+    :ids - A list of User IDs.
+           sequence of integer
+
+    :codes - A list of User Codes (log-in names).
+             sequence of string"
+  [conn {:keys [ids codes]}]
+  (cond
+    (some? ids) (get-all-by conn get-users :ids :users ids)
+    (some? codes) (get-all-by conn get-users :codes :users codes)
+    :else (get-all conn get-users :users)))
+
+(defn get-all-organizations
+  "Gets information of all organizations.
+
+  opts - If :ids and :codes are both set, an error will return. Only one can be set.
+
+    :ids - A list of User IDs.
+           sequence of integer
+
+    :codes - A list of User Codes (log-in names).
+             sequence of string"
+  [conn {:keys [ids codes]}]
+  (cond
+    (some? ids) (get-all-by conn get-organizations :ids :organizations ids)
+    (some? codes) (get-all-by conn get-organizations :codes :organizations codes)
+    :else (get-all conn get-organizations :organizations)))
+
+(defn get-all-groups
+  "Gets information of all groups.
+
+  opts - If :ids and :codes are both set, an error will return. Only one can be set.
+
+    :ids - A list of User IDs.
+           sequence of integer
+
+    :codes - A list of User Codes (log-in names).
+             sequence of string"
+  [conn {:keys [ids codes]}]
+  (cond
+    (some? ids) (get-all-by conn get-groups :ids :groups ids)
+    (some? codes) (get-all-by conn get-groups :codes :groups codes)
+    :else (get-all conn get-groups :groups)))
+
+(defn get-all-organization-users
+  "Gets information of all users that belong to the organization. Each of userTitles may have \"title\" of the job
+
+  code - The organization code.
+         string"
+  [conn code]
+  (get-all conn #(get-organization-users %1 code %2) :userTitles))
+
+(defn get-all-group-users
+  "Gets information of all Users that belong to a Group.
+
+  code - The group code.
+         string"
+  [conn code]
+  (get-all conn #(get-group-users %1 code %2) :users))
