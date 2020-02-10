@@ -130,7 +130,8 @@
 
                       "https://foo.s.cybozu.com/k/1"
                       {:domain "cybozu.com"
-                       :subdomain "foo"}
+                       :subdomain "foo"
+                       :s? true}
 
                       "https://foo-bar.cybozu.com/k/1"
                       {:domain "cybozu.com"
@@ -414,7 +415,7 @@
                         nil
 
                         "https://foo.s.cybozu.com/k/1"
-                        {:subdomain "foo" :domain "cybozu.com" :app-id "1"}
+                        {:subdomain "foo" :domain "cybozu.com" :app-id "1" :s? true}
 
                         "https://foo-bar.cybozu.com/k/1"
                         {:subdomain "foo-bar" :domain "cybozu.com" :app-id "1"}
@@ -464,7 +465,7 @@
                         {:subdomain "foo" :domain "cybozu.com" :guest-space-id "11" :app-id "99999999"}
 
                         "https://foo.s.cybozu.com/k/guest/11/1"
-                        {:subdomain "foo" :domain "cybozu.com" :guest-space-id "11" :app-id "1"}
+                        {:subdomain "foo" :domain "cybozu.com" :guest-space-id "11" :app-id "1" :s? true}
 
                         "https://foo-bar.cybozu.com/k/guest/11/1"
                         {:subdomain "foo-bar" :domain "cybozu.com" :guest-space-id "11" :app-id "1"}
