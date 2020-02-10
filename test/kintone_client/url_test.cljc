@@ -632,3 +632,43 @@
 
                      "https://foo.cybozu.com/k/guest/11/"
                      false)))
+
+(deftest ->base-url-test
+  (are [m base-url] (= (sut/->base-url m) base-url)
+                    {:subdomain "foo" :domain "cybozu.com"}
+                    "https://foo.cybozu.com"
+                    {:subdomain "foo" :domain "cybozu.com" :s? true}
+                    "https://foo.s.cybozu.com"
+                    ;; invalid
+                    {:subdomain "foo"}
+                    nil
+                    ;; invalid
+                    {:subdomain "foo_bar" :domain "cybozu.com"}
+                    nil))
+
+(deftest ->app-url-test
+  (testing "default space app"
+    (are [m app-url] (= (sut/->app-url m) app-url)
+                     {:subdomain "foo" :domain "cybozu.com" :app-id "1"}
+                     "https://foo.cybozu.com/k/1"
+                     ;; s?
+                     {:subdomain "foo" :domain "cybozu.com" :app-id "1" :s? true}
+                     "https://foo.s.cybozu.com/k/1"
+                     ;; invalid
+                     {:subdomain "foo" :domain "cybozu.com"}
+                     nil
+                     ;; invalid
+                     {:subdomain "foo_bar" :domain "cybozu.com" :app-id "1"}
+                     nil))
+  (testing "guest space app"
+    (are [m app-url] (= (sut/->app-url m) app-url)
+                     {:subdomain "foo" :domain "cybozu.com" :guest-space-id "11" :app-id "1"}
+                     "https://foo.cybozu.com/k/guest/11/1"
+                     {:subdomain "foo" :domain "cybozu.com" :guest-space-id "11" :app-id "1" :s? true}
+                     "https://foo.s.cybozu.com/k/guest/11/1"
+                     ;; invalid
+                     {:subdomain "foo" :domain "cybozu.com" :guest-space-id "11"}
+                     nil
+                     ;; invalid
+                     {:subdomain "foo_bar" :domain "cybozu.com" :guest-space-id "11" :app-id "1"}
+                     nil)))
