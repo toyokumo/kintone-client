@@ -56,6 +56,7 @@
  (extract-base-url "https://foo.s.cybozu.com/k/guest/11/1")
  (extract-base-url "https://hoge.hoge.com/k/11"))
 
+;; TODO: add :s? key to returned map
 (defn parse-base-url
   "
   (parse-base-url \"https://hoge.cybozu.com\")\n=> {:domain \"cybozu.com\", :subdomain \"hoge\"}
@@ -113,6 +114,7 @@
  (extract-app-url "https://foo.s.cybozu.com/k/guest/11/1")
  (extract-app-url "https://hoge.hoge.com/k/11"))
 
+;; TODO: add :s? key to returned map
 (defn parse-app-url
   "
   (parse-app-url \"https://hoge.cybozu.com\")\n=> nil\n
