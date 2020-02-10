@@ -154,3 +154,21 @@
  (valid-app-url? "https://hoge.cybozu.com/k/12")
  (valid-app-url? "https://foo.s.cybozu.com/k/guest/11/1")
  (valid-app-url? "https://hoge.hoge.com/k/11"))
+
+(defn ->base-url
+  "generates kintone base url. returns nil if input data is not enough or generated app url is invalid."
+  [{:keys [domain subdomain s?]}]
+  (when (and domain subdomain)
+    (let [base-url (str "https://" subdomain "." (when s? "s.") domain)]
+      (when (valid-base-url? base-url)
+        base-url))))
+
+(defn ->app-url
+  "generates kintone app url. returns nil if input data is not enough or generated app url is invalid."
+  [{:keys [domain subdomain guest-space-id app-id s?]}]
+  (when (and domain subdomain app-id)
+    (let [app-url (if guest-space-id
+                    (str "https://" subdomain "." (when s? "s.") domain "/k/guest/" guest-space-id "/" app-id)
+                    (str "https://" subdomain "." (when s? "s.") domain "/k/" app-id))]
+      (when (valid-app-url? app-url)
+        app-url))))
