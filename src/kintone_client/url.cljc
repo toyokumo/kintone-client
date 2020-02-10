@@ -31,7 +31,7 @@
    "cybozu-dev.cn"])
 
 (def ^:private re-base-url*
-  (str "^https://([a-zA-Z0-9][a-zA-Z0-9\\-]{1,30}[a-zA-Z0-9])(?:\\.s)?\\."
+  (str "^https://([a-zA-Z0-9][a-zA-Z0-9\\-]{1,30}[a-zA-Z0-9])(\\.s)?\\."
        "("
        (->> (map #(str/replace % "." "\\.") domain-list)
             (str/join "|"))
@@ -65,9 +65,10 @@
   (parse-base-url \"https://hoge.hoge.com/k/11\")\n=> nil
   "
   [url]
-  (when-let [[_ subdomain domain] (re-find re-base-url url)]
-    {:domain domain
-     :subdomain subdomain}))
+  (when-let [[_ subdomain s domain] (re-find re-base-url url)]
+    (cond-> {:domain domain
+             :subdomain subdomain}
+      s (assoc :s? true))))
 
 (comment
  (parse-base-url "https://hoge.cybozu.com")
@@ -124,15 +125,17 @@
   "
   [url]
   (or
-   (when-let [[_ subdomain domain app-id] (re-find re-app-url url)]
-     {:domain domain
-      :subdomain subdomain
-      :app-id app-id})
-   (when-let [[_ subdomain domain guest-space-id app-id] (re-find re-guest-app-url url)]
-     {:domain domain
-      :subdomain subdomain
-      :guest-space-id guest-space-id
-      :app-id app-id})))
+   (when-let [[_ subdomain s domain app-id] (re-find re-app-url url)]
+     (cond-> {:domain domain
+              :subdomain subdomain
+              :app-id app-id}
+       s (assoc :s? true)))
+   (when-let [[_ subdomain s domain guest-space-id app-id] (re-find re-guest-app-url url)]
+     (cond-> {:domain domain
+              :subdomain subdomain
+              :guest-space-id guest-space-id
+              :app-id app-id}
+       s (assoc :s? true)))))
 
 (comment
  (parse-app-url "https://hoge.cybozu.com")
