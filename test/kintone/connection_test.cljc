@@ -8,7 +8,9 @@
             [kintone.authentication :as auth]
             [kintone.connection :refer [new-connection]]
             [kintone.protocols :as pt]
-            [kintone.types :as t]))
+            [kintone.types :as t])
+  #?(:clj
+     (:import (org.apache.http.entity.mime HttpMultipartMode))))
 
 (def ^:private auth
   (auth/new-auth {:api-token "TestApiToken"}))
@@ -482,7 +484,9 @@
                   :coerce :always
                   :connection-timeout 10000
                   :socket-timeout 30000
-                  :multipart [{:id 1}]}
+                  :multipart [{:id 1}]
+                  :multipart-charset "UTF-8"
+                  :multipart-mode HttpMultipartMode/BROWSER_COMPATIBLE}
                  nil)
                 (<!! (pt/-multipart-post conn url {:multipart [{:id 1}]}))))))
 
