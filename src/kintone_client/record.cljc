@@ -1,9 +1,9 @@
-(ns kintone.record
+(ns kintone-client.record
   (:require #?(:clj [clojure.core.async :refer [go go-loop <!]]
                :cljs [cljs.core.async :refer [<!] :refer-macros [go go-loop]])
-            [kintone.constant.path.record :as path]
-            [kintone.protocols :as pt]
-            [kintone.types :as t]))
+            [kintone-client.constant.path.record :as path]
+            [kintone-client.protocols :as pt]
+            [kintone-client.types :as t]))
 
 (defn get-record
   "Retrieves details of 1 record from an app.
@@ -30,21 +30,22 @@
     :query - The kintone query.
              string or nil
 
-    :total-count - If true, the request will retrieve
-                   total count of records match with query conditions.
-                   boolean or nil"
+   A response map always contains the totalCount of query-matched records.
+  "
   ([conn app]
    (get-records-by-query conn app nil))
-  ([conn app {:keys [fields query total-count]}]
+  ([conn app {:keys [fields query]}]
    (let [url (pt/-url conn path/records)
-         params (cond-> {:app app}
+         params (cond-> {:app app :totalCount true}
                   (seq fields) (assoc :fields fields)
-                  (seq query) (assoc :query query)
-                  (not (nil? total-count)) (assoc :totalCount total-count))]
+                  (seq query) (assoc :query query))]
      (pt/-get conn url {:params params}))))
 
 (defn create-cursor
-  "Create a cursor that is used to retrieve records.
+  "CAUTION: Consider using get-all-records first (saves you from forgetting to delete cursor).
+  Use this only if get-all-records returns too many records to eat up the whole RAM of your machine.
+
+  Create a cursor that is used to retrieve records.
 
   app - The kintone app ID.
         integer
@@ -72,7 +73,10 @@
      (pt/-post conn url {:params params}))))
 
 (defn get-records-by-cursor
-  "Get one block of records to use cursor.
+  "CAUTION: Consider using get-all-records first (saves you from forgetting to delete cursor).
+  Use this only if get-all-records returns too many records to eat up the whole RAM of your machine.
+
+  Get one block of records with cursor.
 
   :id - Cursor id
         string"
@@ -82,7 +86,9 @@
     (pt/-get conn url {:params params})))
 
 (defn get-all-records
-  "Get all records to use cursor.
+  "Get all records with cursor.
+
+  The cursor is released when all records are fetched.
 
   app - The kintone app ID.
         integer
@@ -118,7 +124,10 @@
                    (t/->KintoneResponse {:records ret} nil)))))))))))
 
 (defn delete-cursor
-  "Delete a cursor.
+  "CAUTION: Consider using get-all-records first (saves you from forgetting to delete cursor).
+  Use this only if get-all-records returns too many records to eat up the whole RAM of your machine.
+
+  Delete a cursor.
 
   cursor - The kintone record cursor
            A map has cursor id"
@@ -147,7 +156,11 @@
      (pt/-post conn url {:params params}))))
 
 (defn add-records
-  "Add multiple records to an app.
+  "
+  CAUTION: Consider using add-all-records first.
+  Use this only if add-all-records takes too many records to eat up the whole RAM of the machine.
+
+  Add multiple records to an app.
 
   app - The kintone app ID.
         integer
@@ -236,7 +249,11 @@
      (pt/-put conn url {:params params}))))
 
 (defn update-records
-  "Updates details of multiple records in an app,
+  "
+  CAUTION: Consider using update-all-records first.
+  Use this only if update-all-records takes too many records to eat up the whole RAM of the machine.
+
+  Updates details of multiple records in an app,
   by specifying their record id, or a different unique key.
 
   app - The kintone app ID.
@@ -578,8 +595,7 @@
   To upload the file to an Attachment field,
   the file key is used with the Add Record or Update Record API.
 
-  file - (Clojure) String, InputStream, File, a byte-array,
-                   or an instance of org.apache.http.entity.mime.content.ContentBody
+  file - (Clojure) File
          (ClojureScript) File object
 
   filename - The filename you want to set to
@@ -600,14 +616,24 @@
 (defn file-download
   "Download a file from an attachment field in an app.
 
-  file-key - The value is set on the attachment field in the response
+  file-key - The value(string) is set on the attachment field in the response
              that is gotten from GET record APIs.
              So the file-key is different from that
-             obtained from the response when using the Upload File API."
-  [conn file-key]
-  (let [url (pt/-url conn path/file)
-        params {:fileKey file-key}]
-    (pt/-get-blob conn url {:params params})))
+             obtained from the response when using the Upload File API.
+
+  as - (Only Clojure) A keyword that is used for output coercion.
+       default :byte-array
+       See clj-http document for detail."
+  ([conn file-key]
+   (let [url (pt/-url conn path/file)
+         params {:fileKey file-key}]
+     (pt/-get-blob conn url {:params params})))
+
+  #?(:clj
+     ([conn file-key as]
+      (let [url (pt/-url conn path/file)
+            params {:fileKey file-key}]
+        (pt/-get-blob conn url {:params params :as as})))))
 
 (defn bulk-request
   "Runs multiple API requests to multiple apps in one go.

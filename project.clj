@@ -1,6 +1,6 @@
-(defproject toyokumo/kintone-clj "0.1.2-SNAPSHOT"
-  :description "A kintone SDK for Clojure and ClojureScript"
-  :url "https://github.com/toyokumo/kintone-clj"
+(defproject toyokumo/kintone-client "0.5.1-SNAPSHOT"
+  :description "A kintone client for Clojure and ClojureScript"
+  :url "https://github.com/toyokumo/kintone-client"
   :license {:name "Apache, Version 2.0"
             :url "http://www.apache.org/licenses/LICENSE-2.0"}
   :deploy-repositories [["releases" {:url "https://repo.clojars.org" :creds :gpg}]

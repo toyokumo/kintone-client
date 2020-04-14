@@ -1,11 +1,14 @@
-(ns kintone.connection
+(ns kintone-client.connection
   "Connection object has connection information to call kintone API"
-  (:require #?(:clj [clj-http.client :as client]
+  (:require #?(:clj [cheshire.core :as json])
+            #?(:clj [clj-http.client :as client]
                :cljs [ajax.core :as ajax])
             #?(:clj [clojure.core.async :refer [chan put! thread]]
                :cljs [cljs.core.async :refer [chan put!]])
-            [kintone.protocols :as pt]
-            [kintone.types :as t])
+            #?(:clj [clojure.string :as str])
+            [kintone-client.protocols :as pt]
+            [kintone-client.types :as t]
+            #?(:cljs [goog.object :as go]))
   #?(:clj (:import (clojure.lang ExceptionInfo)
                    (java.lang Exception)
                    (org.apache.http.entity.mime HttpMultipartMode))))
@@ -16,7 +19,7 @@
            :content-type :json
            :async? true
            :as :json
-           :coerce :always
+           :coerce :unexceptional
            :connection-timeout (* 1000 10)
            :socket-timeout (* 1000 30)}
      :cljs {:format :json
@@ -24,18 +27,32 @@
             :keywords? true
             :timeout (* 1000 30)}))
 
-(defn- ^:dynamic *handler* [channel res]
+(defn- default-handler [channel res]
   #?(:clj (put! channel (t/->KintoneResponse (:body res) nil))
      :cljs (put! channel (t/->KintoneResponse res nil))))
 
+(defn- wrap-handler [handler channel]
+  (fn [res]
+    (put! channel (t/->KintoneResponse (handler res) nil))))
+
+(defn- ->handler [handler channel]
+  (if handler
+    (wrap-handler handler channel)
+    (partial default-handler channel)))
+
 #?(:clj
-   (defn- ^:dynamic *format-err* [err]
+   (defn- format-err [err]
      (cond
        (instance? ExceptionInfo err)
-       (let [{:keys [status body]} (ex-data err)]
+       (let [{:keys [status headers body]} (ex-data err)]
          {:status status
           :status-text (str status)
-          :response body})
+          ;; kintone API sometimes returns HTML, for example basic authentication fails
+          :response (if (some-> (get headers "Content-Type")
+                                str/lower-case
+                                (str/starts-with? "application/json"))
+                      (json/parse-string body true)
+                      body)})
 
        (instance? Exception err)
        {:status -1
@@ -45,12 +62,21 @@
        :else
        err)))
 
-(defn- ^:dynamic *err-handler* [channel err]
-  #?(:clj (put! channel (t/->KintoneResponse nil (*format-err* err)))
+(defn- default-err-handler [channel err]
+  #?(:clj (put! channel (t/->KintoneResponse nil (format-err err)))
      :cljs (put! channel (t/->KintoneResponse nil err))))
 
+(defn- wrap-error-handler [error-handler channel]
+  (fn [err]
+    (put! channel (t/->KintoneResponse nil (error-handler err)))))
+
+(defn- ->error-handler [error-handler channel]
+  (if error-handler
+    (wrap-error-handler error-handler channel)
+    (partial default-err-handler channel)))
+
 #?(:clj
-   (defn- ^:dynamic *build-req*
+   (defn- build-req
      [{:keys [auth connection-timeout socket-timeout headers]} req _]
      (cond-> (assoc *default-req*
                     :headers (merge (pt/-header auth)
@@ -61,22 +87,33 @@
        (:params req) (assoc :form-params (:params req)))))
 
 #?(:cljs
-   (defn- ^:dynamic *build-req*
-     [{:keys [auth timeout headers]} req channel]
+   (defn- build-req
+     [{:keys [auth timeout headers handler error-handler]} req channel]
      (cond-> (assoc *default-req*
                     :headers (merge (pt/-header auth)
+                                    {"X-Requested-With" "XMLHttpRequest"}
                                     headers
                                     (:headers req))
-                    :handler (partial *handler* channel)
-                    :error-handler (partial *err-handler* channel))
+                    :handler (->handler handler channel)
+                    :error-handler (->error-handler error-handler channel))
        timeout (assoc :timeout timeout)
        (:params req) (assoc :params (:params req)))))
 
 (defn- post-as-get [req]
   (assoc-in req [:headers "X-HTTP-Method-Override"] "GET"))
 
+#?(:cljs
+   (defn- get-csrf-token []
+     (when-let [f (go/getValueByKeys js/window "kintone" "getRequestToken")]
+       (f))))
+
+#?(:cljs
+   (defn- add-csrf-token-to-url [url]
+     (str url "?__REQUEST_TOKEN__=" (get-csrf-token))))
+
 (defrecord Connection
   [auth domain guest-space-id
+   handler error-handler
    connection-timeout socket-timeout timeout
    headers]
   pt/IRequest
@@ -91,58 +128,61 @@
     (pt/-post this url (post-as-get req)))
   (-post [this url req]
     (let [c (chan)
-          req (*build-req* this req c)]
-      #?(:clj (client/post url req (partial *handler* c) (partial *err-handler* c))
-         :cljs (ajax/POST url req))
+          req (build-req this req c)]
+      #?(:clj (client/post url req (->handler handler c) (->error-handler error-handler c))
+         :cljs (ajax/POST (add-csrf-token-to-url url) req))
       c))
   (-put [this url req]
     (let [c (chan)
-          req (*build-req* this req c)]
-      #?(:clj (client/put url req (partial *handler* c) (partial *err-handler* c))
-         :cljs (ajax/PUT url req))
+          req (build-req this req c)]
+      #?(:clj (client/put url req (->handler handler c) (->error-handler error-handler c))
+         :cljs (ajax/PUT (add-csrf-token-to-url url) req))
       c))
   (-delete [this url req]
     (let [c (chan)
-          req (*build-req* this req c)]
-      #?(:clj (client/delete url req (partial *handler* c) (partial *err-handler* c))
-         :cljs (ajax/DELETE url req))
+          req (build-req this req c)]
+      #?(:clj (client/delete url req (->handler handler c) (->error-handler error-handler c))
+         :cljs (ajax/DELETE (add-csrf-token-to-url url) req))
       c))
   (-get-blob [this url req]
     (let [c (chan)
           req (post-as-get req)
-          req #?(:clj (-> (*build-req* this req c)
-                          (dissoc :accept :as :coerce))
-                 :cljs (-> (*build-req* this req c)
+          req #?(:clj (-> (build-req this req c)
+                          (dissoc :accept :coerce)
+                          (assoc :as (or (:as req) :byte-array)))
+                 :cljs (-> (build-req this req c)
                            (dissoc :format)
                            (assoc :response-format (ajax/raw-response-format))))]
-      #?(:clj (client/post url req (partial *handler* c) (partial *err-handler* c))
-         :cljs (ajax/POST url req))
+      #?(:clj (client/post url req (->handler handler c) (->error-handler error-handler c))
+         :cljs (ajax/POST (add-csrf-token-to-url url) req))
       c))
   (-multipart-post [this url req]
     (let [c (chan)
           req (assoc req :json-req? false?)
-          req #?(:clj (-> (*build-req* this req c)
+          req #?(:clj (-> (build-req this req c)
                           (dissoc :content-type :async?)
                           (assoc :multipart-mode HttpMultipartMode/BROWSER_COMPATIBLE)
                           (assoc :multipart-charset "UTF-8")
                           (assoc :multipart (:multipart req)))
-                 :cljs (-> (*build-req* this req c)
+                 :cljs (-> (build-req this req c)
                            (dissoc :format)
-                           (assoc :body (:multipart req))))]
+                           (assoc :body (:multipart req))))
+          handler (->handler handler c)
+          error-handler (->error-handler error-handler c)]
       #?(:clj (thread
                (try
-                 (*handler* c (client/post url req))
+                 (handler (client/post url req))
                  (catch ExceptionInfo e
-                   (*err-handler* c e))
+                   (error-handler e))
                  (catch Exception e
-                   (*err-handler* c e))))
-         :cljs (ajax/POST url req))
+                   (error-handler e))))
+         :cljs (ajax/POST (add-csrf-token-to-url url) req))
       c)))
 
 (defn new-connection
   "Make a new connection object.
 
-  :auth - kintone.authentication/Auth object
+  :auth - kintone-client.authentication/Auth object
           required
 
   :domain - kintone domain name string
@@ -151,6 +191,18 @@
 
   :guest-space-id - kintone guest space id
                     integer, optional
+
+  :handler - The handler function for successful operation should accept a single parameter
+             which is the response. If you do not provide this,
+             the default-handler above will be called instead.
+             The value it returns will put into the channel, which is the return value.
+             function, optional
+
+  :error-handler - The handler function for error operation should accept a single parameter
+                   which is the response. If you do not provide this,
+                   the default-error-handler above will be called instead.
+                   The value it returns will put into the channel, which is the return value.
+                   function, optional
 
   See: https://github.com/dakrone/clj-http or https://github.com/JulianBirch/cljs-ajax
 
@@ -170,10 +222,12 @@
 
   :headers - map, optional"
   [{:keys [auth domain guest-space-id
+           handler error-handler
            connection-timeout socket-timeout timeout
            headers]}]
   (let [domain #?(:clj domain
                   :cljs (or domain (.-hostname js/location)))]
     (->Connection auth domain guest-space-id
+                  handler error-handler
                   connection-timeout socket-timeout timeout
                   headers)))

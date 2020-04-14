@@ -12,5 +12,4 @@ pom.xml.asc
 .hgignore
 .hg/
 .idea/
-kintone-clj.iml
 dev-resources/config.edn
