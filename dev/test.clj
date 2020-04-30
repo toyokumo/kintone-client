@@ -17,6 +17,10 @@
 
 (def app (:app conf))
 
+(def string-field-code :文字列__1行_)
+
+(def attachment-file-field-code :添付ファイル)
+
 (def space (:space conf))
 
 (defn delete-all-record [conn app]
@@ -56,6 +60,43 @@
 
 ;; TODO: throws weird error on Cursive
 ;; Error handling response - class java.lang.IndexOutOfBoundsException: Wrong line: 140. Available lines count: 140
+;; use (run-tests 'test)
+
+(deftest file-upload-filename-mojibake-test
+  (testing "japanese filename"
+    (with-cleanup
+     (let [upload-file-key (-> (<!! (record/file-upload conn (io/file "dev-resources/日本語ファイル名.txt")))
+                               :res
+                               :fileKey)
+           record-id (-> (<!! (record/add-record conn app {string-field-code {:value "file name test"}
+                                                           attachment-file-field-code {:value [{:fileKey upload-file-key}]}}))
+                         :res
+                         :id)
+           file-name (-> (<!! (record/get-record conn app record-id))
+                         :res
+                         :record
+                         attachment-file-field-code
+                         :value
+                         first
+                         :name)]
+       (is (= "日本語ファイル名.txt" file-name)))))
+  (testing "ascii filename"
+    (with-cleanup
+      (let [upload-file-key (-> (<!! (record/file-upload conn (io/file "dev-resources/ascii-filename.txt")))
+                                :res
+                                :fileKey)
+            record-id (-> (<!! (record/add-record conn app {string-field-code {:value "file name test"}
+                                                            attachment-file-field-code {:value [{:fileKey upload-file-key}]}}))
+                          :res
+                          :id)
+            file-name (-> (<!! (record/get-record conn app record-id))
+                          :res
+                          :record
+                          attachment-file-field-code
+                          :value
+                          first
+                          :name)]
+        (is (= "ascii-filename.txt" file-name))))))
 
 ;; Record API tests
 
@@ -273,15 +314,15 @@
       (is (= (set ["いいい" "ううう"])
              (->> records :res :records (map #(-> % :文字列__1行_ :value)) set))))))
 
-;; App API tests
-
+;; NOTE: ensure app name is "kintone-clj test"
 (deftest get-app-test
   (with-cleanup
     (let [{:keys [res err]} (<!! (app/get-app conn app))]
       (is (nil? err))
-      (is (= "kintone-cljファイルアップロードテスト" (:name res)))
+      (is (= "kintone-clj test" (:name res)))
       (is (= (str app) (:appId res))))))
 
+;; NOTE: ensure app has these fields
 (deftest get-form-test
   (with-cleanup
     (let [{:keys [res err]} (<!! (app/get-form conn app))
@@ -296,6 +337,8 @@
              (select-keys single-line-text-field test-fields)))
       (is (= {:type "FILE" :code "添付ファイル" :label "添付ファイル"}
              (select-keys file-field test-fields))))))
+
+;; App API tests
 
 (deftest get-apps-test
   (let [names ["test-app1" "test-app2" "dev-app3"]
