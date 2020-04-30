@@ -7,7 +7,7 @@
                         ["snapshots" :clojars]]
   :dependencies [[org.clojure/clojure "1.10.0"]
                  [org.clojure/core.async "0.4.500"]
-                 [clj-http "3.10.0"]
+                 [clj-http "3.10.1"]
                  [cheshire "5.9.0"]]
   :clean-targets ^{:protect false} ["target"]
   :aliases {"test:cljs" ["doo" "chrome-headless" "test" "once"]
