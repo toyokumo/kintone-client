@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+## 0.5.1
+### Changed
+- Bump clj-http to `3.10.1`.
+
+### Fixed
+- Fixed `kintone-client.record/file-upload` to work correctly with multibyte filename.
+
 ## 0.5.0
 ### Fixed
 - Add CSRF Token and `X-Requested-With` header to each request of connection of ClojureScript ([#12](https://github.com/toyokumo/kintone-client/pull/12))
