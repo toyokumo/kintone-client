@@ -162,16 +162,19 @@ You can do insert, update, delete at once with `bulk-request`.
 For more information, See [API documents](https://cljdoc.org/d/toyokumo/kintone-client/CURRENT), `test/`, and `dev/test.clj`.
 
 ## dev/test.clj
-These tests actually interact with a kintone app (not included in CI). These are good examples of the usage of kintone-client.
+These tests actually interact with a kintone app and space (not included in CI).
+These are good examples of the usage of kintone-client.
 
 ### How to run
 - import dev-resources/kintone-clj-test.zip
+- create kintone space (the tests create many apps in this space)
 - fill dev-resources/config.edn
 ```edn
 {:auth {:basic {:username "username" :password "password"}
         :api-token "api-token"}
  :domain "domain"
- :app 9999}
+ :app 9999
+ :space 99}
 ```
 - try tests
 
