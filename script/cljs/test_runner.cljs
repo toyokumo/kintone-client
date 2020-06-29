@@ -5,10 +5,12 @@
             [kintone-client.authentication-test]
             [kintone-client.connection-test]
             [kintone-client.record-test]
-            [kintone-client.url-test]))
+            [kintone-client.url-test]
+            [kintone-client.user-test]))
 
 (doo-tests 'kintone-client.app-test
            'kintone-client.authentication-test
            'kintone-client.connection-test
            'kintone-client.record-test
-           'kintone-client.url-test)
+           'kintone-client.url-test
+           'kintone-client.user-test)

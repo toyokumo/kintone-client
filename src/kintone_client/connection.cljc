@@ -5,7 +5,7 @@
                :cljs [ajax.core :as ajax])
             #?(:clj [clojure.core.async :refer [chan put! thread]]
                :cljs [cljs.core.async :refer [chan put!]])
-            #?(:clj [clojure.string :as str])
+            [clojure.string :as str]
             [kintone-client.protocols :as pt]
             [kintone-client.types :as t]
             #?(:cljs [goog.object :as go]))
@@ -99,6 +99,11 @@
        timeout (assoc :timeout timeout)
        (:params req) (assoc :params (:params req)))))
 
+(defn- build-get-req [conn req channel]
+  (let [params (:params req)]
+    (cond-> (dissoc (build-req conn req channel) :params :form-params :content-type)
+      params (assoc :query-params params))))
+
 (defn- post-as-get [req]
   (assoc-in req [:headers "X-HTTP-Method-Override"] "GET"))
 
@@ -123,9 +128,18 @@
       (str "/k" path)))
   (-url [this path]
     (str "https://" domain (pt/-path this path)))
+  (-user-api-url [_ path]
+    (str "https://" domain path))
   (-get [this url req]
-   ;; Use POST method to pass the URL bytes limitation.
-    (pt/-post this url (post-as-get req)))
+   ;; Use POST method to pass the URL bytes limitation in kintone API.
+   ;; User API does not support 'post-as-get' request.
+    (if (str/includes? url "/k/")
+      (pt/-post this url (post-as-get req))
+      (let [c (chan)
+            req (build-get-req this req c)]
+        #?(:clj (client/get url req (->handler handler c) (->error-handler error-handler c))
+           :cljs (ajax/GET (add-csrf-token-to-url url) req))
+        c)))
   (-post [this url req]
     (let [c (chan)
           req (build-req this req c)]
