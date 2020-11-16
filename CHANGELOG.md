@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+## 0.6.0
+### Added
+- Add support App API ([#15](https://github.com/toyokumo/kintone-client/pull/15))
+- Add support User API ([#16](https://github.com/toyokumo/kintone-client/pull/16))
+
 ## 0.5.1
 ### Changed
 - Bump clj-http to `3.10.1`.
