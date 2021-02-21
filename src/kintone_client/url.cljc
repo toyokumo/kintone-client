@@ -31,7 +31,7 @@
    "cybozu-dev.cn"])
 
 (def ^:private re-base-url*
-  (str "^https://([a-zA-Z0-9][a-zA-Z0-9\\-]{1,30}[a-zA-Z0-9])(?:\\.s)?\\."
+  (str "^https://([a-zA-Z0-9][a-zA-Z0-9\\-]{1,30}[a-zA-Z0-9])(\\.s)?\\."
        "("
        (->> (map #(str/replace % "." "\\.") domain-list)
             (str/join "|"))
@@ -56,6 +56,7 @@
  (extract-base-url "https://foo.s.cybozu.com/k/guest/11/1")
  (extract-base-url "https://hoge.hoge.com/k/11"))
 
+;; TODO: add :s? key to returned map
 (defn parse-base-url
   "
   (parse-base-url \"https://hoge.cybozu.com\")\n=> {:domain \"cybozu.com\", :subdomain \"hoge\"}
@@ -64,9 +65,10 @@
   (parse-base-url \"https://hoge.hoge.com/k/11\")\n=> nil
   "
   [url]
-  (when-let [[_ subdomain domain] (re-find re-base-url url)]
-    {:domain domain
-     :subdomain subdomain}))
+  (when-let [[_ subdomain s domain] (re-find re-base-url url)]
+    (cond-> {:domain domain
+             :subdomain subdomain}
+      s (assoc :s? true))))
 
 (comment
  (parse-base-url "https://hoge.cybozu.com")
@@ -113,6 +115,7 @@
  (extract-app-url "https://foo.s.cybozu.com/k/guest/11/1")
  (extract-app-url "https://hoge.hoge.com/k/11"))
 
+;; TODO: add :s? key to returned map
 (defn parse-app-url
   "
   (parse-app-url \"https://hoge.cybozu.com\")\n=> nil\n
@@ -122,15 +125,17 @@
   "
   [url]
   (or
-   (when-let [[_ subdomain domain app-id] (re-find re-app-url url)]
-     {:domain domain
-      :subdomain subdomain
-      :app-id app-id})
-   (when-let [[_ subdomain domain guest-space-id app-id] (re-find re-guest-app-url url)]
-     {:domain domain
-      :subdomain subdomain
-      :guest-space-id guest-space-id
-      :app-id app-id})))
+   (when-let [[_ subdomain s domain app-id] (re-find re-app-url url)]
+     (cond-> {:domain domain
+              :subdomain subdomain
+              :app-id app-id}
+       s (assoc :s? true)))
+   (when-let [[_ subdomain s domain guest-space-id app-id] (re-find re-guest-app-url url)]
+     (cond-> {:domain domain
+              :subdomain subdomain
+              :guest-space-id guest-space-id
+              :app-id app-id}
+       s (assoc :s? true)))))
 
 (comment
  (parse-app-url "https://hoge.cybozu.com")
@@ -154,3 +159,21 @@
  (valid-app-url? "https://hoge.cybozu.com/k/12")
  (valid-app-url? "https://foo.s.cybozu.com/k/guest/11/1")
  (valid-app-url? "https://hoge.hoge.com/k/11"))
+
+(defn ->base-url
+  "generates kintone base url. returns nil if input data is not enough or generated app url is invalid."
+  [{:keys [domain subdomain s?]}]
+  (when (and domain subdomain)
+    (let [base-url (str "https://" subdomain "." (when s? "s.") domain)]
+      (when (valid-base-url? base-url)
+        base-url))))
+
+(defn ->app-url
+  "generates kintone app url. returns nil if input data is not enough or generated app url is invalid."
+  [{:keys [domain subdomain guest-space-id app-id s?]}]
+  (when (and domain subdomain app-id)
+    (let [app-url (if guest-space-id
+                    (str "https://" subdomain "." (when s? "s.") domain "/k/guest/" guest-space-id "/" app-id)
+                    (str "https://" subdomain "." (when s? "s.") domain "/k/" app-id))]
+      (when (valid-app-url? app-url)
+        app-url))))

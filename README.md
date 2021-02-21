@@ -157,6 +157,14 @@ You can do insert, update, delete at once with `bulk-request`.
 ;; => {:domain "cybozu.com", :subdomain "foo", :guest-space-id "11", :app-id "1"}
 (valid-app-url? "https://hoge.cybozu.com")
 ;; => true
+(->base-url {:subdomain "foo" :domain "cybozu.com"})
+;; => "https://foo.cybozu.com"
+(->base-url {:subdomain "foo" :domain "cybozu.com" :s? true}) ;; you can specify :s? if needed
+;; => "https://foo.s.cybozu.com"
+(->app-url {:subdomain "foo" :domain "cybozu.com" :guest-space-id "11" :app-id "1"})
+;; => "https://foo.cybozu.com/k/guest/11/1"
+(->app-url {:subdomain "foo" :domain "cybozu.com"}) ;; returns nil if given info is not enough or generated url is invalid
+;; => nil
 ```
 
 For more information, See [API documents](https://cljdoc.org/d/toyokumo/kintone-client/CURRENT), `test/`, and `dev/test.clj`.
