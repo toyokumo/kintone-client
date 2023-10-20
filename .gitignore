@@ -14,3 +14,4 @@ pom.xml.asc
 .idea/
 dev-resources/config.edn
 .clj-kondo/.cache
+/node_modules
