@@ -1,5 +1,6 @@
 (ns user
-  (:require [figwheel.main.api :as fig]))
+  (:require
+   [figwheel.main.api :as fig]))
 
 (defn fig-start []
   (fig/start "dev"))

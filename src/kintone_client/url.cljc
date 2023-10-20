@@ -20,7 +20,8 @@
 ;OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 ;SOFTWARE.
 (ns kintone-client.url
-  (:require [clojure.string :as str]))
+  (:require
+   [clojure.string :as str]))
 
 (def domain-list
   ["cybozu.com"

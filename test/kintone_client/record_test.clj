@@ -1,9 +1,10 @@
 (ns kintone-client.record-test
-  (:require [clojure.core.async :refer [<!! chan put!]]
-            [clojure.test :refer :all]
-            [kintone-client.record :as r]
-            [kintone-client.test-helper :as h]
-            [kintone-client.types :as t]))
+  (:require
+   [clojure.core.async :refer [<!! chan put!]]
+   [clojure.test :refer :all]
+   [kintone-client.record :as r]
+   [kintone-client.test-helper :as h]
+   [kintone-client.types :as t]))
 
 (def app (rand-int 100))
 
@@ -35,8 +36,8 @@
                                               :query "order by $id limit 10"}}}
                               nil)
          (<!! (r/get-records-by-query h/fake-conn app {:app app
-                                                     :fields [:$id :name]
-                                                     :query "order by $id limit 10"})))))
+                                                       :fields [:$id :name]
+                                                       :query "order by $id limit 10"})))))
 
 (deftest create-cursor-test
   (is (= (t/->KintoneResponse {:url "https://test.kintone.com/k/v1/records/cursor.json"
@@ -56,8 +57,8 @@
                                               :size 123}}}
                               nil)
          (<!! (r/create-cursor h/fake-conn app {:fields [:$id :name]
-                                              :query "$id > 100"
-                                              :size 123})))))
+                                                :query "$id > 100"
+                                                :size 123})))))
 
 (deftest get-records-by-cursor-test
   (is (= (t/->KintoneResponse {:url "https://test.kintone.com/k/v1/records/cursor.json"
@@ -174,7 +175,7 @@
                                                         {:name {:value "bar"}}]}}}
                               nil)
          (<!! (r/add-records h/fake-conn app [{:name {:value "foo"}}
-                                            {:name {:value "bar"}}])))))
+                                              {:name {:value "bar"}}])))))
 
 (deftest add-all-records-test
   (testing "Fail to add on the first request"
@@ -185,7 +186,7 @@
                       c))]
       (is (= (t/->KintoneResponse nil {:status 400})
              (<!! (r/add-all-records h/fake-conn app [{:name {:value "foo"}}
-                                                    {:name {:value "bar"}}]))))))
+                                                      {:name {:value "bar"}}]))))))
 
   (testing "Fail to add on the second request"
     (let [ncall (atom 0)]
@@ -203,7 +204,7 @@
                                      :revisions ["1" "1"]}
                                     nil)
                (<!! (r/add-all-records h/fake-conn app [{:name {:value "foo"}}
-                                                      {:name {:value "bar"}}]))))
+                                                        {:name {:value "bar"}}]))))
 
         ;; Clear state
         (reset! ncall 0)
@@ -230,8 +231,8 @@
                                                           :value "123"}}}}
                               nil)
          (<!! (r/update-record h/fake-conn app {:update-key {:field "XYZ"
-                                                           :value "123"}
-                                              :record {:name {:value "foo"}}})))))
+                                                             :value "123"}
+                                                :record {:name {:value "foo"}}})))))
 
 
 (deftest update-records-test
@@ -254,9 +255,9 @@
                                                          :record {:name {:value "bar"}}}]}}}
                               nil)
          (<!! (r/update-records h/fake-conn app [{:id 1
-                                                :record {:name {:value "foo"}}}
-                                               {:id 2
-                                                :record {:name {:value "bar"}}}])))))
+                                                  :record {:name {:value "foo"}}}
+                                                 {:id 2
+                                                  :record {:name {:value "bar"}}}])))))
 
 (deftest update-all-records-test
   (testing "Fail to update on the first request"
@@ -267,9 +268,9 @@
                       c))]
       (is (= (t/->KintoneResponse nil {:status 400})
              (<!! (r/update-all-records h/fake-conn app [{:id 1
-                                                        :record {:name {:value "foo"}}}
-                                                       {:id 2
-                                                        :record {:name {:value "bar"}}}]))))))
+                                                          :record {:name {:value "foo"}}}
+                                                         {:id 2
+                                                          :record {:name {:value "bar"}}}]))))))
 
   (testing "Fail to update on the second request"
     (let [ncall (atom 0)]
@@ -291,9 +292,9 @@
                                                 :revision "1"}]}
                                     nil)
                (<!! (r/update-all-records h/fake-conn app [{:id 1
-                                                          :record {:name {:value "foo"}}}
-                                                         {:id 2
-                                                          :record {:name {:value "bar"}}}]))))
+                                                            :record {:name {:value "foo"}}}
+                                                           {:id 2
+                                                            :record {:name {:value "bar"}}}]))))
 
         ;; Clear state
         (reset! ncall 0)
@@ -333,7 +334,7 @@
                                               :revisions [1 1]}}}
                               nil)
          (<!! (r/delete-records-with-revision h/fake-conn app [{:id 1 :revision 1}
-                                                             {:id 2 :revision 1}])))))
+                                                               {:id 2 :revision 1}])))))
 
 (deftest delete-all-records-by-query-test
   (testing "Fail to create cursor"
@@ -438,8 +439,8 @@
                                               :limit 50}}}
                               nil)
          (<!! (r/get-comments h/fake-conn app id {:order "asc"
-                                                :offset 20
-                                                :limit 50})))))
+                                                  :offset 20
+                                                  :limit 50})))))
 
 (deftest add-comment-test
   (is (= (t/->KintoneResponse {:url "https://test.kintone.com/k/v1/record/comment.json"
@@ -458,8 +459,8 @@
                                                                     :type :USER}]}}}}
                               nil)
          (<!! (r/add-comment h/fake-conn app id {:text "test comment"
-                                               :mentions [{:code "foo"
-                                                           :type :USER}]})))))
+                                                 :mentions [{:code "foo"
+                                                             :type :USER}]})))))
 
 (deftest delete-comment-test
   (is (= (t/->KintoneResponse {:url "https://test.kintone.com/k/v1/record/comment.json"
@@ -505,9 +506,9 @@
                                               :revision 11}}}
                               nil)
          (<!! (r/update-record-status h/fake-conn app {:id id
-                                                     :action "accept"
-                                                     :assignee ["foo" "bar"]
-                                                     :revision 11})))))
+                                                       :action "accept"
+                                                       :assignee ["foo" "bar"]
+                                                       :revision 11})))))
 
 (deftest update-records-status-test
   (is (= (t/->BulkRequest :PUT "/v1/records/status.json"
@@ -539,13 +540,13 @@
                                                          :assignee ["baz"]}]}}}
                               nil)
          (<!! (r/update-records-status h/fake-conn app [{:id id
-                                                       :action "accept"
-                                                       :assignee ["foo" "bar"]
-                                                       :revision 11}
-                                                      {:id (inc id)
-                                                       :action "reject"
-                                                       :assignee ["baz"]
-                                                       :revision nil}])))))
+                                                         :action "accept"
+                                                         :assignee ["foo" "bar"]
+                                                         :revision 11}
+                                                        {:id (inc id)
+                                                         :action "reject"
+                                                         :assignee ["baz"]
+                                                         :revision nil}])))))
 
 (deftest file-upload-test
   (is (= (t/->KintoneResponse {:url "https://test.kintone.com/k/v1/file.json"

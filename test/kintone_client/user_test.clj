@@ -1,9 +1,10 @@
 (ns kintone-client.user-test
-  (:require [clojure.core.async :refer [<!! chan put!]]
-            [clojure.test :refer :all]
-            [kintone-client.user :as user]
-            [kintone-client.test-helper :as h]
-            [kintone-client.types :as t]))
+  (:require
+   [clojure.core.async :refer [<!! chan put!]]
+   [clojure.test :refer :all]
+   [kintone-client.test-helper :as h]
+   [kintone-client.types :as t]
+   [kintone-client.user :as user]))
 
 (deftest get-users-test
   (is (= (t/->KintoneResponse {:url "https://test.kintone.com/v1/users.json"
@@ -585,7 +586,7 @@
                       (if (< @ncall 3)
                         (put! c (t/->KintoneResponse
                                  {:userTitles (map #(assoc {} :id (+ (* 100 @ncall) %))
-                                              (range 100))}
+                                                   (range 100))}
                                  nil))
                         (put! c (t/->KintoneResponse {:userTitles [{:id 1000} {:id 1500}]}
                                                      nil)))

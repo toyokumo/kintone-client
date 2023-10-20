@@ -1,16 +1,19 @@
 (ns kintone-client.connection-test
-  (:require #?(:clj [clojure.test :refer :all]
-               :cljs [cljs.test :refer-macros [deftest is testing async]])
-            #?(:clj [clj-http.client :as client]
-               :cljs [ajax.core :as ajax])
-            #?(:clj [clojure.core.async :refer [<!!]]
-               :cljs [cljs.core.async :refer [<!] :refer-macros [go]])
-            [kintone-client.authentication :as auth]
-            [kintone-client.connection :refer [new-connection]]
-            [kintone-client.protocols :as pt]
-            [kintone-client.types :as t])
+  (:require
+   #?(:clj [clj-http.client :as client]
+      :cljs [ajax.core :as ajax])
+   #?(:clj [clojure.core.async :refer [<!!]]
+      :cljs [cljs.core.async :refer [<!] :refer-macros [go]])
+   #?(:clj [clojure.test :refer :all]
+      :cljs [cljs.test :refer-macros [deftest is testing async]])
+   [kintone-client.authentication :as auth]
+   [kintone-client.connection :refer [new-connection]]
+   [kintone-client.protocols :as pt]
+   [kintone-client.types :as t])
   #?(:clj
-     (:import (org.apache.http.entity.mime HttpMultipartMode))))
+     (:import
+      (org.apache.http.entity.mime
+       HttpMultipartMode))))
 
 (def ^:private auth
   (auth/new-auth {:api-token "TestApiToken"}))
@@ -274,162 +277,162 @@
 #?(:cljs
    (deftest -get-test-positive
      (async done
-       (go
-        (with-redefs [ajax.easy/easy-ajax-request
-                      (fn [uri method opts]
-                        (is (= method "POST"))
-                        ((:handler opts)
-                         (dissoc opts
-                                 :handler
-                                 :error-handler)))]
-          (is (= (t/->KintoneResponse
-                  {:headers {"X-Cybozu-API-Token" "TestApiToken"
-                             "X-HTTP-Method-Override" "GET"
-                             "X-Requested-With" "XMLHttpRequest"}
-                   :format :json
-                   :response-format :json
-                   :keywords? true
-                   :timeout 30000
-                   :params {:id 1}}
-                  nil)
-                 (<! (pt/-get conn url {:params {:id 1}})))))
-        (done)))))
+            (go
+              (with-redefs [ajax.easy/easy-ajax-request
+                            (fn [uri method opts]
+                              (is (= method "POST"))
+                              ((:handler opts)
+                               (dissoc opts
+                                       :handler
+                                       :error-handler)))]
+                (is (= (t/->KintoneResponse
+                        {:headers {"X-Cybozu-API-Token" "TestApiToken"
+                                   "X-HTTP-Method-Override" "GET"
+                                   "X-Requested-With" "XMLHttpRequest"}
+                         :format :json
+                         :response-format :json
+                         :keywords? true
+                         :timeout 30000
+                         :params {:id 1}}
+                        nil)
+                       (<! (pt/-get conn url {:params {:id 1}})))))
+              (done)))))
 
 #?(:cljs
    (deftest -get-test-positive-user-api
      (async done
-       (go
-        (with-redefs [ajax.easy/easy-ajax-request
-                      (fn [uri method opts]
-                        (is (= method "GET"))
-                        ((:handler opts)
-                         (dissoc opts
-                                 :handler
-                                 :error-handler)))]
-          (is (= (t/->KintoneResponse
-                  {:headers {"X-Cybozu-API-Token" "TestApiToken"
-                             "X-Requested-With" "XMLHttpRequest"}
-                   :format :json
-                   :response-format :json
-                   :keywords? true
-                   :timeout 30000
-                   :query-params {:id 1}}
-                  nil)
-                 (<! (pt/-get conn user-api-url {:params {:id 1}})))))
-        (done)))))
+            (go
+              (with-redefs [ajax.easy/easy-ajax-request
+                            (fn [uri method opts]
+                              (is (= method "GET"))
+                              ((:handler opts)
+                               (dissoc opts
+                                       :handler
+                                       :error-handler)))]
+                (is (= (t/->KintoneResponse
+                        {:headers {"X-Cybozu-API-Token" "TestApiToken"
+                                   "X-Requested-With" "XMLHttpRequest"}
+                         :format :json
+                         :response-format :json
+                         :keywords? true
+                         :timeout 30000
+                         :query-params {:id 1}}
+                        nil)
+                       (<! (pt/-get conn user-api-url {:params {:id 1}})))))
+              (done)))))
 
 #?(:cljs
    (deftest -get-test-positive-with-custom-handler
      (async done
-       (go
-        (with-redefs [ajax.easy/easy-ajax-request
-                      (fn [uri method opts]
-                        (is (= method "POST"))
-                        ((:handler opts)
-                         (dissoc opts
-                                 :handler
-                                 :error-handler)))]
-          (is (= (t/->KintoneResponse
-                  {:id 1}
-                  nil)
-                 (<! (pt/-get (assoc conn :handler :params)
-                              url
-                              {:params {:id 1}})))))
-        (done)))))
+            (go
+              (with-redefs [ajax.easy/easy-ajax-request
+                            (fn [uri method opts]
+                              (is (= method "POST"))
+                              ((:handler opts)
+                               (dissoc opts
+                                       :handler
+                                       :error-handler)))]
+                (is (= (t/->KintoneResponse
+                        {:id 1}
+                        nil)
+                       (<! (pt/-get (assoc conn :handler :params)
+                                    url
+                                    {:params {:id 1}})))))
+              (done)))))
 
 #?(:cljs
    (deftest -get-test-positive-with-custom-handler-user-api
      (async done
-       (go
-        (with-redefs [ajax.easy/easy-ajax-request
-                      (fn [uri method opts]
-                        (is (= method "GET"))
-                        ((:handler opts)
-                         (dissoc opts
-                                 :handler
-                                 :error-handler)))]
-          (is (= (t/->KintoneResponse
-                  {:id 1}
-                  nil)
-                 (<! (pt/-get (assoc conn :handler :query-params)
-                              user-api-url
-                              {:params {:id 1}})))))
-        (done)))))
+            (go
+              (with-redefs [ajax.easy/easy-ajax-request
+                            (fn [uri method opts]
+                              (is (= method "GET"))
+                              ((:handler opts)
+                               (dissoc opts
+                                       :handler
+                                       :error-handler)))]
+                (is (= (t/->KintoneResponse
+                        {:id 1}
+                        nil)
+                       (<! (pt/-get (assoc conn :handler :query-params)
+                                    user-api-url
+                                    {:params {:id 1}})))))
+              (done)))))
 
 #?(:cljs
    (deftest -get-test-negative
      (async done
-       (go
-        (with-redefs [ajax.easy/easy-ajax-request
-                      (fn [uri method opts]
-                        (is (= method "POST"))
-                        ((:error-handler opts)
-                         {:status 400
-                          :status-text "400"
-                          :response {:message "Something bad happen"}}))]
-          (is (= (t/->KintoneResponse
-                  nil
-                  {:status 400
-                   :status-text "400"
-                   :response {:message "Something bad happen"}})
-                 (<! (pt/-get conn url {:params {:id 1}})))))
-        (done)))))
+            (go
+              (with-redefs [ajax.easy/easy-ajax-request
+                            (fn [uri method opts]
+                              (is (= method "POST"))
+                              ((:error-handler opts)
+                               {:status 400
+                                :status-text "400"
+                                :response {:message "Something bad happen"}}))]
+                (is (= (t/->KintoneResponse
+                        nil
+                        {:status 400
+                         :status-text "400"
+                         :response {:message "Something bad happen"}})
+                       (<! (pt/-get conn url {:params {:id 1}})))))
+              (done)))))
 
 #?(:cljs
    (deftest -get-test-negative-user-api
      (async done
-       (go
-        (with-redefs [ajax.easy/easy-ajax-request
-                      (fn [uri method opts]
-                        (is (= method "GET"))
-                        ((:error-handler opts)
-                         {:status 400
-                          :status-text "400"
-                          :response {:message "Something bad happen"}}))]
-          (is (= (t/->KintoneResponse
-                  nil
-                  {:status 400 :status-text "400"
-                   :response {:message "Something bad happen"}})
-                 (<! (pt/-get conn user-api-url {:params {:id 1}})))))
-        (done)))))
+            (go
+              (with-redefs [ajax.easy/easy-ajax-request
+                            (fn [uri method opts]
+                              (is (= method "GET"))
+                              ((:error-handler opts)
+                               {:status 400
+                                :status-text "400"
+                                :response {:message "Something bad happen"}}))]
+                (is (= (t/->KintoneResponse
+                        nil
+                        {:status 400 :status-text "400"
+                         :response {:message "Something bad happen"}})
+                       (<! (pt/-get conn user-api-url {:params {:id 1}})))))
+              (done)))))
 
 #?(:cljs
    (deftest -get-test-negative-with-custom-error-handler
      (async done
-       (go
-        (with-redefs [ajax.easy/easy-ajax-request
-                      (fn [uri method opts]
-                        (is (= method "POST"))
-                        ((:error-handler opts)
-                         {:status 400
-                          :status-text "400"
-                          :response {:message "Something bad happen"}}))]
-          (is (= (t/->KintoneResponse
-                  nil
-                  {:message "Something bad happen"})
-                 (<! (pt/-get (assoc conn :error-handler :response)
-                              url
-                              {:params {:id 1}})))))
-        (done)))))
+            (go
+              (with-redefs [ajax.easy/easy-ajax-request
+                            (fn [uri method opts]
+                              (is (= method "POST"))
+                              ((:error-handler opts)
+                               {:status 400
+                                :status-text "400"
+                                :response {:message "Something bad happen"}}))]
+                (is (= (t/->KintoneResponse
+                        nil
+                        {:message "Something bad happen"})
+                       (<! (pt/-get (assoc conn :error-handler :response)
+                                    url
+                                    {:params {:id 1}})))))
+              (done)))))
 
 #?(:cljs
    (deftest -get-test-negative-with-custom-error-handler-user-api
      (async done
-       (go
-        (with-redefs [ajax.easy/easy-ajax-request
-                      (fn [uri method opts]
-                        (is (= method "GET"))
-                        ((:error-handler opts)
-                         {:status 400
-                          :status-text "400"
-                          :response {:message "Something bad happen"}}))]
-          (is (= (t/->KintoneResponse
-                  nil
-                  {:message "Something bad happen"})
-                 (<! (pt/-get (assoc conn :error-handler :response)
-                              user-api-url
-                              {:params {:id 1}})))))
-        (done)))))
+            (go
+              (with-redefs [ajax.easy/easy-ajax-request
+                            (fn [uri method opts]
+                              (is (= method "GET"))
+                              ((:error-handler opts)
+                               {:status 400
+                                :status-text "400"
+                                :response {:message "Something bad happen"}}))]
+                (is (= (t/->KintoneResponse
+                        nil
+                        {:message "Something bad happen"})
+                       (<! (pt/-get (assoc conn :error-handler :response)
+                                    user-api-url
+                                    {:params {:id 1}})))))
+              (done)))))
 
 #?(:clj
    (deftest -post-test
@@ -516,80 +519,80 @@
 #?(:cljs
    (deftest -post-test-positive
      (async done
-       (go
-        (with-redefs [ajax.easy/easy-ajax-request
-                      (fn [uri method opts]
-                        (is (= method "POST"))
-                        ((:handler opts)
-                         (dissoc opts
-                                 :handler
-                                 :error-handler)))]
-          (is (= (t/->KintoneResponse
-                  {:headers {"X-Cybozu-API-Token" "TestApiToken"
-                             "X-Requested-With" "XMLHttpRequest"}
-                   :format :json
-                   :response-format :json
-                   :keywords? true
-                   :timeout 30000
-                   :params {:id 1}}
-                  nil)
-                 (<! (pt/-post conn url {:params {:id 1}})))))
-        (done)))))
+            (go
+              (with-redefs [ajax.easy/easy-ajax-request
+                            (fn [uri method opts]
+                              (is (= method "POST"))
+                              ((:handler opts)
+                               (dissoc opts
+                                       :handler
+                                       :error-handler)))]
+                (is (= (t/->KintoneResponse
+                        {:headers {"X-Cybozu-API-Token" "TestApiToken"
+                                   "X-Requested-With" "XMLHttpRequest"}
+                         :format :json
+                         :response-format :json
+                         :keywords? true
+                         :timeout 30000
+                         :params {:id 1}}
+                        nil)
+                       (<! (pt/-post conn url {:params {:id 1}})))))
+              (done)))))
 
 #?(:cljs
    (deftest -post-test-positive-with-custom-handler
      (async done
-       (go
-        (with-redefs [ajax.easy/easy-ajax-request
-                      (fn [uri method opts]
-                        (is (= method "POST"))
-                        ((:handler opts)
-                         (dissoc opts
-                                 :handler
-                                 :error-handler)))]
-          (is (= (t/->KintoneResponse
-                  {:id 1}
-                  nil)
-                 (<! (pt/-post (assoc conn :handler :params)
-                               url
-                               {:params {:id 1}})))))
-        (done)))))
+            (go
+              (with-redefs [ajax.easy/easy-ajax-request
+                            (fn [uri method opts]
+                              (is (= method "POST"))
+                              ((:handler opts)
+                               (dissoc opts
+                                       :handler
+                                       :error-handler)))]
+                (is (= (t/->KintoneResponse
+                        {:id 1}
+                        nil)
+                       (<! (pt/-post (assoc conn :handler :params)
+                                     url
+                                     {:params {:id 1}})))))
+              (done)))))
 
 #?(:cljs
    (deftest -post-test-negative
      (async done
-       (go
-        (with-redefs [ajax.easy/easy-ajax-request
-                      (fn [uri method opts]
-                        ((:error-handler opts)
-                         {:status 400
-                          :status-text "400"
-                          :response {:message "Something bad happen"}}))]
-          (is (= (t/->KintoneResponse
-                  nil
-                  {:status 400
-                   :status-text "400"
-                   :response {:message "Something bad happen"}})
-                 (<! (pt/-post conn url {:params {:id 1}})))))
-        (done)))))
+            (go
+              (with-redefs [ajax.easy/easy-ajax-request
+                            (fn [uri method opts]
+                              ((:error-handler opts)
+                               {:status 400
+                                :status-text "400"
+                                :response {:message "Something bad happen"}}))]
+                (is (= (t/->KintoneResponse
+                        nil
+                        {:status 400
+                         :status-text "400"
+                         :response {:message "Something bad happen"}})
+                       (<! (pt/-post conn url {:params {:id 1}})))))
+              (done)))))
 
 #?(:cljs
    (deftest -post-test-negative-with-custom-handler
      (async done
-       (go
-        (with-redefs [ajax.easy/easy-ajax-request
-                      (fn [uri method opts]
-                        ((:error-handler opts)
-                         {:status 400
-                          :status-text "400"
-                          :response {:message "Something bad happen"}}))]
-          (is (= (t/->KintoneResponse
-                  nil
-                  400)
-                 (<! (pt/-post (assoc conn :error-handler :status)
-                               url
-                               {:params {:id 1}})))))
-        (done)))))
+            (go
+              (with-redefs [ajax.easy/easy-ajax-request
+                            (fn [uri method opts]
+                              ((:error-handler opts)
+                               {:status 400
+                                :status-text "400"
+                                :response {:message "Something bad happen"}}))]
+                (is (= (t/->KintoneResponse
+                        nil
+                        400)
+                       (<! (pt/-post (assoc conn :error-handler :status)
+                                     url
+                                     {:params {:id 1}})))))
+              (done)))))
 
 #?(:clj
    (deftest -put-test
@@ -676,86 +679,86 @@
 #?(:cljs
    (deftest -put-test-positive
      (async done
-       (go
-        (with-redefs [ajax.easy/easy-ajax-request
-                      (fn [uri method opts]
-                        (is (= method "PUT"))
-                        ((:handler opts)
-                         (dissoc opts
-                                 :handler
-                                 :error-handler)))]
-          (is (= (t/->KintoneResponse
-                  {:headers {"X-Cybozu-API-Token" "TestApiToken"
-                             "X-Requested-With" "XMLHttpRequest"}
-                   :format :json
-                   :response-format :json
-                   :keywords? true
-                   :timeout 30000
-                   :params {:id 1}}
-                  nil)
-                 (<! (pt/-put conn url {:params {:id 1}})))))
-        (done)))))
+            (go
+              (with-redefs [ajax.easy/easy-ajax-request
+                            (fn [uri method opts]
+                              (is (= method "PUT"))
+                              ((:handler opts)
+                               (dissoc opts
+                                       :handler
+                                       :error-handler)))]
+                (is (= (t/->KintoneResponse
+                        {:headers {"X-Cybozu-API-Token" "TestApiToken"
+                                   "X-Requested-With" "XMLHttpRequest"}
+                         :format :json
+                         :response-format :json
+                         :keywords? true
+                         :timeout 30000
+                         :params {:id 1}}
+                        nil)
+                       (<! (pt/-put conn url {:params {:id 1}})))))
+              (done)))))
 
 #?(:cljs
    (deftest -put-test-positive-with-custom-handler
      (async done
-       (go
-        (with-redefs [ajax.easy/easy-ajax-request
-                      (fn [uri method opts]
-                        (is (= method "PUT"))
-                        ((:handler opts)
-                         (dissoc opts
-                                 :handler
-                                 :error-handler)))]
-          (is (= (t/->KintoneResponse
-                  {:headers {"X-Cybozu-API-Token" "TestApiToken"
-                             "X-Requested-With" "XMLHttpRequest"}
-                   :format :json
-                   :response-format :json
-                   :keywords? true
-                   :timeout 30000
-                   :params {:id 2}}
-                  nil)
-                 (<! (pt/-put (assoc conn :handler #(update-in % [:params :id] inc))
-                              url
-                              {:params {:id 1}})))))
-        (done)))))
+            (go
+              (with-redefs [ajax.easy/easy-ajax-request
+                            (fn [uri method opts]
+                              (is (= method "PUT"))
+                              ((:handler opts)
+                               (dissoc opts
+                                       :handler
+                                       :error-handler)))]
+                (is (= (t/->KintoneResponse
+                        {:headers {"X-Cybozu-API-Token" "TestApiToken"
+                                   "X-Requested-With" "XMLHttpRequest"}
+                         :format :json
+                         :response-format :json
+                         :keywords? true
+                         :timeout 30000
+                         :params {:id 2}}
+                        nil)
+                       (<! (pt/-put (assoc conn :handler #(update-in % [:params :id] inc))
+                                    url
+                                    {:params {:id 1}})))))
+              (done)))))
 
 #?(:cljs
    (deftest -put-test-negative
      (async done
-       (go
-        (with-redefs [ajax.easy/easy-ajax-request
-                      (fn [uri method opts]
-                        ((:error-handler opts)
-                         {:status 400
-                          :status-text "400"
-                          :response {:message "Something bad happen"}}))]
-          (is (= (t/->KintoneResponse
-                  nil
-                  {:status 400
-                   :status-text "400"
-                   :response {:message "Something bad happen"}})
-                 (<! (pt/-put conn url {:params {:id 1}})))))
-        (done)))))
+            (go
+              (with-redefs [ajax.easy/easy-ajax-request
+                            (fn [uri method opts]
+                              ((:error-handler opts)
+                               {:status 400
+                                :status-text "400"
+                                :response {:message "Something bad happen"}}))]
+                (is (= (t/->KintoneResponse
+                        nil
+                        {:status 400
+                         :status-text "400"
+                         :response {:message "Something bad happen"}})
+                       (<! (pt/-put conn url {:params {:id 1}})))))
+              (done)))))
 
 #?(:cljs
    (deftest -put-test-negative-with-custom-error-handler
      (async done
-       (go
-        (with-redefs [ajax.easy/easy-ajax-request
-                      (fn [uri method opts]
-                        ((:error-handler opts)
-                         {:status 400
-                          :status-text "400"
-                          :response {:message "Something bad happen"}}))]
-          (is (= (t/->KintoneResponse
-                  nil
-                  "Something bad happen")
-                 (<! (pt/-put (assoc conn :error-handler #(get-in % [:response :message]))
-                              url
-                              {:params {:id 1}})))))
-        (done)))))
+            (go
+              (with-redefs [ajax.easy/easy-ajax-request
+                            (fn [uri method opts]
+                              ((:error-handler opts)
+                               {:status 400
+                                :status-text "400"
+                                :response {:message "Something bad happen"}}))]
+                (is (= (t/->KintoneResponse
+                        nil
+                        "Something bad happen")
+                       (<! (pt/-put (assoc conn :error-handler #(get-in % [:response :message]))
+                                    url
+                                    {:params {:id 1}})))))
+              (done)))))
 
 #?(:clj
    (deftest -delete-test
@@ -842,80 +845,80 @@
 #?(:cljs
    (deftest -delete-test-positive
      (async done
-       (go
-        (with-redefs [ajax.easy/easy-ajax-request
-                      (fn [uri method opts]
-                        (is (= method "DELETE"))
-                        ((:handler opts)
-                         (dissoc opts
-                                 :handler
-                                 :error-handler)))]
-          (is (= (t/->KintoneResponse
-                  {:headers {"X-Cybozu-API-Token" "TestApiToken"
-                             "X-Requested-With" "XMLHttpRequest"}
-                   :format :json
-                   :response-format :json
-                   :keywords? true
-                   :timeout 30000
-                   :params {:id 1}}
-                  nil)
-                 (<! (pt/-delete conn url {:params {:id 1}})))))
-        (done)))))
+            (go
+              (with-redefs [ajax.easy/easy-ajax-request
+                            (fn [uri method opts]
+                              (is (= method "DELETE"))
+                              ((:handler opts)
+                               (dissoc opts
+                                       :handler
+                                       :error-handler)))]
+                (is (= (t/->KintoneResponse
+                        {:headers {"X-Cybozu-API-Token" "TestApiToken"
+                                   "X-Requested-With" "XMLHttpRequest"}
+                         :format :json
+                         :response-format :json
+                         :keywords? true
+                         :timeout 30000
+                         :params {:id 1}}
+                        nil)
+                       (<! (pt/-delete conn url {:params {:id 1}})))))
+              (done)))))
 
 #?(:cljs
    (deftest -delete-test-positive-with-custom-handler
      (async done
-       (go
-        (with-redefs [ajax.easy/easy-ajax-request
-                      (fn [uri method opts]
-                        (is (= method "DELETE"))
-                        ((:handler opts)
-                         (dissoc opts
-                                 :handler
-                                 :error-handler)))]
-          (is (= (t/->KintoneResponse
-                  {:id 1}
-                  nil)
-                 (<! (pt/-delete (assoc conn :handler :params)
-                                 url
-                                 {:params {:id 1}})))))
-        (done)))))
+            (go
+              (with-redefs [ajax.easy/easy-ajax-request
+                            (fn [uri method opts]
+                              (is (= method "DELETE"))
+                              ((:handler opts)
+                               (dissoc opts
+                                       :handler
+                                       :error-handler)))]
+                (is (= (t/->KintoneResponse
+                        {:id 1}
+                        nil)
+                       (<! (pt/-delete (assoc conn :handler :params)
+                                       url
+                                       {:params {:id 1}})))))
+              (done)))))
 
 #?(:cljs
    (deftest -delete-test-negative
      (async done
-       (go
-        (with-redefs [ajax.easy/easy-ajax-request
-                      (fn [uri method opts]
-                        ((:error-handler opts)
-                         {:status 400
-                          :status-text "400"
-                          :response {:message "Something bad happen"}}))]
-          (is (= (t/->KintoneResponse
-                  nil
-                  {:status 400
-                   :status-text "400"
-                   :response {:message "Something bad happen"}})
-                 (<! (pt/-delete conn url {:params {:id 1}})))))
-        (done)))))
+            (go
+              (with-redefs [ajax.easy/easy-ajax-request
+                            (fn [uri method opts]
+                              ((:error-handler opts)
+                               {:status 400
+                                :status-text "400"
+                                :response {:message "Something bad happen"}}))]
+                (is (= (t/->KintoneResponse
+                        nil
+                        {:status 400
+                         :status-text "400"
+                         :response {:message "Something bad happen"}})
+                       (<! (pt/-delete conn url {:params {:id 1}})))))
+              (done)))))
 
 #?(:cljs
    (deftest -delete-test-negative-with-custom-error-handler
      (async done
-       (go
-        (with-redefs [ajax.easy/easy-ajax-request
-                      (fn [uri method opts]
-                        ((:error-handler opts)
-                         {:status 400
-                          :status-text "400"
-                          :response {:message "Something bad happen"}}))]
-          (is (= (t/->KintoneResponse
-                  nil
-                  {:message "Something bad happen"})
-                 (<! (pt/-delete (assoc conn :error-handler :response)
-                                 url
-                                 {:params {:id 1}})))))
-        (done)))))
+            (go
+              (with-redefs [ajax.easy/easy-ajax-request
+                            (fn [uri method opts]
+                              ((:error-handler opts)
+                               {:status 400
+                                :status-text "400"
+                                :response {:message "Something bad happen"}}))]
+                (is (= (t/->KintoneResponse
+                        nil
+                        {:message "Something bad happen"})
+                       (<! (pt/-delete (assoc conn :error-handler :response)
+                                       url
+                                       {:params {:id 1}})))))
+              (done)))))
 
 #?(:clj
    (deftest -get-blob-test
@@ -1014,80 +1017,80 @@
 #?(:cljs
    (deftest -get-blob-test-positive
      (async done
-       (go
-        (with-redefs [ajax.easy/easy-ajax-request
-                      (fn [uri method opts]
-                        (is (= method "POST"))
-                        ((:handler opts)
-                         (dissoc opts
-                                 :handler
-                                 :error-handler)))]
-          (let [{:keys [res err]} (<! (pt/-get-blob conn url {:params {:id 1}}))]
-            (is (= {:headers {"X-Cybozu-API-Token" "TestApiToken"
-                              "X-HTTP-Method-Override" "GET"
-                              "X-Requested-With" "XMLHttpRequest"}
-                    :keywords? true
-                    :timeout 30000
-                    :params {:id 1}}
-                   (dissoc res :response-format)))
-            (is (= err nil))
-            (is (record? (:response-format res)))))
-        (done)))))
+            (go
+              (with-redefs [ajax.easy/easy-ajax-request
+                            (fn [uri method opts]
+                              (is (= method "POST"))
+                              ((:handler opts)
+                               (dissoc opts
+                                       :handler
+                                       :error-handler)))]
+                (let [{:keys [res err]} (<! (pt/-get-blob conn url {:params {:id 1}}))]
+                  (is (= {:headers {"X-Cybozu-API-Token" "TestApiToken"
+                                    "X-HTTP-Method-Override" "GET"
+                                    "X-Requested-With" "XMLHttpRequest"}
+                          :keywords? true
+                          :timeout 30000
+                          :params {:id 1}}
+                         (dissoc res :response-format)))
+                  (is (= err nil))
+                  (is (record? (:response-format res)))))
+              (done)))))
 
 #?(:cljs
    (deftest -get-blob-test-positive-with-custom-handler
      (async done
-       (go
-        (with-redefs [ajax.easy/easy-ajax-request
-                      (fn [uri method opts]
-                        (is (= method "POST"))
-                        ((:handler opts)
-                         (dissoc opts
-                                 :handler
-                                 :error-handler)))]
-          (let [{:keys [res err]} (<! (pt/-get-blob (assoc conn :handler :params)
-                                                    url
-                                                    {:params {:id 1}}))]
-            (is (= {:id 1}
-                   res))
-            (is (= err nil))))
-        (done)))))
+            (go
+              (with-redefs [ajax.easy/easy-ajax-request
+                            (fn [uri method opts]
+                              (is (= method "POST"))
+                              ((:handler opts)
+                               (dissoc opts
+                                       :handler
+                                       :error-handler)))]
+                (let [{:keys [res err]} (<! (pt/-get-blob (assoc conn :handler :params)
+                                                          url
+                                                          {:params {:id 1}}))]
+                  (is (= {:id 1}
+                         res))
+                  (is (= err nil))))
+              (done)))))
 
 #?(:cljs
    (deftest -get-blob-test-negative
      (async done
-       (go
-        (with-redefs [ajax.easy/easy-ajax-request
-                      (fn [uri method opts]
-                        ((:error-handler opts)
-                         {:status 400
-                          :status-text "400"
-                          :response {:message "Something bad happen"}}))]
-          (is (= (t/->KintoneResponse
-                  nil
-                  {:status 400
-                   :status-text "400"
-                   :response {:message "Something bad happen"}})
-                 (<! (pt/-get-blob conn url {:params {:id 1}})))))
-        (done)))))
+            (go
+              (with-redefs [ajax.easy/easy-ajax-request
+                            (fn [uri method opts]
+                              ((:error-handler opts)
+                               {:status 400
+                                :status-text "400"
+                                :response {:message "Something bad happen"}}))]
+                (is (= (t/->KintoneResponse
+                        nil
+                        {:status 400
+                         :status-text "400"
+                         :response {:message "Something bad happen"}})
+                       (<! (pt/-get-blob conn url {:params {:id 1}})))))
+              (done)))))
 
 #?(:cljs
    (deftest -get-blob-test-negative-with-custom-error-handler
      (async done
-       (go
-        (with-redefs [ajax.easy/easy-ajax-request
-                      (fn [uri method opts]
-                        ((:error-handler opts)
-                         {:status 400
-                          :status-text "400"
-                          :response {:message "Something bad happen"}}))]
-          (is (= (t/->KintoneResponse
-                  nil
-                  {:message "Something bad happen"})
-                 (<! (pt/-get-blob (assoc conn :error-handler :response)
-                                   url
-                                   {:params {:id 1}})))))
-        (done)))))
+            (go
+              (with-redefs [ajax.easy/easy-ajax-request
+                            (fn [uri method opts]
+                              ((:error-handler opts)
+                               {:status 400
+                                :status-text "400"
+                                :response {:message "Something bad happen"}}))]
+                (is (= (t/->KintoneResponse
+                        nil
+                        {:message "Something bad happen"})
+                       (<! (pt/-get-blob (assoc conn :error-handler :response)
+                                         url
+                                         {:params {:id 1}})))))
+              (done)))))
 
 #?(:clj
    (deftest -multipart-test
@@ -1177,76 +1180,76 @@
 #?(:cljs
    (deftest -multipart-post-test-positive
      (async done
-       (go
-        (with-redefs [ajax.easy/easy-ajax-request
-                      (fn [uri method opts]
-                        (is (= method "POST"))
-                        ((:handler opts)
-                         (dissoc opts
-                                 :handler
-                                 :error-handler)))]
-          (let [{:keys [res err]} (<! (pt/-multipart-post conn url {:multipart [{:id 1}]}))]
-            (is (= {:headers {"X-Cybozu-API-Token" "TestApiToken"
-                              "X-Requested-With" "XMLHttpRequest"}
-                    :response-format :json
-                    :keywords? true
-                    :timeout 30000
-                    :body [{:id 1}]}
-                   res))
-            (is (= err nil))))
-        (done)))))
+            (go
+              (with-redefs [ajax.easy/easy-ajax-request
+                            (fn [uri method opts]
+                              (is (= method "POST"))
+                              ((:handler opts)
+                               (dissoc opts
+                                       :handler
+                                       :error-handler)))]
+                (let [{:keys [res err]} (<! (pt/-multipart-post conn url {:multipart [{:id 1}]}))]
+                  (is (= {:headers {"X-Cybozu-API-Token" "TestApiToken"
+                                    "X-Requested-With" "XMLHttpRequest"}
+                          :response-format :json
+                          :keywords? true
+                          :timeout 30000
+                          :body [{:id 1}]}
+                         res))
+                  (is (= err nil))))
+              (done)))))
 
 #?(:cljs
    (deftest -multipart-post-test-positive-with-handler
      (async done
-       (go
-        (with-redefs [ajax.easy/easy-ajax-request
-                      (fn [uri method opts]
-                        (is (= method "POST"))
-                        ((:handler opts)
-                         (dissoc opts
-                                 :handler
-                                 :error-handler)))]
-          (let [{:keys [res err]} (<! (pt/-multipart-post (assoc conn :handler :body)
-                                                          url
-                                                          {:multipart [{:id 1}]}))]
-            (is (= [{:id 1}]
-                   res))
-            (is (= err nil))))
-        (done)))))
+            (go
+              (with-redefs [ajax.easy/easy-ajax-request
+                            (fn [uri method opts]
+                              (is (= method "POST"))
+                              ((:handler opts)
+                               (dissoc opts
+                                       :handler
+                                       :error-handler)))]
+                (let [{:keys [res err]} (<! (pt/-multipart-post (assoc conn :handler :body)
+                                                                url
+                                                                {:multipart [{:id 1}]}))]
+                  (is (= [{:id 1}]
+                         res))
+                  (is (= err nil))))
+              (done)))))
 
 #?(:cljs
    (deftest -multipart-post-test-negative
      (async done
-       (go
-        (with-redefs [ajax.easy/easy-ajax-request
-                      (fn [uri method opts]
-                        ((:error-handler opts)
-                         {:status 400
-                          :status-text "400"
-                          :response {:message "Something bad happen"}}))]
-          (is (= (t/->KintoneResponse
-                  nil
-                  {:status 400
-                   :status-text "400"
-                   :response {:message "Something bad happen"}})
-                 (<! (pt/-multipart-post conn url {:multipart [{:id 1}]})))))
-        (done)))))
+            (go
+              (with-redefs [ajax.easy/easy-ajax-request
+                            (fn [uri method opts]
+                              ((:error-handler opts)
+                               {:status 400
+                                :status-text "400"
+                                :response {:message "Something bad happen"}}))]
+                (is (= (t/->KintoneResponse
+                        nil
+                        {:status 400
+                         :status-text "400"
+                         :response {:message "Something bad happen"}})
+                       (<! (pt/-multipart-post conn url {:multipart [{:id 1}]})))))
+              (done)))))
 
 #?(:cljs
    (deftest -multipart-post-test-negative-with-custom-error-handler
      (async done
-       (go
-        (with-redefs [ajax.easy/easy-ajax-request
-                      (fn [uri method opts]
-                        ((:error-handler opts)
-                         {:status 400
-                          :status-text "400"
-                          :response {:message "Something bad happen"}}))]
-          (is (= (t/->KintoneResponse
-                  nil
-                  {:message "Something bad happen"})
-                 (<! (pt/-multipart-post (assoc conn :error-handler :response)
-                                         url
-                                         {:multipart [{:id 1}]})))))
-        (done)))))
+            (go
+              (with-redefs [ajax.easy/easy-ajax-request
+                            (fn [uri method opts]
+                              ((:error-handler opts)
+                               {:status 400
+                                :status-text "400"
+                                :response {:message "Something bad happen"}}))]
+                (is (= (t/->KintoneResponse
+                        nil
+                        {:message "Something bad happen"})
+                       (<! (pt/-multipart-post (assoc conn :error-handler :response)
+                                               url
+                                               {:multipart [{:id 1}]})))))
+              (done)))))

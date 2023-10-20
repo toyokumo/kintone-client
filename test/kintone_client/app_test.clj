@@ -1,9 +1,10 @@
 (ns kintone-client.app-test
-  (:require [clojure.core.async :refer [<!!]]
-            [clojure.test :refer :all]
-            [kintone-client.app :as app]
-            [kintone-client.test-helper :as h]
-            [kintone-client.types :as t]))
+  (:require
+   [clojure.core.async :refer [<!!]]
+   [clojure.test :refer :all]
+   [kintone-client.app :as app]
+   [kintone-client.test-helper :as h]
+   [kintone-client.types :as t]))
 
 (def ^:private app (rand-int 100))
 
