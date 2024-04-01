@@ -1,7 +1,7 @@
 (ns kintone-client.app-test
   (:require
    [clojure.core.async :refer [<!!]]
-   [clojure.test :refer :all]
+   [clojure.test :refer [deftest is]]
    [kintone-client.app :as app]
    [kintone-client.test-helper :as h]
    [kintone-client.types :as t]))

@@ -1,7 +1,7 @@
 (ns kintone-client.test-helper
   (:require
-   #?@(:clj  [[clojure.core.async :refer [<!! chan put!]]]
-       :cljs [[cljs.core.async :refer [<! chan put!] :refer-macros [go]]])
+   #?(:clj  [clojure.core.async :refer [chan put!]]
+      :cljs [cljs.core.async :refer [chan put!]])
    [kintone-client.authentication :as auth]
    [kintone-client.connection :as conn]
    [kintone-client.protocols :as pt]

@@ -1,7 +1,7 @@
 (ns kintone-client.record-test
   (:require
    [clojure.core.async :refer [<!! chan put!]]
-   [clojure.test :refer :all]
+   [clojure.test :refer [deftest is testing]]
    [kintone-client.record :as r]
    [kintone-client.test-helper :as h]
    [kintone-client.types :as t]))
@@ -69,7 +69,7 @@
 (deftest get-all-records-test
   (testing "Fail to create cursor"
     (with-redefs [r/create-cursor
-                  (fn [conn app otps]
+                  (fn [& _]
                     (let [c (chan)]
                       (put! c (t/->KintoneResponse nil {:status 500}))
                       c))]
@@ -78,12 +78,12 @@
 
   (testing "Fail to get record on the first request"
     (with-redefs [r/create-cursor
-                  (fn [conn app otps]
+                  (fn [& _]
                     (let [c (chan)]
                       (put! c (t/->KintoneResponse {:id "123-123"} nil))
                       c))
                   r/get-records-by-cursor
-                  (fn [conn cursor]
+                  (fn [& _]
                     (let [c (chan)]
                       (put! c (t/->KintoneResponse nil {:status 400}))
                       c))]
@@ -93,12 +93,12 @@
   (testing "Fail to get record on the second request"
     (let [ncall (atom 0)]
       (with-redefs [r/create-cursor
-                    (fn [conn app otps]
+                    (fn [& _]
                       (let [c (chan)]
                         (put! c (t/->KintoneResponse {:id "123-123"} nil))
                         c))
                     r/get-records-by-cursor
-                    (fn [conn cursor]
+                    (fn [& _]
                       (let [c (chan)]
                         (if (< @ncall 2)
                           (do (swap! ncall inc)
@@ -113,12 +113,12 @@
   (testing "Success"
     (let [ncall (atom 0)]
       (with-redefs [r/create-cursor
-                    (fn [conn app otps]
+                    (fn [& _]
                       (let [c (chan)]
                         (put! c (t/->KintoneResponse {:id "123-123"} nil))
                         c))
                     r/get-records-by-cursor
-                    (fn [conn cursor]
+                    (fn [& _]
                       (let [c (chan)]
                         (if (< @ncall 2)
                           (do (swap! ncall inc)
@@ -180,7 +180,7 @@
 (deftest add-all-records-test
   (testing "Fail to add on the first request"
     (with-redefs [r/add-records
-                  (fn [conn app records]
+                  (fn [& _]
                     (let [c (chan)]
                       (put! c (t/->KintoneResponse nil {:status 400}))
                       c))]
@@ -191,7 +191,7 @@
   (testing "Fail to add on the second request"
     (let [ncall (atom 0)]
       (with-redefs [r/add-records
-                    (fn [conn app records]
+                    (fn [& _]
                       (let [c (chan)]
                         (if (< @ncall 1)
                           (do (swap! ncall inc)
@@ -262,7 +262,7 @@
 (deftest update-all-records-test
   (testing "Fail to update on the first request"
     (with-redefs [r/update-records
-                  (fn [conn app records]
+                  (fn [& _]
                     (let [c (chan)]
                       (put! c (t/->KintoneResponse nil {:status 400}))
                       c))]
@@ -275,7 +275,7 @@
   (testing "Fail to update on the second request"
     (let [ncall (atom 0)]
       (with-redefs [r/update-records
-                    (fn [conn app records]
+                    (fn [& _]
                       (let [c (chan)]
                         (if (< @ncall 1)
                           (do (swap! ncall inc)
@@ -339,7 +339,7 @@
 (deftest delete-all-records-by-query-test
   (testing "Fail to create cursor"
     (with-redefs [r/create-cursor
-                  (fn [conn app otps]
+                  (fn [& _]
                     (let [c (chan)]
                       (put! c (t/->KintoneResponse nil {:status 500}))
                       c))]
@@ -348,12 +348,12 @@
 
   (testing "Fail to get record on the first request"
     (with-redefs [r/create-cursor
-                  (fn [conn app otps]
+                  (fn [& _]
                     (let [c (chan)]
                       (put! c (t/->KintoneResponse {:id "123-123"} nil))
                       c))
                   r/get-records-by-cursor
-                  (fn [conn cursor]
+                  (fn [& _]
                     (let [c (chan)]
                       (put! c (t/->KintoneResponse nil {:status 400}))
                       c))]
@@ -363,12 +363,12 @@
   (testing "Fail to get record on the second request"
     (let [ncall (atom 0)]
       (with-redefs [r/create-cursor
-                    (fn [conn app otps]
+                    (fn [& _]
                       (let [c (chan)]
                         (put! c (t/->KintoneResponse {:id "123-123"} nil))
                         c))
                     r/get-records-by-cursor
-                    (fn [conn cursor]
+                    (fn [& _]
                       (let [c (chan)]
                         (if (< @ncall 2)
                           (do (swap! ncall inc)
@@ -382,12 +382,12 @@
 
   (testing "Get empty records"
     (with-redefs [r/create-cursor
-                  (fn [conn app otps]
+                  (fn [& _]
                     (let [c (chan)]
                       (put! c (t/->KintoneResponse {:id "123-123"} nil))
                       c))
                   r/get-records-by-cursor
-                  (fn [conn cursor]
+                  (fn [& _]
                     (let [c (chan)]
                       (put! c (t/->KintoneResponse {:records []} nil))
                       c))]
@@ -397,12 +397,12 @@
   (testing "Success"
     (let [ncall (atom 0)]
       (with-redefs [r/create-cursor
-                    (fn [conn app otps]
+                    (fn [& _]
                       (let [c (chan)]
                         (put! c (t/->KintoneResponse {:id "123-123"} nil))
                         c))
                     r/get-records-by-cursor
-                    (fn [conn cursor]
+                    (fn [& _]
                       (let [c (chan)]
                         (if (< @ncall 2)
                           (do (swap! ncall inc)

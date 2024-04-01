@@ -83,7 +83,7 @@
     (async done
            (go
              (with-redefs [r/create-cursor
-                           (fn [conn app otps]
+                           (fn [& _]
                              (let [c (chan)]
                                (put! c (t/->KintoneResponse nil {:status 500}))
                                c))]
@@ -96,12 +96,12 @@
     (async done
            (go
              (with-redefs [r/create-cursor
-                           (fn [conn app otps]
+                           (fn [& _]
                              (let [c (chan)]
                                (put! c (t/->KintoneResponse {:id "123-123"} nil))
                                c))
                            r/get-records-by-cursor
-                           (fn [conn cursor]
+                           (fn [& _]
                              (let [c (chan)]
                                (put! c (t/->KintoneResponse nil {:status 400}))
                                c))]
@@ -115,12 +115,12 @@
            (go
              (let [ncall (atom 0)]
                (with-redefs [r/create-cursor
-                             (fn [conn app otps]
+                             (fn [& _]
                                (let [c (chan)]
                                  (put! c (t/->KintoneResponse {:id "123-123"} nil))
                                  c))
                              r/get-records-by-cursor
-                             (fn [conn cursor]
+                             (fn [& _]
                                (let [c (chan)]
                                  (if (< @ncall 2)
                                    (do (swap! ncall inc)
@@ -139,12 +139,12 @@
            (go
              (let [ncall (atom 0)]
                (with-redefs [r/create-cursor
-                             (fn [conn app otps]
+                             (fn [& _]
                                (let [c (chan)]
                                  (put! c (t/->KintoneResponse {:id "123-123"} nil))
                                  c))
                              r/get-records-by-cursor
-                             (fn [conn cursor]
+                             (fn [& _]
                                (let [c (chan)]
                                  (if (< @ncall 2)
                                    (do (swap! ncall inc)
@@ -217,7 +217,7 @@
     (async done
            (go
              (with-redefs [r/add-records
-                           (fn [conn app records]
+                           (fn [& _]
                              (let [c (chan)]
                                (put! c (t/->KintoneResponse nil {:status 400}))
                                c))]
@@ -232,7 +232,7 @@
            (go
              (let [ncall (atom 0)]
                (with-redefs [r/add-records
-                             (fn [conn app records]
+                             (fn [& _]
                                (let [c (chan)]
                                  (if (< @ncall 1)
                                    (do (swap! ncall inc)
@@ -311,7 +311,7 @@
     (async done
            (go
              (with-redefs [r/update-records
-                           (fn [conn app records]
+                           (fn [& _]
                              (let [c (chan)]
                                (put! c (t/->KintoneResponse nil {:status 400}))
                                c))]
@@ -328,7 +328,7 @@
            (go
              (let [ncall (atom 0)]
                (with-redefs [r/update-records
-                             (fn [conn app records]
+                             (fn [& _]
                                (let [c (chan)]
                                  (if (< @ncall 1)
                                    (do (swap! ncall inc)
@@ -401,7 +401,7 @@
     (async done
            (go
              (with-redefs [r/create-cursor
-                           (fn [conn app otps]
+                           (fn [& _]
                              (let [c (chan)]
                                (put! c (t/->KintoneResponse nil {:status 500}))
                                c))]
@@ -414,12 +414,12 @@
     (async done
            (go
              (with-redefs [r/create-cursor
-                           (fn [conn app otps]
+                           (fn [& _]
                              (let [c (chan)]
                                (put! c (t/->KintoneResponse {:id "123-123"} nil))
                                c))
                            r/get-records-by-cursor
-                           (fn [conn cursor]
+                           (fn [& _]
                              (let [c (chan)]
                                (put! c (t/->KintoneResponse nil {:status 400}))
                                c))]
@@ -433,12 +433,12 @@
            (go
              (let [ncall (atom 0)]
                (with-redefs [r/create-cursor
-                             (fn [conn app otps]
+                             (fn [& _]
                                (let [c (chan)]
                                  (put! c (t/->KintoneResponse {:id "123-123"} nil))
                                  c))
                              r/get-records-by-cursor
-                             (fn [conn cursor]
+                             (fn [& _]
                                (let [c (chan)]
                                  (if (< @ncall 2)
                                    (do (swap! ncall inc)
@@ -456,12 +456,12 @@
     (async done
            (go
              (with-redefs [r/create-cursor
-                           (fn [conn app otps]
+                           (fn [& _]
                              (let [c (chan)]
                                (put! c (t/->KintoneResponse {:id "123-123"} nil))
                                c))
                            r/get-records-by-cursor
-                           (fn [conn cursor]
+                           (fn [& _]
                              (let [c (chan)]
                                (put! c (t/->KintoneResponse {:records []} nil))
                                c))]
@@ -475,12 +475,12 @@
            (go
              (let [ncall (atom 0)]
                (with-redefs [r/create-cursor
-                             (fn [conn app otps]
+                             (fn [& _]
                                (let [c (chan)]
                                  (put! c (t/->KintoneResponse {:id "123-123"} nil))
                                  c))
                              r/get-records-by-cursor
-                             (fn [conn cursor]
+                             (fn [& _]
                                (let [c (chan)]
                                  (if (< @ncall 2)
                                    (do (swap! ncall inc)

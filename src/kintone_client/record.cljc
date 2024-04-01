@@ -81,7 +81,7 @@
 
   :id - Cursor id
         string"
-  [conn {:as cursor :keys [id]}]
+  [conn {:keys [id]}]
   (let [url (pt/-url conn path/cursor)
         params {:id id}]
     (pt/-get conn url {:params params})))
@@ -108,7 +108,7 @@
             Maximum: 500"
   ([conn app]
    (get-all-records conn app nil))
-  ([conn app {:as opts :keys [fields query size]}]
+  ([conn app opts]
    (go
      (let [res (<! (create-cursor conn app opts))
            cursor (:res res)]
@@ -132,7 +132,7 @@
 
   cursor - The kintone record cursor
            A map has cursor id"
-  [conn {:as cursor :keys [id]}]
+  [conn {:keys [id]}]
   (let [url (pt/-url conn path/cursor)
         params {:id id}]
     (pt/-delete conn url {:params params})))
@@ -237,13 +237,13 @@
 
     :revision - The revision number of the record.
                 integer, optional"
-  ([app {:as params :keys [id update-key record revision]}]
+  ([app params]
    (t/map->BulkRequest
     {:method :PUT
      :path path/record
      :payload (assoc (->update-params params)
                      :app app)}))
-  ([conn app {:as params :keys [id update-key record revision]}]
+  ([conn app params]
    (let [url (pt/-url conn path/record)
          params (assoc (->update-params params)
                        :app app)]
@@ -426,7 +426,7 @@
              The default and maximum is 10 comments."
   ([conn app id]
    (get-comments conn app id nil))
-  ([conn app id {:as opts :keys [order offset limit]}]
+  ([conn app id {:keys [order offset limit]}]
    (let [url (pt/-url conn path/comments)
          params {:app app
                  :record id
@@ -457,7 +457,7 @@
 
       :type - The type of the mentioned target.
               USER or GROUP or ORGANIZATION"
-  [conn app id {:as comment :keys [text mentions]}]
+  [conn app id {:keys [text mentions]}]
   (let [url (pt/-url conn path/comment)
         params {:app app
                 :record id
@@ -537,12 +537,12 @@
 
     :revision - The revision number of the record.
                 integer, optional"
-  ([app {:as params :keys [id action assignee revision]}]
+  ([app params]
    (t/map->BulkRequest {:method :PUT
                         :path path/status
                         :payload (assoc (->status-record params)
                                         :app app)}))
-  ([conn app {:as params :keys [id action assignee revision]}]
+  ([conn app params]
    (let [url (pt/-url conn path/status)
          params (assoc (->status-record params)
                        :app app)]
@@ -576,12 +576,12 @@
 
     :revision - The revision number of the record.
                 integer, optional"
-  ([app [{:keys [id action assignee revision]} :as records]]
+  ([app records]
    (t/map->BulkRequest {:method :PUT
                         :path path/statuses
                         :payload {:app app
                                   :records (mapv ->status-record records)}}))
-  ([conn app [{:keys [id action assignee revision]} :as records]]
+  ([conn app records]
    (let [url (pt/-url conn path/statuses)
          params {:app app
                  :records (mapv ->status-record records)}]

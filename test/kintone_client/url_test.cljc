@@ -21,8 +21,8 @@
 ;SOFTWARE.
 (ns kintone-client.url-test
   (:require
-   #?(:clj [clojure.test :refer :all]
-      :cljs [cljs.test :refer-macros [deftest testing are run-tests]])
+   #?(:clj [clojure.test :refer [deftest testing are]]
+      :cljs [cljs.test :refer-macros [deftest testing are]])
    [kintone-client.url :as sut]))
 
 (deftest extract-base-url-test

@@ -1,7 +1,7 @@
 (ns kintone-client.user-test
   (:require
    [cljs.core.async :refer [<! chan put!] :refer-macros [go]]
-   [cljs.test :refer-macros [deftest is testing async]]
+   [cljs.test :refer-macros [deftest is async]]
    [kintone-client.test-helper :as h]
    [kintone-client.types :as t]
    [kintone-client.user :as user]))
@@ -292,384 +292,391 @@
                   (<! (user/get-group-users h/fake-conn "group1" {:offset 10 :size 5}))))
            (done))))
 
-(deftest get-all-users
-  (testing "query by user code"
-    (async done
-           (go
-             (let [ncall (atom 0)]
-               (with-redefs [user/get-users
-                             (fn [conn {:keys [code]}]
-                               (let [c (chan)]
-                                 (swap! ncall inc)
-                                 (case @ncall
-                                   1 (put! c (t/->KintoneResponse {:users [{:id 1} {:id 2}]}
-                                                                  nil))
-                                   2 (put! c (t/->KintoneResponse {:users [{:id 3}]}
-                                                                  nil)))
-                                 c))]
-                 (is (= (t/->KintoneResponse {:users [{:id 1} {:id 2}]} nil)
-                        (<! (user/get-all-users h/fake-conn {:codes (map str (range 100))}))))))
-             (done)))
-
-    (async done
-           (go
-             (let [ncall (atom 0)]
-               (with-redefs [user/get-users
-                             (fn [conn {:keys [code]}]
-                               (let [c (chan)]
-                                 (swap! ncall inc)
-                                 (case @ncall
-                                   1 (put! c (t/->KintoneResponse {:users [{:id 1} {:id 2}]}
-                                                                  nil))
-                                   2 (put! c (t/->KintoneResponse {:users [{:id 3}]}
-                                                                  nil))
-                                   3 (put! c (t/->KintoneResponse {:users [{:id 4}]}
-                                                                  nil)))
-                                 c))]
-                 (is (= (t/->KintoneResponse {:users [{:id 1}
-                                                      {:id 2}
-                                                      {:id 3}]} nil)
-                        (<! (user/get-all-users h/fake-conn {:codes (map str (range 101))}))))))
-             (done))))
-
-  (testing "query by user id"
-    (async done
-           (go
-             (let [ncall (atom 0)]
-               (with-redefs [user/get-users
-                             (fn [conn {:keys [code]}]
-                               (let [c (chan)]
-                                 (swap! ncall inc)
-                                 (case @ncall
-                                   1 (put! c (t/->KintoneResponse {:users [{:id 1} {:id 2}]}
-                                                                  nil))
-                                   2 (put! c (t/->KintoneResponse {:users [{:id 3}]}
-                                                                  nil)))
-                                 c))]
-                 (is (= (t/->KintoneResponse {:users [{:id 1} {:id 2}]} nil)
-                        (<! (user/get-all-users h/fake-conn {:ids (range 100)}))))))
-             (done)))
-
-    (async done
-           (go
-             (let [ncall (atom 0)]
-               (with-redefs [user/get-users
-                             (fn [conn {:keys [code]}]
-                               (let [c (chan)]
-                                 (swap! ncall inc)
-                                 (case @ncall
-                                   1 (put! c (t/->KintoneResponse {:users [{:id 1} {:id 2}]}
-                                                                  nil))
-                                   2 (put! c (t/->KintoneResponse {:users [{:id 3}]}
-                                                                  nil))
-                                   3 (put! c (t/->KintoneResponse {:users [{:id 4}]}
-                                                                  nil)))
-                                 c))]
-                 (is (= (t/->KintoneResponse {:users [{:id 1}
-                                                      {:id 2}
-                                                      {:id 3}]} nil)
-                        (<! (user/get-all-users h/fake-conn {:ids (range 101)}))))))
-             (done))))
-
-  (testing "no query"
-    (async done
-           (go
-             (let [ncall (atom 0)]
-               (with-redefs [user/get-users
-                             (fn [conn {:keys [code]}]
-                               (let [c (chan)]
-                                 (swap! ncall inc)
-                                 (case @ncall
-                                   1 (put! c (t/->KintoneResponse
-                                              {:users (map #(assoc {} :id %) (range 100))}
-                                              nil))
-                                   2 (put! c (t/->KintoneResponse {:users []}
-                                                                  nil)))
-                                 c))]
-                 (is (= 100
-                        (-> (<! (user/get-all-users h/fake-conn {}))
-                            :res
-                            :users
-                            count)))))
-             (done)))
-
-    (async done
-           (go
-             (let [ncall (atom 0)]
-               (with-redefs [user/get-users
-                             (fn [conn {:keys [code]}]
-                               (let [c (chan)]
-                                 (swap! ncall inc)
-                                 (if (< @ncall 3)
-                                   (put! c (t/->KintoneResponse
-                                            {:users (map #(assoc {} :id (+ (* 100 @ncall) %))
-                                                         (range 100))}
-                                            nil))
-                                   (put! c (t/->KintoneResponse {:users [{:id 1000} {:id 1500}]}
+(deftest get-all-users-with-query-by-user-code
+  (async done
+         (go
+           (let [ncall (atom 0)]
+             (with-redefs [user/get-users
+                           (fn [& _]
+                             (let [c (chan)]
+                               (swap! ncall inc)
+                               (case @ncall
+                                 1 (put! c (t/->KintoneResponse {:users [{:id 1} {:id 2}]}
+                                                                nil))
+                                 2 (put! c (t/->KintoneResponse {:users [{:id 3}]}
                                                                 nil)))
-                                 c))]
-                 (is (= 202
-                        (-> (<! (user/get-all-users h/fake-conn {}))
-                            :res
-                            :users
-                            count)))))
-             (done)))))
+                               c))]
+               (is (= (t/->KintoneResponse {:users [{:id 1} {:id 2}]} nil)
+                      (<! (user/get-all-users h/fake-conn {:codes (map str (range 100))})))
+                   "100個単位でリクエストを分けるので1回しか呼ばれないこと")))
+           (done))))
 
-
-(deftest get-all-organizations
-  (testing "query by user code"
-    (async done
-           (go
-             (let [ncall (atom 0)]
-               (with-redefs [user/get-organizations
-                             (fn [conn {:keys [code]}]
-                               (let [c (chan)]
-                                 (swap! ncall inc)
-                                 (case @ncall
-                                   1 (put! c (t/->KintoneResponse {:organizations [{:id 1} {:id 2}]}
-                                                                  nil))
-                                   2 (put! c (t/->KintoneResponse {:organizations [{:id 3}]}
-                                                                  nil)))
-                                 c))]
-                 (is (= (t/->KintoneResponse {:organizations [{:id 1} {:id 2}]} nil)
-                        (<! (user/get-all-organizations h/fake-conn {:codes (map str (range 100))}))))))
-             (done)))
-
-    (async done
-           (go
-             (let [ncall (atom 0)]
-               (with-redefs [user/get-organizations
-                             (fn [conn {:keys [code]}]
-                               (let [c (chan)]
-                                 (swap! ncall inc)
-                                 (case @ncall
-                                   1 (put! c (t/->KintoneResponse {:organizations [{:id 1} {:id 2}]}
-                                                                  nil))
-                                   2 (put! c (t/->KintoneResponse {:organizations [{:id 3}]}
-                                                                  nil))
-                                   3 (put! c (t/->KintoneResponse {:organizations [{:id 4}]}
-                                                                  nil)))
-                                 c))]
-                 (is (= (t/->KintoneResponse {:organizations [{:id 1}
-                                                              {:id 2}
-                                                              {:id 3}]} nil)
-                        (<! (user/get-all-organizations h/fake-conn {:codes (map str (range 101))}))))))
-             (done))))
-
-  (testing "query by user id"
-    (async done
-           (go
-             (let [ncall (atom 0)]
-               (with-redefs [user/get-organizations
-                             (fn [conn {:keys [code]}]
-                               (let [c (chan)]
-                                 (swap! ncall inc)
-                                 (case @ncall
-                                   1 (put! c (t/->KintoneResponse {:organizations [{:id 1} {:id 2}]}
-                                                                  nil))
-                                   2 (put! c (t/->KintoneResponse {:organizations [{:id 3}]}
-                                                                  nil)))
-                                 c))]
-                 (is (= (t/->KintoneResponse {:organizations [{:id 1} {:id 2}]} nil)
-                        (<! (user/get-all-organizations h/fake-conn {:ids (range 100)}))))))
-             (done)))
-
-    (async done
-           (go
-             (let [ncall (atom 0)]
-               (with-redefs [user/get-organizations
-                             (fn [conn {:keys [code]}]
-                               (let [c (chan)]
-                                 (swap! ncall inc)
-                                 (case @ncall
-                                   1 (put! c (t/->KintoneResponse {:organizations [{:id 1} {:id 2}]}
-                                                                  nil))
-                                   2 (put! c (t/->KintoneResponse {:organizations [{:id 3}]}
-                                                                  nil))
-                                   3 (put! c (t/->KintoneResponse {:organizations [{:id 4}]}
-                                                                  nil)))
-                                 c))]
-                 (is (= (t/->KintoneResponse {:organizations [{:id 1}
-                                                              {:id 2}
-                                                              {:id 3}]} nil)
-                        (<! (user/get-all-organizations h/fake-conn {:ids (range 101)}))))))
-             (done))))
-
-  (testing "no query"
-    (async done
-           (go
-             (let [ncall (atom 0)]
-               (with-redefs [user/get-organizations
-                             (fn [conn {:keys [code]}]
-                               (let [c (chan)]
-                                 (swap! ncall inc)
-                                 (case @ncall
-                                   1 (put! c (t/->KintoneResponse
-                                              {:organizations (map #(assoc {} :id %) (range 100))}
-                                              nil))
-                                   2 (put! c (t/->KintoneResponse {:organizations []}
-                                                                  nil)))
-                                 c))]
-                 (is (= 100
-                        (-> (<! (user/get-all-organizations h/fake-conn {}))
-                            :res
-                            :organizations
-                            count)))))
-             (done)))
-
-
-    (async done
-           (go
-             (let [ncall (atom 0)]
-               (with-redefs [user/get-organizations
-                             (fn [conn {:keys [code]}]
-                               (let [c (chan)]
-                                 (swap! ncall inc)
-                                 (if (< @ncall 3)
-                                   (put! c (t/->KintoneResponse
-                                            {:organizations (map #(assoc {} :id (+ (* 100 @ncall) %))
-                                                                 (range 100))}
-                                            nil))
-                                   (put! c (t/->KintoneResponse {:organizations [{:id 1000} {:id 1500}]}
+(deftest get-all-users-with-query-by-user-code-multiple-requests
+  (async done
+         (go
+           (let [ncall (atom 0)]
+             (with-redefs [user/get-users
+                           (fn [& _]
+                             (let [c (chan)]
+                               (swap! ncall inc)
+                               (case @ncall
+                                 1 (put! c (t/->KintoneResponse {:users [{:id 1} {:id 2}]}
+                                                                nil))
+                                 2 (put! c (t/->KintoneResponse {:users [{:id 3}]}
+                                                                nil))
+                                 3 (put! c (t/->KintoneResponse {:users [{:id 4}]}
                                                                 nil)))
-                                 c))]
-                 (is (= 202
-                        (-> (<! (user/get-all-organizations h/fake-conn {}))
-                            :res
-                            :organizations
-                            count)))))
-             (done)))))
+                               c))]
+               (is (= (t/->KintoneResponse {:users [{:id 1}
+                                                    {:id 2}
+                                                    {:id 3}]} nil)
+                      (<! (user/get-all-users h/fake-conn {:codes (map str (range 101))})))
+                   "100個単位でリクエストを分けるので2回呼ばれること")))
+           (done))))
 
-(deftest get-all-groups
-  (testing "query by user code"
-    (async done
-           (go
-             (let [ncall (atom 0)]
-               (with-redefs [user/get-groups
-                             (fn [conn {:keys [code]}]
-                               (let [c (chan)]
-                                 (swap! ncall inc)
-                                 (case @ncall
-                                   1 (put! c (t/->KintoneResponse {:groups [{:id 1} {:id 2}]}
-                                                                  nil))
-                                   2 (put! c (t/->KintoneResponse {:groups [{:id 3}]}
-                                                                  nil)))
-                                 c))]
-                 (is (= (t/->KintoneResponse {:groups [{:id 1} {:id 2}]} nil)
-                        (<! (user/get-all-groups h/fake-conn {:codes (map str (range 100))}))))))
-             (done)))
-
-    (async done
-           (go
-             (let [ncall (atom 0)]
-               (with-redefs [user/get-groups
-                             (fn [conn {:keys [code]}]
-                               (let [c (chan)]
-                                 (swap! ncall inc)
-                                 (case @ncall
-                                   1 (put! c (t/->KintoneResponse {:groups [{:id 1} {:id 2}]}
-                                                                  nil))
-                                   2 (put! c (t/->KintoneResponse {:groups [{:id 3}]}
-                                                                  nil))
-                                   3 (put! c (t/->KintoneResponse {:groups [{:id 4}]}
-                                                                  nil)))
-                                 c))]
-                 (is (= (t/->KintoneResponse {:groups [{:id 1}
-                                                       {:id 2}
-                                                       {:id 3}]} nil)
-                        (<! (user/get-all-groups h/fake-conn {:codes (map str (range 101))}))))))
-             (done))))
-
-  (testing "query by user id"
-    (async done
-           (go
-             (let [ncall (atom 0)]
-               (with-redefs [user/get-groups
-                             (fn [conn {:keys [code]}]
-                               (let [c (chan)]
-                                 (swap! ncall inc)
-                                 (case @ncall
-                                   1 (put! c (t/->KintoneResponse {:groups [{:id 1} {:id 2}]}
-                                                                  nil))
-                                   2 (put! c (t/->KintoneResponse {:groups [{:id 3}]}
-                                                                  nil)))
-                                 c))]
-                 (is (= (t/->KintoneResponse {:groups [{:id 1} {:id 2}]} nil)
-                        (<! (user/get-all-groups h/fake-conn {:ids (range 100)}))))))
-             (done)))
-
-    (async done
-           (go
-             (let [ncall (atom 0)]
-               (with-redefs [user/get-groups
-                             (fn [conn {:keys [code]}]
-                               (let [c (chan)]
-                                 (swap! ncall inc)
-                                 (case @ncall
-                                   1 (put! c (t/->KintoneResponse {:groups [{:id 1} {:id 2}]}
-                                                                  nil))
-                                   2 (put! c (t/->KintoneResponse {:groups [{:id 3}]}
-                                                                  nil))
-                                   3 (put! c (t/->KintoneResponse {:groups [{:id 4}]}
-                                                                  nil)))
-                                 c))]
-                 (is (= (t/->KintoneResponse {:groups [{:id 1}
-                                                       {:id 2}
-                                                       {:id 3}]} nil)
-                        (<! (user/get-all-groups h/fake-conn {:ids (range 101)}))))))
-             (done))))
-
-  (testing "no query"
-    (async done
-           (go
-             (let [ncall (atom 0)]
-               (with-redefs [user/get-groups
-                             (fn [conn {:keys [code]}]
-                               (let [c (chan)]
-                                 (swap! ncall inc)
-                                 (case @ncall
-                                   1 (put! c (t/->KintoneResponse
-                                              {:groups (map #(assoc {} :id %) (range 100))}
-                                              nil))
-                                   2 (put! c (t/->KintoneResponse {:groups []}
-                                                                  nil)))
-                                 c))]
-                 (is (= 100
-                        (-> (<! (user/get-all-groups h/fake-conn {}))
-                            :res
-                            :groups
-                            count)))))
-             (done)))
-
-
-    (async done
-           (go
-             (let [ncall (atom 0)]
-               (with-redefs [user/get-groups
-                             (fn [conn {:keys [code]}]
-                               (let [c (chan)]
-                                 (swap! ncall inc)
-                                 (if (< @ncall 3)
-                                   (put! c (t/->KintoneResponse
-                                            {:groups (map #(assoc {} :id (+ (* 100 @ncall) %))
-                                                          (range 100))}
-                                            nil))
-                                   (put! c (t/->KintoneResponse {:groups [{:id 1000} {:id 1500}]}
+(deftest get-all-users-with-query-by-user-id
+  (async done
+         (go
+           (let [ncall (atom 0)]
+             (with-redefs [user/get-users
+                           (fn [& _]
+                             (let [c (chan)]
+                               (swap! ncall inc)
+                               (case @ncall
+                                 1 (put! c (t/->KintoneResponse {:users [{:id 1} {:id 2}]}
+                                                                nil))
+                                 2 (put! c (t/->KintoneResponse {:users [{:id 3}]}
                                                                 nil)))
-                                 c))]
-                 (is (= 202
-                        (-> (<! (user/get-all-groups h/fake-conn {}))
-                            :res
-                            :groups
-                            count)))))
-             (done)))))
+                               c))]
+               (is (= (t/->KintoneResponse {:users [{:id 1} {:id 2}]} nil)
+                      (<! (user/get-all-users h/fake-conn {:ids (range 100)}))))))
+           (done))))
+
+(deftest get-all-users-with-query-by-user-id-multiple-requests
+  (async done
+         (go
+           (let [ncall (atom 0)]
+             (with-redefs [user/get-users
+                           (fn [& _]
+                             (let [c (chan)]
+                               (swap! ncall inc)
+                               (case @ncall
+                                 1 (put! c (t/->KintoneResponse {:users [{:id 1} {:id 2}]}
+                                                                nil))
+                                 2 (put! c (t/->KintoneResponse {:users [{:id 3}]}
+                                                                nil))
+                                 3 (put! c (t/->KintoneResponse {:users [{:id 4}]}
+                                                                nil)))
+                               c))]
+               (is (= (t/->KintoneResponse {:users [{:id 1}
+                                                    {:id 2}
+                                                    {:id 3}]} nil)
+                      (<! (user/get-all-users h/fake-conn {:ids (range 101)}))))))
+           (done))))
+
+(deftest get-all-users-with-no-query
+  (async done
+         (go
+           (let [ncall (atom 0)]
+             (with-redefs [user/get-users
+                           (fn [& _]
+                             (let [c (chan)]
+                               (swap! ncall inc)
+                               (case @ncall
+                                 1 (put! c (t/->KintoneResponse
+                                            {:users (map #(assoc {} :id %) (range 100))}
+                                            nil))
+                                 2 (put! c (t/->KintoneResponse {:users []}
+                                                                nil)))
+                               c))]
+               (is (= 100
+                      (-> (<! (user/get-all-users h/fake-conn {}))
+                          :res
+                          :users
+                          count)))))
+           (done))))
+
+(deftest get-all-users-with-no-query-multiple-requests
+  (async done
+         (go
+           (let [ncall (atom 0)]
+             (with-redefs [user/get-users
+                           (fn [& _]
+                             (let [c (chan)]
+                               (swap! ncall inc)
+                               (if (< @ncall 3)
+                                 (put! c (t/->KintoneResponse
+                                          {:users (map #(assoc {} :id (+ (* 100 @ncall) %))
+                                                       (range 100))}
+                                          nil))
+                                 (put! c (t/->KintoneResponse {:users [{:id 1000} {:id 1500}]}
+                                                              nil)))
+                               c))]
+               (is (= 202
+                      (-> (<! (user/get-all-users h/fake-conn {}))
+                          :res
+                          :users
+                          count)))))
+           (done))))
+
+
+(deftest get-all-organizations-with-query-by-user-code
+  (async done
+         (go
+           (let [ncall (atom 0)]
+             (with-redefs [user/get-organizations
+                           (fn [& _]
+                             (let [c (chan)]
+                               (swap! ncall inc)
+                               (case @ncall
+                                 1 (put! c (t/->KintoneResponse {:organizations [{:id 1} {:id 2}]}
+                                                                nil))
+                                 2 (put! c (t/->KintoneResponse {:organizations [{:id 3}]}
+                                                                nil)))
+                               c))]
+               (is (= (t/->KintoneResponse {:organizations [{:id 1} {:id 2}]} nil)
+                      (<! (user/get-all-organizations h/fake-conn {:codes (map str (range 100))}))))))
+           (done))))
+
+(deftest get-all-organizations-with-query-by-user-code-multiple-requests
+  (async done
+         (go
+           (let [ncall (atom 0)]
+             (with-redefs [user/get-organizations
+                           (fn [& _]
+                             (let [c (chan)]
+                               (swap! ncall inc)
+                               (case @ncall
+                                 1 (put! c (t/->KintoneResponse {:organizations [{:id 1} {:id 2}]}
+                                                                nil))
+                                 2 (put! c (t/->KintoneResponse {:organizations [{:id 3}]}
+                                                                nil))
+                                 3 (put! c (t/->KintoneResponse {:organizations [{:id 4}]}
+                                                                nil)))
+                               c))]
+               (is (= (t/->KintoneResponse {:organizations [{:id 1}
+                                                            {:id 2}
+                                                            {:id 3}]} nil)
+                      (<! (user/get-all-organizations h/fake-conn {:codes (map str (range 101))}))))))
+           (done))))
+
+(deftest get-all-organizations-with-query-by-user-id
+  (async done
+         (go
+           (let [ncall (atom 0)]
+             (with-redefs [user/get-organizations
+                           (fn [& _]
+                             (let [c (chan)]
+                               (swap! ncall inc)
+                               (case @ncall
+                                 1 (put! c (t/->KintoneResponse {:organizations [{:id 1} {:id 2}]}
+                                                                nil))
+                                 2 (put! c (t/->KintoneResponse {:organizations [{:id 3}]}
+                                                                nil)))
+                               c))]
+               (is (= (t/->KintoneResponse {:organizations [{:id 1} {:id 2}]} nil)
+                      (<! (user/get-all-organizations h/fake-conn {:ids (range 100)}))))))
+           (done))))
+
+(deftest get-all-organizations-with-query-by-user-id-multiple-requests
+  (async done
+         (go
+           (let [ncall (atom 0)]
+             (with-redefs [user/get-organizations
+                           (fn [& _]
+                             (let [c (chan)]
+                               (swap! ncall inc)
+                               (case @ncall
+                                 1 (put! c (t/->KintoneResponse {:organizations [{:id 1} {:id 2}]}
+                                                                nil))
+                                 2 (put! c (t/->KintoneResponse {:organizations [{:id 3}]}
+                                                                nil))
+                                 3 (put! c (t/->KintoneResponse {:organizations [{:id 4}]}
+                                                                nil)))
+                               c))]
+               (is (= (t/->KintoneResponse {:organizations [{:id 1}
+                                                            {:id 2}
+                                                            {:id 3}]} nil)
+                      (<! (user/get-all-organizations h/fake-conn {:ids (range 101)}))))))
+           (done))))
+
+(deftest get-all-organizations-with-no-query
+  (async done
+         (go
+           (let [ncall (atom 0)]
+             (with-redefs [user/get-organizations
+                           (fn [& _]
+                             (let [c (chan)]
+                               (swap! ncall inc)
+                               (case @ncall
+                                 1 (put! c (t/->KintoneResponse
+                                            {:organizations (map #(assoc {} :id %) (range 100))}
+                                            nil))
+                                 2 (put! c (t/->KintoneResponse {:organizations []}
+                                                                nil)))
+                               c))]
+               (is (= 100
+                      (-> (<! (user/get-all-organizations h/fake-conn {}))
+                          :res
+                          :organizations
+                          count)))))
+           (done))))
+
+(deftest get-all-organizations-with-no-query-multiple-requests
+  (async done
+         (go
+           (let [ncall (atom 0)]
+             (with-redefs [user/get-organizations
+                           (fn [& _]
+                             (let [c (chan)]
+                               (swap! ncall inc)
+                               (if (< @ncall 3)
+                                 (put! c (t/->KintoneResponse
+                                          {:organizations (map #(assoc {} :id (+ (* 100 @ncall) %))
+                                                               (range 100))}
+                                          nil))
+                                 (put! c (t/->KintoneResponse {:organizations [{:id 1000} {:id 1500}]}
+                                                              nil)))
+                               c))]
+               (is (= 202
+                      (-> (<! (user/get-all-organizations h/fake-conn {}))
+                          :res
+                          :organizations
+                          count)))))
+           (done))))
+
+(deftest get-all-groups-with-query-by-user-code
+  (async done
+         (go
+           (let [ncall (atom 0)]
+             (with-redefs [user/get-groups
+                           (fn [& _]
+                             (let [c (chan)]
+                               (swap! ncall inc)
+                               (case @ncall
+                                 1 (put! c (t/->KintoneResponse {:groups [{:id 1} {:id 2}]}
+                                                                nil))
+                                 2 (put! c (t/->KintoneResponse {:groups [{:id 3}]}
+                                                                nil)))
+                               c))]
+               (is (= (t/->KintoneResponse {:groups [{:id 1} {:id 2}]} nil)
+                      (<! (user/get-all-groups h/fake-conn {:codes (map str (range 100))}))))))
+           (done))))
+
+(deftest get-all-groups-with-query-by-user-code-multiple-requests
+  (async done
+         (go
+           (let [ncall (atom 0)]
+             (with-redefs [user/get-groups
+                           (fn [& _]
+                             (let [c (chan)]
+                               (swap! ncall inc)
+                               (case @ncall
+                                 1 (put! c (t/->KintoneResponse {:groups [{:id 1} {:id 2}]}
+                                                                nil))
+                                 2 (put! c (t/->KintoneResponse {:groups [{:id 3}]}
+                                                                nil))
+                                 3 (put! c (t/->KintoneResponse {:groups [{:id 4}]}
+                                                                nil)))
+                               c))]
+               (is (= (t/->KintoneResponse {:groups [{:id 1}
+                                                     {:id 2}
+                                                     {:id 3}]} nil)
+                      (<! (user/get-all-groups h/fake-conn {:codes (map str (range 101))}))))))
+           (done))))
+
+(deftest get-all-groups-with-query-by-user-id
+  (async done
+         (go
+           (let [ncall (atom 0)]
+             (with-redefs [user/get-groups
+                           (fn [& _]
+                             (let [c (chan)]
+                               (swap! ncall inc)
+                               (case @ncall
+                                 1 (put! c (t/->KintoneResponse {:groups [{:id 1} {:id 2}]}
+                                                                nil))
+                                 2 (put! c (t/->KintoneResponse {:groups [{:id 3}]}
+                                                                nil)))
+                               c))]
+               (is (= (t/->KintoneResponse {:groups [{:id 1} {:id 2}]} nil)
+                      (<! (user/get-all-groups h/fake-conn {:ids (range 100)}))))))
+           (done))))
+
+(deftest get-all-groups-with-query-by-user-id-multiple-requests
+  (async done
+         (go
+           (let [ncall (atom 0)]
+             (with-redefs [user/get-groups
+                           (fn [& _]
+                             (let [c (chan)]
+                               (swap! ncall inc)
+                               (case @ncall
+                                 1 (put! c (t/->KintoneResponse {:groups [{:id 1} {:id 2}]}
+                                                                nil))
+                                 2 (put! c (t/->KintoneResponse {:groups [{:id 3}]}
+                                                                nil))
+                                 3 (put! c (t/->KintoneResponse {:groups [{:id 4}]}
+                                                                nil)))
+                               c))]
+               (is (= (t/->KintoneResponse {:groups [{:id 1}
+                                                     {:id 2}
+                                                     {:id 3}]} nil)
+                      (<! (user/get-all-groups h/fake-conn {:ids (range 101)}))))))
+           (done))))
+
+(deftest get-all-groups-with-no-query
+  (async done
+         (go
+           (let [ncall (atom 0)]
+             (with-redefs [user/get-groups
+                           (fn [& _]
+                             (let [c (chan)]
+                               (swap! ncall inc)
+                               (case @ncall
+                                 1 (put! c (t/->KintoneResponse
+                                            {:groups (map #(assoc {} :id %) (range 100))}
+                                            nil))
+                                 2 (put! c (t/->KintoneResponse {:groups []}
+                                                                nil)))
+                               c))]
+               (is (= 100
+                      (-> (<! (user/get-all-groups h/fake-conn {}))
+                          :res
+                          :groups
+                          count)))))
+           (done))))
+
+
+(deftest get-all-groups-with-no-query-multiple-requests
+  (async done
+         (go
+           (let [ncall (atom 0)]
+             (with-redefs [user/get-groups
+                           (fn [& _]
+                             (let [c (chan)]
+                               (swap! ncall inc)
+                               (if (< @ncall 3)
+                                 (put! c (t/->KintoneResponse
+                                          {:groups (map #(assoc {} :id (+ (* 100 @ncall) %))
+                                                        (range 100))}
+                                          nil))
+                                 (put! c (t/->KintoneResponse {:groups [{:id 1000} {:id 1500}]}
+                                                              nil)))
+                               c))]
+               (is (= 202
+                      (-> (<! (user/get-all-groups h/fake-conn {}))
+                          :res
+                          :groups
+                          count)))))
+           (done))))
 
 (deftest get-all-organization-users
   (async done
          (go
            (let [ncall (atom 0)]
              (with-redefs [user/get-organization-users
-                           (fn [conn code opts]
+                           (fn [& _]
                              (let [c (chan)]
                                (swap! ncall inc)
                                (case @ncall
@@ -684,14 +691,15 @@
                           :res
                           :userTitles
                           count)))))
-           (done)))
+           (done))))
 
 
+(deftest get-all-organization-users-multiple-requests
   (async done
          (go
            (let [ncall (atom 0)]
              (with-redefs [user/get-organization-users
-                           (fn [conn code opts]
+                           (fn [& _]
                              (let [c (chan)]
                                (swap! ncall inc)
                                (if (< @ncall 3)
@@ -714,7 +722,7 @@
          (go
            (let [ncall (atom 0)]
              (with-redefs [user/get-group-users
-                           (fn [conn code opts]
+                           (fn [& _]
                              (let [c (chan)]
                                (swap! ncall inc)
                                (case @ncall
@@ -729,14 +737,14 @@
                           :res
                           :users
                           count)))))
-           (done)))
+           (done))))
 
-
+(deftest get-all-group-users-multiple-requests
   (async done
          (go
            (let [ncall (atom 0)]
              (with-redefs [user/get-group-users
-                           (fn [conn code opts]
+                           (fn [& _]
                              (let [c (chan)]
                                (swap! ncall inc)
                                (if (< @ncall 3)

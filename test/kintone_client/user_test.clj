@@ -1,7 +1,7 @@
 (ns kintone-client.user-test
   (:require
    [clojure.core.async :refer [<!! chan put!]]
-   [clojure.test :refer :all]
+   [clojure.test :refer [deftest is testing]]
    [kintone-client.test-helper :as h]
    [kintone-client.types :as t]
    [kintone-client.user :as user]))
@@ -248,7 +248,7 @@
   (testing "query by user code"
     (let [ncall (atom 0)]
       (with-redefs [user/get-users
-                    (fn [conn {:keys [code]}]
+                    (fn [& _]
                       (let [c (chan)]
                         (swap! ncall inc)
                         (case @ncall
@@ -262,7 +262,7 @@
 
     (let [ncall (atom 0)]
       (with-redefs [user/get-users
-                    (fn [conn {:keys [code]}]
+                    (fn [& _]
                       (let [c (chan)]
                         (swap! ncall inc)
                         (case @ncall
@@ -281,7 +281,7 @@
   (testing "query by user id"
     (let [ncall (atom 0)]
       (with-redefs [user/get-users
-                    (fn [conn {:keys [code]}]
+                    (fn [& _]
                       (let [c (chan)]
                         (swap! ncall inc)
                         (case @ncall
@@ -295,7 +295,7 @@
 
     (let [ncall (atom 0)]
       (with-redefs [user/get-users
-                    (fn [conn {:keys [code]}]
+                    (fn [& _]
                       (let [c (chan)]
                         (swap! ncall inc)
                         (case @ncall
@@ -314,7 +314,7 @@
   (testing "no query"
     (let [ncall (atom 0)]
       (with-redefs [user/get-users
-                    (fn [conn {:keys [code]}]
+                    (fn [& _]
                       (let [c (chan)]
                         (swap! ncall inc)
                         (case @ncall
@@ -332,7 +332,7 @@
 
     (let [ncall (atom 0)]
       (with-redefs [user/get-users
-                    (fn [conn {:keys [code]}]
+                    (fn [& _]
                       (let [c (chan)]
                         (swap! ncall inc)
                         (if (< @ncall 3)
@@ -353,7 +353,7 @@
   (testing "query by user code"
     (let [ncall (atom 0)]
       (with-redefs [user/get-organizations
-                    (fn [conn {:keys [code]}]
+                    (fn [& _]
                       (let [c (chan)]
                         (swap! ncall inc)
                         (case @ncall
@@ -367,7 +367,7 @@
 
     (let [ncall (atom 0)]
       (with-redefs [user/get-organizations
-                    (fn [conn {:keys [code]}]
+                    (fn [& _]
                       (let [c (chan)]
                         (swap! ncall inc)
                         (case @ncall
@@ -386,7 +386,7 @@
   (testing "query by user id"
     (let [ncall (atom 0)]
       (with-redefs [user/get-organizations
-                    (fn [conn {:keys [code]}]
+                    (fn [& _]
                       (let [c (chan)]
                         (swap! ncall inc)
                         (case @ncall
@@ -400,7 +400,7 @@
 
     (let [ncall (atom 0)]
       (with-redefs [user/get-organizations
-                    (fn [conn {:keys [code]}]
+                    (fn [& _]
                       (let [c (chan)]
                         (swap! ncall inc)
                         (case @ncall
@@ -419,7 +419,7 @@
   (testing "no query"
     (let [ncall (atom 0)]
       (with-redefs [user/get-organizations
-                    (fn [conn {:keys [code]}]
+                    (fn [& _]
                       (let [c (chan)]
                         (swap! ncall inc)
                         (case @ncall
@@ -437,7 +437,7 @@
 
     (let [ncall (atom 0)]
       (with-redefs [user/get-organizations
-                    (fn [conn {:keys [code]}]
+                    (fn [& _]
                       (let [c (chan)]
                         (swap! ncall inc)
                         (if (< @ncall 3)
@@ -458,7 +458,7 @@
   (testing "query by user code"
     (let [ncall (atom 0)]
       (with-redefs [user/get-groups
-                    (fn [conn {:keys [code]}]
+                    (fn [& _]
                       (let [c (chan)]
                         (swap! ncall inc)
                         (case @ncall
@@ -472,7 +472,7 @@
 
     (let [ncall (atom 0)]
       (with-redefs [user/get-groups
-                    (fn [conn {:keys [code]}]
+                    (fn [& _]
                       (let [c (chan)]
                         (swap! ncall inc)
                         (case @ncall
@@ -491,7 +491,7 @@
   (testing "query by user id"
     (let [ncall (atom 0)]
       (with-redefs [user/get-groups
-                    (fn [conn {:keys [code]}]
+                    (fn [& _]
                       (let [c (chan)]
                         (swap! ncall inc)
                         (case @ncall
@@ -505,7 +505,7 @@
 
     (let [ncall (atom 0)]
       (with-redefs [user/get-groups
-                    (fn [conn {:keys [code]}]
+                    (fn [& _]
                       (let [c (chan)]
                         (swap! ncall inc)
                         (case @ncall
@@ -524,7 +524,7 @@
   (testing "no query"
     (let [ncall (atom 0)]
       (with-redefs [user/get-groups
-                    (fn [conn {:keys [code]}]
+                    (fn [& _]
                       (let [c (chan)]
                         (swap! ncall inc)
                         (case @ncall
@@ -542,7 +542,7 @@
 
     (let [ncall (atom 0)]
       (with-redefs [user/get-groups
-                    (fn [conn {:keys [code]}]
+                    (fn [& _]
                       (let [c (chan)]
                         (swap! ncall inc)
                         (if (< @ncall 3)
@@ -562,7 +562,7 @@
 (deftest get-all-organization-users
   (let [ncall (atom 0)]
     (with-redefs [user/get-organization-users
-                  (fn [conn code opts]
+                  (fn [& _]
                     (let [c (chan)]
                       (swap! ncall inc)
                       (case @ncall
@@ -580,7 +580,7 @@
 
   (let [ncall (atom 0)]
     (with-redefs [user/get-organization-users
-                  (fn [conn code opts]
+                  (fn [& _]
                     (let [c (chan)]
                       (swap! ncall inc)
                       (if (< @ncall 3)
@@ -600,7 +600,7 @@
 (deftest get-all-group-users
   (let [ncall (atom 0)]
     (with-redefs [user/get-group-users
-                  (fn [conn code opts]
+                  (fn [& _]
                     (let [c (chan)]
                       (swap! ncall inc)
                       (case @ncall
@@ -618,7 +618,7 @@
 
   (let [ncall (atom 0)]
     (with-redefs [user/get-group-users
-                  (fn [conn code opts]
+                  (fn [& _]
                     (let [c (chan)]
                       (swap! ncall inc)
                       (if (< @ncall 3)

@@ -1,7 +1,7 @@
 (ns kintone-client.user
   (:require
-   #?(:clj  [clojure.core.async :refer [go go-loop <!]]
-      :cljs [cljs.core.async :refer [<!] :refer-macros [go go-loop]])
+   #?(:clj  [clojure.core.async :refer [go-loop <!]]
+      :cljs [cljs.core.async :refer [<!] :refer-macros [go-loop]])
    [kintone-client.constant.path.user :as path]
    [kintone-client.protocols :as pt]
    [kintone-client.types :as t]))

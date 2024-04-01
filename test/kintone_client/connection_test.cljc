@@ -1,11 +1,11 @@
 (ns kintone-client.connection-test
   (:require
    #?(:clj [clj-http.client :as client]
-      :cljs [ajax.core :as ajax])
+      :cljs [ajax.easy])
    #?(:clj [clojure.core.async :refer [<!!]]
       :cljs [cljs.core.async :refer [<!] :refer-macros [go]])
-   #?(:clj [clojure.test :refer :all]
-      :cljs [cljs.test :refer-macros [deftest is testing async]])
+   #?(:clj [clojure.test :refer [deftest is testing]]
+      :cljs [cljs.test :refer-macros [deftest is async]])
    [kintone-client.authentication :as auth]
    [kintone-client.connection :refer [new-connection]]
    [kintone-client.protocols :as pt]
@@ -101,7 +101,7 @@
    (deftest -get-test
      (testing "Positive"
        (testing "default-handler"
-         (with-redefs [client/post (fn [url req h eh]
+         (with-redefs [client/post (fn [_url req h _eh]
                                      (h {:body req}))]
            (is (= (t/->KintoneResponse
                    {:headers {"X-Cybozu-API-Token" "TestApiToken"
@@ -118,7 +118,7 @@
                   (<!! (pt/-get conn url {:params {:id 1}}))))))
 
        (testing "default-handler-user-api"
-         (with-redefs [client/get (fn [url req h eh]
+         (with-redefs [client/get (fn [_url req h _eh]
                                     (h {:body req}))]
            (is (= (t/->KintoneResponse
                    {:headers {"X-Cybozu-API-Token" "TestApiToken"}
@@ -133,7 +133,7 @@
                   (<!! (pt/-get conn user-api-url {:params {:id 1}}))))))
 
        (testing "custom handler"
-         (with-redefs [client/post (fn [url req h eh]
+         (with-redefs [client/post (fn [_url req h _eh]
                                      (h {:body req}))]
            (is (= (t/->KintoneResponse
                    {:body {:headers {"X-Cybozu-API-Token" "TestApiToken"
@@ -152,7 +152,7 @@
                                 {:params {:id 1}}))))))
 
        (testing "custom handler user api"
-         (with-redefs [client/get (fn [url req h eh]
+         (with-redefs [client/get (fn [_url req h _eh]
                                     (h {:body req}))]
            (is (= (t/->KintoneResponse
                    {:body {:headers {"X-Cybozu-API-Token" "TestApiToken"}
@@ -172,7 +172,7 @@
        (testing "ExceptionInfo"
          (testing "JSON response"
            (with-redefs [client/post
-                         (fn [url req h eh]
+                         (fn [_url _req _h eh]
                            (eh (ex-info "Test error"
                                         {:status 400
                                          :headers {"Content-Type" "application/json; charset=utf-8"}
@@ -186,7 +186,7 @@
 
          (testing "JSON response user api"
            (with-redefs [client/get
-                         (fn [url req h eh]
+                         (fn [_url _req _h eh]
                            (eh (ex-info "Test error"
                                         {:status 400
                                          :headers {"Content-Type" "application/json; charset=utf-8"}
@@ -200,7 +200,7 @@
 
          (testing "HTML response"
            (with-redefs [client/post
-                         (fn [url req h eh]
+                         (fn [_url _req _h eh]
                            (eh (ex-info "Test error"
                                         {:status 400
                                          :headers {"Content-Type" "text/html; charset=utf-8"}
@@ -214,7 +214,7 @@
 
          (testing "HTML response user api"
            (with-redefs [client/get
-                         (fn [url req h eh]
+                         (fn [_url _req _h eh]
                            (eh (ex-info "Test error"
                                         {:status 400
                                          :headers {"Content-Type" "text/html; charset=utf-8"}
@@ -228,7 +228,7 @@
 
          (testing "custom error-handler"
            (with-redefs [client/post
-                         (fn [url req h eh]
+                         (fn [_url _req _h eh]
                            (eh (ex-info "Test error"
                                         {:status 400
                                          :headers {"Content-Type" "application/json; charset=utf-8"}
@@ -242,7 +242,7 @@
 
          (testing "custom error-handler user api"
            (with-redefs [client/get
-                         (fn [url req h eh]
+                         (fn [_url _req _h eh]
                            (eh (ex-info "Test error"
                                         {:status 400
                                          :headers {"Content-Type" "application/json; charset=utf-8"}
@@ -256,7 +256,7 @@
 
        (testing "Exception"
          (with-redefs [client/post
-                       (fn [url req h eh]
+                       (fn [_url _req _h eh]
                          (eh (Exception. "Test error")))]
            (let [{:keys [status status-text response]}
                  (:err (<!! (pt/-get conn url {:params {:id 1}})))]
@@ -266,7 +266,7 @@
 
        (testing "Exception user api"
          (with-redefs [client/get
-                       (fn [url req h eh]
+                       (fn [_url _req _h eh]
                          (eh (Exception. "Test error")))]
            (let [{:keys [status status-text response]}
                  (:err (<!! (pt/-get conn user-api-url {:params {:id 1}})))]
@@ -279,7 +279,7 @@
      (async done
             (go
               (with-redefs [ajax.easy/easy-ajax-request
-                            (fn [uri method opts]
+                            (fn [_uri method opts]
                               (is (= method "POST"))
                               ((:handler opts)
                                (dissoc opts
@@ -303,7 +303,7 @@
      (async done
             (go
               (with-redefs [ajax.easy/easy-ajax-request
-                            (fn [uri method opts]
+                            (fn [_uri method opts]
                               (is (= method "GET"))
                               ((:handler opts)
                                (dissoc opts
@@ -326,7 +326,7 @@
      (async done
             (go
               (with-redefs [ajax.easy/easy-ajax-request
-                            (fn [uri method opts]
+                            (fn [_uri method opts]
                               (is (= method "POST"))
                               ((:handler opts)
                                (dissoc opts
@@ -345,7 +345,7 @@
      (async done
             (go
               (with-redefs [ajax.easy/easy-ajax-request
-                            (fn [uri method opts]
+                            (fn [_uri method opts]
                               (is (= method "GET"))
                               ((:handler opts)
                                (dissoc opts
@@ -364,7 +364,7 @@
      (async done
             (go
               (with-redefs [ajax.easy/easy-ajax-request
-                            (fn [uri method opts]
+                            (fn [_uri method opts]
                               (is (= method "POST"))
                               ((:error-handler opts)
                                {:status 400
@@ -383,7 +383,7 @@
      (async done
             (go
               (with-redefs [ajax.easy/easy-ajax-request
-                            (fn [uri method opts]
+                            (fn [_uri method opts]
                               (is (= method "GET"))
                               ((:error-handler opts)
                                {:status 400
@@ -401,7 +401,7 @@
      (async done
             (go
               (with-redefs [ajax.easy/easy-ajax-request
-                            (fn [uri method opts]
+                            (fn [_uri method opts]
                               (is (= method "POST"))
                               ((:error-handler opts)
                                {:status 400
@@ -420,7 +420,7 @@
      (async done
             (go
               (with-redefs [ajax.easy/easy-ajax-request
-                            (fn [uri method opts]
+                            (fn [_uri method opts]
                               (is (= method "GET"))
                               ((:error-handler opts)
                                {:status 400
@@ -437,7 +437,7 @@
 #?(:clj
    (deftest -post-test
      (testing "Positive"
-       (with-redefs [client/post (fn [url req h eh]
+       (with-redefs [client/post (fn [_url req h _eh]
                                    (h {:body req}))]
          (is (= (t/->KintoneResponse
                  {:headers {"X-Cybozu-API-Token" "TestApiToken"}
@@ -453,7 +453,7 @@
                 (<!! (pt/-post conn url {:params {:id 1}}))))))
 
      (testing "Positive but custom handler"
-       (with-redefs [client/post (fn [url req h eh]
+       (with-redefs [client/post (fn [_url req h _eh]
                                    (h {:body req}))]
          (is (= (t/->KintoneResponse
                  {:id 1}
@@ -466,7 +466,7 @@
        (testing "ExceptionInfo"
          (testing "JSON response"
            (with-redefs [client/post
-                         (fn [url req h eh]
+                         (fn [_url _req _h eh]
                            (eh (ex-info "Test error"
                                         {:status 400
                                          :headers {"Content-Type" "application/json; charset=utf-8"}
@@ -480,7 +480,7 @@
 
          (testing "HTML response"
            (with-redefs [client/post
-                         (fn [url req h eh]
+                         (fn [_url _req _h eh]
                            (eh (ex-info "Test error"
                                         {:status 400
                                          :headers {"Content-Type" "text/html; charset=utf-8"}
@@ -494,7 +494,7 @@
 
          (testing "custom error-handler"
            (with-redefs [client/post
-                         (fn [url req h eh]
+                         (fn [_url _req _h eh]
                            (eh (ex-info "Test error"
                                         {:status 400
                                          :headers {"Content-Type" "text/html; charset=utf-8"}
@@ -508,7 +508,7 @@
 
        (testing "Exception"
          (with-redefs [client/post
-                       (fn [url req h eh]
+                       (fn [_url _req _h eh]
                          (eh (Exception. "Test error")))]
            (let [{:keys [status status-text response]}
                  (:err (<!! (pt/-post conn url {:params {:id 1}})))]
@@ -521,7 +521,7 @@
      (async done
             (go
               (with-redefs [ajax.easy/easy-ajax-request
-                            (fn [uri method opts]
+                            (fn [_uri method opts]
                               (is (= method "POST"))
                               ((:handler opts)
                                (dissoc opts
@@ -544,7 +544,7 @@
      (async done
             (go
               (with-redefs [ajax.easy/easy-ajax-request
-                            (fn [uri method opts]
+                            (fn [_uri method opts]
                               (is (= method "POST"))
                               ((:handler opts)
                                (dissoc opts
@@ -563,7 +563,7 @@
      (async done
             (go
               (with-redefs [ajax.easy/easy-ajax-request
-                            (fn [uri method opts]
+                            (fn [_uri _method opts]
                               ((:error-handler opts)
                                {:status 400
                                 :status-text "400"
@@ -581,7 +581,7 @@
      (async done
             (go
               (with-redefs [ajax.easy/easy-ajax-request
-                            (fn [uri method opts]
+                            (fn [_uri _method opts]
                               ((:error-handler opts)
                                {:status 400
                                 :status-text "400"
@@ -597,7 +597,7 @@
 #?(:clj
    (deftest -put-test
      (testing "Positive"
-       (with-redefs [client/put (fn [url req h eh]
+       (with-redefs [client/put (fn [_url req h _eh]
                                   (h {:body req}))]
          (is (= (t/->KintoneResponse
                  {:headers {"X-Cybozu-API-Token" "TestApiToken"}
@@ -613,7 +613,7 @@
                 (<!! (pt/-put conn url {:params {:id 1}}))))))
 
      (testing "Positive but custom handler"
-       (with-redefs [client/put (fn [url req h eh]
+       (with-redefs [client/put (fn [_url req h _eh]
                                   (h {:body req}))]
          (is (= (t/->KintoneResponse
                  {:id 1}
@@ -626,7 +626,7 @@
        (testing "ExceptionInfo"
          (testing "JSON response"
            (with-redefs [client/put
-                         (fn [url req h eh]
+                         (fn [_url _req _h eh]
                            (eh (ex-info "Test error"
                                         {:status 400
                                          :headers {"Content-Type" "application/json; charset=utf-8"}
@@ -640,7 +640,7 @@
 
          (testing "HTML response"
            (with-redefs [client/put
-                         (fn [url req h eh]
+                         (fn [_url _req _h eh]
                            (eh (ex-info "Test error"
                                         {:status 400
                                          :headers {"Content-Type" "text/html; charset=utf-8"}
@@ -654,7 +654,7 @@
 
          (testing "custom error-handler"
            (with-redefs [client/put
-                         (fn [url req h eh]
+                         (fn [_url _req _h eh]
                            (eh (ex-info "Test error"
                                         {:status 400
                                          :headers {"Content-Type" "application/json; charset=utf-8"}
@@ -668,7 +668,7 @@
 
        (testing "Exception"
          (with-redefs [client/put
-                       (fn [url req h eh]
+                       (fn [_url _req _h eh]
                          (eh (Exception. "Test error")))]
            (let [{:keys [status status-text response]}
                  (:err (<!! (pt/-put conn url {:params {:id 1}})))]
@@ -681,7 +681,7 @@
      (async done
             (go
               (with-redefs [ajax.easy/easy-ajax-request
-                            (fn [uri method opts]
+                            (fn [_uri method opts]
                               (is (= method "PUT"))
                               ((:handler opts)
                                (dissoc opts
@@ -704,7 +704,7 @@
      (async done
             (go
               (with-redefs [ajax.easy/easy-ajax-request
-                            (fn [uri method opts]
+                            (fn [_uri method opts]
                               (is (= method "PUT"))
                               ((:handler opts)
                                (dissoc opts
@@ -729,7 +729,7 @@
      (async done
             (go
               (with-redefs [ajax.easy/easy-ajax-request
-                            (fn [uri method opts]
+                            (fn [_uri _method opts]
                               ((:error-handler opts)
                                {:status 400
                                 :status-text "400"
@@ -747,7 +747,7 @@
      (async done
             (go
               (with-redefs [ajax.easy/easy-ajax-request
-                            (fn [uri method opts]
+                            (fn [_uri _method opts]
                               ((:error-handler opts)
                                {:status 400
                                 :status-text "400"
@@ -763,7 +763,7 @@
 #?(:clj
    (deftest -delete-test
      (testing "Positive"
-       (with-redefs [client/delete (fn [url req h eh]
+       (with-redefs [client/delete (fn [_url req h _eh]
                                      (h {:body req}))]
          (is (= (t/->KintoneResponse
                  {:headers {"X-Cybozu-API-Token" "TestApiToken"}
@@ -779,7 +779,7 @@
                 (<!! (pt/-delete conn url {:params {:id 1}}))))))
 
      (testing "Positive but custom handler"
-       (with-redefs [client/delete (fn [url req h eh]
+       (with-redefs [client/delete (fn [_url req h _eh]
                                      (h {:body req}))]
          (is (= (t/->KintoneResponse
                  {:id 1}
@@ -792,7 +792,7 @@
        (testing "ExceptionInfo"
          (testing "JSON response"
            (with-redefs [client/delete
-                         (fn [url req h eh]
+                         (fn [_url _req _h eh]
                            (eh (ex-info "Test error"
                                         {:status 400
                                          :headers {"Content-Type" "application/json; charset=utf-8"}
@@ -806,7 +806,7 @@
 
          (testing "HTML response"
            (with-redefs [client/delete
-                         (fn [url req h eh]
+                         (fn [_url _req _h eh]
                            (eh (ex-info "Test error"
                                         {:status 400
                                          :headers {"Content-Type" "text/html; charset=utf-8"}
@@ -820,7 +820,7 @@
 
          (testing "custom error-handler"
            (with-redefs [client/delete
-                         (fn [url req h eh]
+                         (fn [_url _req _h eh]
                            (eh (ex-info "Test error"
                                         {:status 400
                                          :headers {"Content-Type" "application/json; charset=utf-8"}
@@ -834,7 +834,7 @@
 
        (testing "Exception"
          (with-redefs [client/delete
-                       (fn [url req h eh]
+                       (fn [_url _req _h eh]
                          (eh (Exception. "Test error")))]
            (let [{:keys [status status-text response]}
                  (:err (<!! (pt/-delete conn url {:params {:id 1}})))]
@@ -847,7 +847,7 @@
      (async done
             (go
               (with-redefs [ajax.easy/easy-ajax-request
-                            (fn [uri method opts]
+                            (fn [_uri method opts]
                               (is (= method "DELETE"))
                               ((:handler opts)
                                (dissoc opts
@@ -870,7 +870,7 @@
      (async done
             (go
               (with-redefs [ajax.easy/easy-ajax-request
-                            (fn [uri method opts]
+                            (fn [_uri method opts]
                               (is (= method "DELETE"))
                               ((:handler opts)
                                (dissoc opts
@@ -889,7 +889,7 @@
      (async done
             (go
               (with-redefs [ajax.easy/easy-ajax-request
-                            (fn [uri method opts]
+                            (fn [_uri _method opts]
                               ((:error-handler opts)
                                {:status 400
                                 :status-text "400"
@@ -907,7 +907,7 @@
      (async done
             (go
               (with-redefs [ajax.easy/easy-ajax-request
-                            (fn [uri method opts]
+                            (fn [_uri _method opts]
                               ((:error-handler opts)
                                {:status 400
                                 :status-text "400"
@@ -923,7 +923,7 @@
 #?(:clj
    (deftest -get-blob-test
      (testing "Positive"
-       (with-redefs [client/post (fn [url req h eh]
+       (with-redefs [client/post (fn [_url req h _eh]
                                    (h {:body req}))]
          (is (= (t/->KintoneResponse
                  {:headers {"X-Cybozu-API-Token" "TestApiToken"
@@ -951,7 +951,7 @@
                                              :as :stream}))))))
 
      (testing "Positive but custom handler"
-       (with-redefs [client/post (fn [url req h eh]
+       (with-redefs [client/post (fn [_url req h _eh]
                                    (h {:body req}))]
          (is (= (t/->KintoneResponse
                  {:id 1}
@@ -964,7 +964,7 @@
        (testing "ExceptionInfo"
          (testing "JSON response"
            (with-redefs [client/post
-                         (fn [url req h eh]
+                         (fn [_url _req _h eh]
                            (eh (ex-info "Test error"
                                         {:status 400
                                          :headers {"Content-Type" "application/json; charset=utf-8"}
@@ -978,7 +978,7 @@
 
          (testing "HTML response"
            (with-redefs [client/post
-                         (fn [url req h eh]
+                         (fn [_url _req _h eh]
                            (eh (ex-info "Test error"
                                         {:status 400
                                          :headers {"Content-Type" "text/html; charset=utf-8"}
@@ -992,7 +992,7 @@
 
          (testing "custom error-handler"
            (with-redefs [client/post
-                         (fn [url req h eh]
+                         (fn [_url _req _h eh]
                            (eh (ex-info "Test error"
                                         {:status 400
                                          :headers {"Content-Type" "application/json; charset=utf-8"}
@@ -1006,7 +1006,7 @@
 
        (testing "Exception"
          (with-redefs [client/post
-                       (fn [url req h eh]
+                       (fn [_url _req _h eh]
                          (eh (Exception. "Test error")))]
            (let [{:keys [status status-text response]}
                  (:err (<!! (pt/-get-blob conn url {:params {:id 1}})))]
@@ -1019,7 +1019,7 @@
      (async done
             (go
               (with-redefs [ajax.easy/easy-ajax-request
-                            (fn [uri method opts]
+                            (fn [_uri method opts]
                               (is (= method "POST"))
                               ((:handler opts)
                                (dissoc opts
@@ -1042,7 +1042,7 @@
      (async done
             (go
               (with-redefs [ajax.easy/easy-ajax-request
-                            (fn [uri method opts]
+                            (fn [_uri method opts]
                               (is (= method "POST"))
                               ((:handler opts)
                                (dissoc opts
@@ -1061,7 +1061,7 @@
      (async done
             (go
               (with-redefs [ajax.easy/easy-ajax-request
-                            (fn [uri method opts]
+                            (fn [_uri _method opts]
                               ((:error-handler opts)
                                {:status 400
                                 :status-text "400"
@@ -1079,7 +1079,7 @@
      (async done
             (go
               (with-redefs [ajax.easy/easy-ajax-request
-                            (fn [uri method opts]
+                            (fn [_uri _method opts]
                               ((:error-handler opts)
                                {:status 400
                                 :status-text "400"
@@ -1095,7 +1095,7 @@
 #?(:clj
    (deftest -multipart-test
      (testing "Positive"
-       (with-redefs [client/post (fn [url req]
+       (with-redefs [client/post (fn [_url req]
                                    {:body req})]
          (is (= (t/->KintoneResponse
                  {:headers {"X-Cybozu-API-Token" "TestApiToken"}
@@ -1111,7 +1111,7 @@
                 (<!! (pt/-multipart-post conn url {:multipart [{:id 1}]}))))))
 
      (testing "Positive but custom handler"
-       (with-redefs [client/post (fn [url req]
+       (with-redefs [client/post (fn [_url req]
                                    {:body req})]
          (is (= (t/->KintoneResponse
                  [{:id 1}]
@@ -1124,7 +1124,7 @@
        (testing "ExceptionInfo"
          (testing "JSON response"
            (with-redefs [client/post
-                         (fn [url req]
+                         (fn [_url _req]
                            (throw
                             (ex-info "Test error"
                                      {:status 400
@@ -1139,7 +1139,7 @@
 
          (testing "HTML response"
            (with-redefs [client/post
-                         (fn [url req]
+                         (fn [_url _req]
                            (throw
                             (ex-info "Test error"
                                      {:status 400
@@ -1154,7 +1154,7 @@
 
          (testing "custom error-handler"
            (with-redefs [client/post
-                         (fn [url req]
+                         (fn [_url _req]
                            (throw
                             (ex-info "Test error"
                                      {:status 400
@@ -1169,7 +1169,7 @@
 
        (testing "Exception"
          (with-redefs [client/post
-                       (fn [url req]
+                       (fn [_url _req]
                          (throw (Exception. "Test error")))]
            (let [{:keys [status status-text response]}
                  (:err (<!! (pt/-multipart-post conn url {:multipart [{:id 1}]})))]
@@ -1182,7 +1182,7 @@
      (async done
             (go
               (with-redefs [ajax.easy/easy-ajax-request
-                            (fn [uri method opts]
+                            (fn [_uri method opts]
                               (is (= method "POST"))
                               ((:handler opts)
                                (dissoc opts
@@ -1204,7 +1204,7 @@
      (async done
             (go
               (with-redefs [ajax.easy/easy-ajax-request
-                            (fn [uri method opts]
+                            (fn [_uri method opts]
                               (is (= method "POST"))
                               ((:handler opts)
                                (dissoc opts
@@ -1223,7 +1223,7 @@
      (async done
             (go
               (with-redefs [ajax.easy/easy-ajax-request
-                            (fn [uri method opts]
+                            (fn [_uri _method opts]
                               ((:error-handler opts)
                                {:status 400
                                 :status-text "400"
@@ -1241,7 +1241,7 @@
      (async done
             (go
               (with-redefs [ajax.easy/easy-ajax-request
-                            (fn [uri method opts]
+                            (fn [_uri _method opts]
                               ((:error-handler opts)
                                {:status 400
                                 :status-text "400"

@@ -186,16 +186,16 @@
                           (assoc :multipart (:multipart req)))
                  :cljs (-> (build-req this req c)
                            (dissoc :format)
-                           (assoc :body (:multipart req))))
-          handler (->handler handler c)
-          error-handler (->error-handler error-handler c)]
+                           (assoc :body (:multipart req))))]
       #?(:clj (thread
-                (try
-                  (handler (client/post url req))
-                  (catch ExceptionInfo e
-                    (error-handler e))
-                  (catch Exception e
-                    (error-handler e))))
+                (let [handler (->handler handler c)
+                      error-handler (->error-handler error-handler c)]
+                  (try
+                    (handler (client/post url req))
+                    (catch ExceptionInfo e
+                      (error-handler e))
+                    (catch Exception e
+                      (error-handler e)))))
          :cljs (ajax/POST (add-csrf-token-to-url url) req))
       c)))
 
