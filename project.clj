@@ -13,6 +13,7 @@
   :aliases {"test:cljs" ["doo" "chrome-headless" "test" "once"]
             "bump-version" ["change" "version" "leiningen.release/bump-version"]}
   :plugins [[lein-doo "0.1.11"]]
+  :doo {:paths {:karma "node_modules/karma/bin/karma"}}
   ;; Switch to Figwheel Main when this issue is solved
   ;; https://github.com/bhauman/figwheel-main/issues/159
   :cljsbuild {:builds [{:id "test"
