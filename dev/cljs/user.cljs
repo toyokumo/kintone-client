@@ -1,11 +1,12 @@
 (ns cljs.user
-  (:require [cljs-test-display.core]
-            [figwheel.main.testing :refer-macros [run-tests run-tests-async]]
-            ;; require all the namespaces that have tests in them
-            [kintone-client.authentication-test]
-            [kintone-client.connection-test]
-            [kintone-client.record-test]
-            [kintone-client.url-test]))
+  (:require
+   [cljs-test-display.core]
+   [figwheel.main.testing :refer-macros [run-tests run-tests-async]]
+   ;; require all the namespaces that have tests in them
+   [kintone-client.authentication-test]
+   [kintone-client.connection-test]
+   [kintone-client.record-test]
+   [kintone-client.url-test]))
 
 (goog-define ^boolean DEBUG false)
 

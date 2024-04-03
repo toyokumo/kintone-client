@@ -1,14 +1,15 @@
 (ns test
-  (:require [clojure.core.async :refer [<!! <! chan go-loop timeout]]
-            [clojure.edn :as edn]
-            [clojure.java.io :as io]
-            [clojure.test :refer :all]
-            [kintone-client.app :as app]
-            [kintone-client.user :as user]
-            [kintone-client.authentication :as auth]
-            [kintone-client.connection :as conn]
-            [kintone-client.record :as record]
-            [clojure.string :as str]))
+  (:require
+   [clojure.core.async :refer [<!! <! chan go-loop timeout]]
+   [clojure.edn :as edn]
+   [clojure.java.io :as io]
+   [clojure.string :as str]
+   [clojure.test :refer :all]
+   [kintone-client.app :as app]
+   [kintone-client.authentication :as auth]
+   [kintone-client.connection :as conn]
+   [kintone-client.record :as record]
+   [kintone-client.user :as user]))
 
 (def conf (edn/read-string (slurp "dev-resources/config.edn")))
 
@@ -67,21 +68,21 @@
 (deftest file-upload-filename-mojibake-test
   (testing "japanese filename"
     (with-cleanup
-     (let [upload-file-key (-> (<!! (record/file-upload conn (io/file "dev-resources/日本語ファイル名.txt")))
-                               :res
-                               :fileKey)
-           record-id (-> (<!! (record/add-record conn app {string-field-code {:value "file name test"}
-                                                           attachment-file-field-code {:value [{:fileKey upload-file-key}]}}))
-                         :res
-                         :id)
-           file-name (-> (<!! (record/get-record conn app record-id))
-                         :res
-                         :record
-                         attachment-file-field-code
-                         :value
-                         first
-                         :name)]
-       (is (= "日本語ファイル名.txt" file-name)))))
+      (let [upload-file-key (-> (<!! (record/file-upload conn (io/file "dev-resources/日本語ファイル名.txt")))
+                                :res
+                                :fileKey)
+            record-id (-> (<!! (record/add-record conn app {string-field-code {:value "file name test"}
+                                                            attachment-file-field-code {:value [{:fileKey upload-file-key}]}}))
+                          :res
+                          :id)
+            file-name (-> (<!! (record/get-record conn app record-id))
+                          :res
+                          :record
+                          attachment-file-field-code
+                          :value
+                          first
+                          :name)]
+        (is (= "日本語ファイル名.txt" file-name)))))
   (testing "ascii filename"
     (with-cleanup
       (let [upload-file-key (-> (<!! (record/file-upload conn (io/file "dev-resources/ascii-filename.txt")))
@@ -684,8 +685,7 @@
               :res
               :properties
               (contains? :TEXT1)
-              not)))
-    ))
+              not)))))
 
 (deftest get-app-deploy-status-test
   (with-app app
@@ -855,8 +855,7 @@
              :entity {:type "GROUP", :code "everyone"},
              :recordAddable true,
              :recordEditable true}]
-           (:rights res)))
-    ))
+           (:rights res)))))
 
 (deftest update-acl-test
   (with-app app

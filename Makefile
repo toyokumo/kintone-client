@@ -1,5 +1,11 @@
 .PHONY: test
 
+lint:
+	clj-kondo --lint src:test
+
+format-check:
+	cljstyle check --report -v
+
 clean:
 	lein clean
 

@@ -3,9 +3,12 @@
   This module allows authenticating with the Kintone app
   by password authenticator or API token authenticator.
   This module is also supported the basic authenticator"
-  (:require [kintone-client.protocols :as pt]
-            #?(:cljs [goog.crypt.base64 :as goog.base64]))
-  #?(:clj (:import java.util.Base64)))
+  (:require
+   #?(:cljs [goog.crypt.base64 :as goog.base64])
+   [kintone-client.protocols :as pt])
+  #?(:clj
+     (:import
+      java.util.Base64)))
 
 (defn- base64-encode [s]
   #?(:clj (.encodeToString (Base64/getEncoder) (.getBytes s))
@@ -14,10 +17,10 @@
 (defrecord Auth [basic password api-token]
   pt/IAuth
   (-header [_]
-   (cond-> {}
-     basic (assoc "Authorization" (str "Basic " basic))
-     password (assoc "X-Cybozu-Authorization" password)
-     api-token (assoc "X-Cybozu-API-Token" api-token))))
+    (cond-> {}
+      basic (assoc "Authorization" (str "Basic " basic))
+      password (assoc "X-Cybozu-Authorization" password)
+      api-token (assoc "X-Cybozu-API-Token" api-token))))
 
 (defn new-auth
   "Make a new Auth object.

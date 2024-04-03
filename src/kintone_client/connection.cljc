@@ -1,17 +1,23 @@
 (ns kintone-client.connection
   "Connection object has connection information to call kintone API"
-  (:require #?(:clj [cheshire.core :as json])
-            #?(:clj [clj-http.client :as client]
-               :cljs [ajax.core :as ajax])
-            #?(:clj [clojure.core.async :refer [chan put! thread]]
-               :cljs [cljs.core.async :refer [chan put!]])
-            [clojure.string :as str]
-            [kintone-client.protocols :as pt]
-            [kintone-client.types :as t]
-            #?(:cljs [goog.object :as go]))
-  #?(:clj (:import (clojure.lang ExceptionInfo)
-                   (java.lang Exception)
-                   (org.apache.http.entity.mime HttpMultipartMode))))
+  (:require
+   #?(:clj [cheshire.core :as json])
+   #?(:clj [clj-http.client :as client]
+      :cljs [ajax.core :as ajax])
+   #?(:clj [clojure.core.async :refer [chan put! thread]]
+      :cljs [cljs.core.async :refer [chan put!]])
+   [clojure.string :as str]
+   #?(:cljs [goog.object :as go])
+   [kintone-client.protocols :as pt]
+   [kintone-client.types :as t])
+  #?(:clj
+     (:import
+      (clojure.lang
+       ExceptionInfo)
+      (java.lang
+       Exception)
+      (org.apache.http.entity.mime
+       HttpMultipartMode))))
 
 (def ^:dynamic ^:private *default-req*
   "Default request parameters."
@@ -131,8 +137,8 @@
   (-user-api-url [_ path]
     (str "https://" domain path))
   (-get [this url req]
-   ;; Use POST method to pass the URL bytes limitation in kintone API.
-   ;; User API does not support 'post-as-get' request.
+    ;; Use POST method to pass the URL bytes limitation in kintone API.
+    ;; User API does not support 'post-as-get' request.
     (if (str/includes? url "/k/")
       (pt/-post this url (post-as-get req))
       (let [c (chan)
@@ -180,16 +186,16 @@
                           (assoc :multipart (:multipart req)))
                  :cljs (-> (build-req this req c)
                            (dissoc :format)
-                           (assoc :body (:multipart req))))
-          handler (->handler handler c)
-          error-handler (->error-handler error-handler c)]
+                           (assoc :body (:multipart req))))]
       #?(:clj (thread
-               (try
-                 (handler (client/post url req))
-                 (catch ExceptionInfo e
-                   (error-handler e))
-                 (catch Exception e
-                   (error-handler e))))
+                (let [handler (->handler handler c)
+                      error-handler (->error-handler error-handler c)]
+                  (try
+                    (handler (client/post url req))
+                    (catch ExceptionInfo e
+                      (error-handler e))
+                    (catch Exception e
+                      (error-handler e)))))
          :cljs (ajax/POST (add-csrf-token-to-url url) req))
       c)))
 

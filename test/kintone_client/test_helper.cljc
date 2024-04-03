@@ -1,10 +1,11 @@
 (ns kintone-client.test-helper
-  (:require #?@(:clj  [[clojure.core.async :refer [<!! chan put!]]]
-                :cljs [[cljs.core.async :refer [<! chan put!] :refer-macros [go]]])
-            [kintone-client.authentication :as auth]
-            [kintone-client.connection :as conn]
-            [kintone-client.types :as t]
-            [kintone-client.protocols :as pt]))
+  (:require
+   #?(:clj  [clojure.core.async :refer [chan put!]]
+      :cljs [cljs.core.async :refer [chan put!]])
+   [kintone-client.authentication :as auth]
+   [kintone-client.connection :as conn]
+   [kintone-client.protocols :as pt]
+   [kintone-client.types :as t]))
 
 (def ^:private auth
   (auth/new-auth {:api-token "MyToken"}))
@@ -26,7 +27,7 @@
     (-url [_ path]
       (fake-url path))
     (-user-api-url [_ path]
-     (fake-user-api-url path))
+      (fake-user-api-url path))
     (-get [_ url req]
       (let [c (chan)]
         (put! c (t/->KintoneResponse {:url url :req req} nil))
