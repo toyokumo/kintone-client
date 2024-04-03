@@ -3,8 +3,8 @@
   :url "https://github.com/toyokumo/kintone-client"
   :license {:name "Apache, Version 2.0"
             :url "http://www.apache.org/licenses/LICENSE-2.0"}
-  :deploy-repositories [["releases" {:url "https://repo.clojars.org" :creds :gpg}]
-                        ["snapshots" :clojars]]
+  :repositories [["clojars" {:url "https://clojars.org/repo"
+                             :sign-releases false}]]
   :dependencies [[org.clojure/clojure "1.11.2"]
                  [org.clojure/core.async "1.6.681"]
                  [clj-http "3.12.3"]
