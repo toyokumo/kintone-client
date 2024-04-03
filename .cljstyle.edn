@@ -11,5 +11,3 @@
          :types {:enabled? false}
          :namespaces {:indent-size 1}}
  :files {:ignore #{"out" "target"}}}
-
-;; vim: ft=clojure
