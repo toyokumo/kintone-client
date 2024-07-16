@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 0.6.2
+### Changed
+- Make `re-base-url` to public. ([#21](https://github.com/toyokumo/kintone-client/pull/21))
+
 ## 0.6.1
 ### Changed
 - Bump outdated dependencies. ([#20](https://github.com/toyokumo/kintone-client/pull/20))
