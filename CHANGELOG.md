@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+## 0.6.1
+### Changed
+- Bump outdated dependencies. ([#20](https://github.com/toyokumo/kintone-client/pull/20))
+
 ## 0.6.0
 ### Added
 - Add support App API ([#15](https://github.com/toyokumo/kintone-client/pull/15))
