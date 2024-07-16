@@ -38,7 +38,7 @@
             (str/join "|"))
        ")"))
 
-(def ^:private re-base-url
+(def re-base-url
   (re-pattern re-base-url*))
 
 (defn extract-base-url
