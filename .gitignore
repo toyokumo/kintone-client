@@ -14,4 +14,10 @@ pom.xml.asc
 .idea/
 dev-resources/config.edn
 .clj-kondo/.cache
+.calva
+.lsp
+.envrc
 /node_modules
+*.DS_Store
+*.iml
+CLAUDE.md
