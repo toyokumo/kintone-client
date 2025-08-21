@@ -36,7 +36,10 @@
                string
 
   :user-api-token - cybozu.com User API token.
-                    string"
+                    string
+
+  NOTE: :basic and :user-api-token cannot be used together as they both
+        set the Authorization header. Use one or the other."
   #?(:cljs
      ([]
       (->Auth nil nil nil nil)))
@@ -51,4 +54,6 @@
                      api-token)
          user-api-token (when (seq user-api-token)
                           user-api-token)]
+     (assert (not (and basic user-api-token))
+             "Basic authentication and User API token cannot be used together")
      (->Auth basic password api-token user-api-token))))

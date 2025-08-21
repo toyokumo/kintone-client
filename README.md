@@ -57,6 +57,9 @@ on kintone as customize script for kintone app or portal.
 
 ;; User API token (for cybozu.com User API)
 (auth/new-auth {:user-api-token "xyz..."})
+
+;; NOTE: Basic authentication and User API token cannot be used together
+;; as they both set the Authorization header. Use one or the other.
 ```
 
 ### Make `Connection` object

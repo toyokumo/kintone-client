@@ -28,4 +28,11 @@
                                         :password "barbar"}
                                 :password {:username "foofoo"
                                            :password "barbar"}
-                                :api-token "XXXYYYXXX"})))))
+                                :api-token "XXXYYYXXX"}))))
+
+  (is (= {"Authorization" "Bearer XXXYYYXXX"}
+         (pt/-header (new-auth {:user-api-token "XXXYYYXXX"}))))
+
+  (is (thrown? #?(:clj AssertionError :cljs js/Error)
+        (new-auth {:basic {:username "foofoo" :password "barbar"}
+                   :user-api-token "XXXYYYXXX"}))))
