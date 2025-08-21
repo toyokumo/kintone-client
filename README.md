@@ -54,6 +54,9 @@ on kintone as customize script for kintone app or portal.
 (auth/new-auth {:basic {:username "basic-username" :password "basic-password"}
                 :password {:username "login-name" :password "login-password"}
                 :api-token "xyz..."})
+
+;; User API token (for cybozu.com User API)
+(auth/new-auth {:user-api-token "xyz..."})
 ```
 
 ### Make `Connection` object

@@ -14,13 +14,14 @@
   #?(:clj (.encodeToString (Base64/getEncoder) (.getBytes s))
      :cljs (goog.base64/encodeString s)))
 
-(defrecord Auth [basic password api-token]
+(defrecord Auth [basic password api-token user-api-token]
   pt/IAuth
   (-header [_]
     (cond-> {}
       basic (assoc "Authorization" (str "Basic " basic))
       password (assoc "X-Cybozu-Authorization" password)
-      api-token (assoc "X-Cybozu-API-Token" api-token))))
+      api-token (assoc "X-Cybozu-API-Token" api-token)
+      user-api-token (assoc "Authorization" (str "Bearer " user-api-token)))))
 
 (defn new-auth
   "Make a new Auth object.
@@ -32,11 +33,14 @@
               {:username \"...\" :password \"...\"}
 
   :api-token - kintone app api token.
-               string"
+               string
+
+  :user-api-token - cybozu.com User API token.
+                    string"
   #?(:cljs
      ([]
-      (->Auth nil nil nil)))
-  ([{:keys [basic password api-token]}]
+      (->Auth nil nil nil nil)))
+  ([{:keys [basic password api-token user-api-token]}]
    (let [basic (when (and (seq (:username basic))
                           (seq (:password basic)))
                  (base64-encode (str (:username basic) ":" (:password basic))))
@@ -44,5 +48,7 @@
                              (seq (:password password)))
                     (base64-encode (str (:username password) ":" (:password password))))
          api-token (when (seq api-token)
-                     api-token)]
-     (->Auth basic password api-token))))
+                     api-token)
+         user-api-token (when (seq user-api-token)
+                          user-api-token)]
+     (->Auth basic password api-token user-api-token))))

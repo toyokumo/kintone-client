@@ -1,6 +1,8 @@
 # Change Log
 
 ## Unreleased
+### Added
+- Add support for User API token authentication with Bearer authorization header
 
 ## 0.6.2
 ### Changed
