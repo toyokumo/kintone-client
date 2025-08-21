@@ -1,8 +1,10 @@
 # Change Log
 
 ## Unreleased
+
+## 0.6.3
 ### Added
-- Add support for User API token authentication with Bearer authorization header
+- Add support for User API token authentication with Bearer authorization header. ([#23](https://github.com/toyokumo/kintone-client/pull/23))
 
 ## 0.6.2
 ### Changed
