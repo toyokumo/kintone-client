@@ -1,4 +1,4 @@
-(defproject toyokumo/kintone-client "0.6.2"
+(defproject toyokumo/kintone-client "0.6.3"
   :description "A kintone client for Clojure and ClojureScript"
   :url "https://github.com/toyokumo/kintone-client"
   :license {:name "Apache, Version 2.0"
